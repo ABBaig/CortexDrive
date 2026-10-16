@@ -11,10 +11,10 @@
 
 | Section | Contents |
 |---------|----------|
-| §1–§2 | Problem, impact, users, and solution overview |
-| §3 | Scope & release strategy (MVP cut and roadmap) |
-| §4–§7 | User journey, feature list, data model, technical approach |
-| §8 | Team, engineering methodology, risks, and success criteria |
+| 1–2 | Problem, impact, users, and solution overview |
+| 3 | Scope & release strategy (MVP cut and roadmap) |
+| 4–7 | User journey, feature list, data model, technical approach |
+| 8 | Team, engineering methodology, risks, and success criteria |
 
 ---
 
