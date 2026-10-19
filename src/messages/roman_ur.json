@@ -1,0 +1,14 @@
+{
+  "Home": {
+    "welcome": "CortexDrive mein khush amdeed",
+    "tagline": "Pakistan ke liye AI madad se chalti driving taleem aur instructor marketplace.",
+    "ctaLearner": "Learner ke tor par register karein",
+    "ctaInstructor": "Instructor ke tor par register karein"
+  },
+  "Common": {
+    "language": "Zaban",
+    "selectLanguage": "Zaban ka intikhab karein",
+    "loading": "Loading...",
+    "error": "Koi masla hua hai. Barah-e-karam baad mein koshish karein."
+  }
+}

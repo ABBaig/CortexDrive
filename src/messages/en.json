@@ -1,0 +1,14 @@
+{
+  "Home": {
+    "welcome": "Welcome to CortexDrive",
+    "tagline": "AI-assisted driving education and instructor marketplace for Pakistan.",
+    "ctaLearner": "Register as a Learner",
+    "ctaInstructor": "Register as an Instructor"
+  },
+  "Common": {
+    "language": "Language",
+    "selectLanguage": "Select Language",
+    "loading": "Loading...",
+    "error": "An error occurred. Please try again later."
+  }
+}
