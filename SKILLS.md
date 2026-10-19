@@ -1,80 +1,99 @@
-# SKILLS.md — CortexDrive Team Skill Matrix
+# SKILLS.md — CortexDrive
 
-> CortexDrive — AI-verified driving school + vehicle companion platform (Pakistan)
-> Stack: Next.js (App Router) · Tailwind CSS · Supabase (Auth, Postgres + RLS, Realtime, Storage, Edge Functions) · Google Gemini (gemini-1.5-flash) · Recharts · shadcn/ui
-> Status: 3-member team building via Devmarketplace AI builder (token-efficient mega-prompts)
-
----
-
-## 1. Required Project Skills (All Members)
-
-| Skill | Level Needed | Where It's Used |
-|---|---|---|
-| Next.js App Router (pages, layouts, route groups) | Working | Every module |
-| Tailwind CSS + shadcn/ui | Working | All UI, Dark Slate theme (#0f172a / #22d3ee / #10b981) |
-| Supabase JS SDK (client + server) | Working | Auth, DB, Storage, Realtime everywhere |
-| PostgreSQL + Row-Level Security (RLS) | Strong | 4-tier RBAC (learner/instructor/vendor/admin) — critical |
-| Git hygiene (own folders only, no cross-file conflicts) | Working | 3 accounts → 1 repo |
-| Mega-prompt writing (one command = one full module) | Working | Token economy on the AI builder |
-| i18n discipline (en / ur / roman_ur keys, no hardcoded strings) | Working | All user-facing UI |
+> **Project:** CortexDrive — AI-verified driving school + vehicle companion platform (Pakistan)
+> **Type:** Mobile-first responsive PWA (web app)
+> **Purpose:** A unified platform where learners verify identity via AI (CNIC/license OCR + face-match), book driving instructors, complete a guided license-progress journey, access a tutor chatbot, track driving behavior (harsh braking/acceleration, SOS alerts), manage an escrow wallet, and maintain a vehicle cost-companion logbook.
 
 ---
 
-## 2. Member Skill Profiles & Module Ownership
+## 1. Project Overview
 
-### Member 1 — Auth, Onboarding & Admin (Module A)
-**Owns:** `/modules/auth`, `/modules/admin`, repo docs, AGENTS.md/SPEC.md upkeep, Gig 1 publishing
+CortexDrive combines four domains into one product:
 
-- Supabase Auth: email/password signup, session refresh, **MFA/2FA (TOTP)** — the rubric's non-negotiable path starts here
-- Postgres **event trigger on `auth.users`** for atomic profile creation (server-side, chosen approach)
-- Route guarding (`RouteGuard`) + `guard_plus_hide` pattern for admin UI (RLS still enforces)
-- Admin dashboard shell: verification queue, SOS feed, bookings overview
-- Docs/writing: README, .env.example, gig packaging
+1. **AI identity verification** — document (CNIC/driving license) OCR and selfie face-match, scored server-side and persisted with audit status (`verified` / `needs_review`).
+2. **Driving school marketplace** — discover instructors by city/language/price, book lessons, chat in realtime, and pay through an escrow wallet (`topup → escrow_hold → payout/refund` with a platform fee).
+3. **Telematics & safety** — GPS-based trip sampling, harsh braking/acceleration event detection, SOS alert dispatch, and live location tracking.
+4. **Vehicle companion** — fuel, spare-part, and service expense logging with analytics dashboards.
 
-### Member 2 — AI Verification, Tutor & Telematics (Module B)
-**Owns:** `/modules/verification`, `supabase/functions/ai-verify`, tutor chatbot, trip telematics, Gig 2 publishing
-
-- **Gemini 1.5 Flash** multimodal calls (vision): CNIC / driving-license OCR → structured JSON extraction
-- Face-match scoring (selfie vs document photo) → threshold decisions (verified / needs_review)
-- Supabase **Edge Functions** (Deno): secure server-side GEMINI_API_KEY, CORS, error handling
-- Supabase Storage: document upload paths, signed URLs
-- Geolocation: **3s sampling**, harsh-event detection at **≥10 km/h delta** (store derived events only, latest pin for live tracking)
-- RLS policies on `verifications`, `license_progress`, `sos_alerts`
-
-### Member 3 — Marketplace, Wallet & Vehicle (Module C)
-**Owns:** `/modules/marketplace`, `/modules/wallet`, `/modules/vehicle`, seed data, theme polish
-
-- Marketplace UI: instructor/vendor cards, availability slots, booking flow (booked → completed → refunded)
-- **Escrow wallet logic**: topup → escrow_hold → payout/refund with 10% platform fee split — transaction ledger integrity (balance_after chain)
-- Realtime chat (Supabase Realtime) on bookings, GPS live-tracking map
-- `vehicle_logs` (fuel/spare_part/service) + **Recharts** spend analytics
-- `demo-data.sql` seeding with deterministic UUIDs (7 accounts, password `CortexDemo123`)
+The platform enforces **4-tier role-based access control** (learner, instructor, vendor, admin) at the database layer, is **trilingual** (English, Urdu, Roman Urdu), and uses a **Dark Slate / Electric Cyan / Emerald** themed, mobile-first UI.
 
 ---
 
-## 3. Skill-to-Rubric Mapping (M1–M6)
+## 2. Tech Stack
 
-| Rubric | Skills Required | Owner(s) |
-|---|---|---|
-| M1 — Core judge path (signup → 2FA → CNIC → Gemini OCR → persistence after re-login) | Supabase Auth + MFA, Edge Functions, Gemini vision, RLS | Member 1 + Member 2 (joint, build first) |
-| M2 — RBAC & data isolation | RLS policies, role claims, route guard + hide | Member 1 |
-| M3 — Marketplace & payments | Escrow transactions, booking state machine, Realtime | Member 3 |
-| M4 — Telematics & safety | Geolocation sampling, harsh-event detection, SOS alerts | Member 2 |
-| M5 — Vehicle companion & analytics | vehicle_logs CRUD, Recharts dashboards | Member 3 |
-| M6 — Gig publishing DURING build (≥2) | Gig packaging: title, description, stranger-friendly setup, 3 contributors credited | Member 1 (Gig 1, Day 1–2), Member 2 (Gig 2, Day 2–3) |
+| Layer | Technology |
+|---|---|
+| Framework | Next.js (App Router) |
+| Styling / UI | Tailwind CSS, shadcn/ui |
+| Auth | Supabase Auth (email/password, sessions, TOTP-based MFA/2FA) |
+| Database | Supabase PostgreSQL with Row-Level Security (RLS) |
+| Server compute | Supabase Edge Functions (Deno runtime) |
+| Realtime & Storage | Supabase Realtime, Supabase Storage |
+| AI / ML | Google Gemini API (`gemini-1.5-flash`, vision/multimodal) |
+| Charts | Recharts |
+| Internationalization | i18n keys (en / ur / roman_ur) |
 
 ---
 
-## 4. Cross-Team Working Agreements (Skills Applied)
+## 3. Required Skills
 
-1. **Build order:** Member 1 foundation (schema + auth trigger) → Members 2 & 3 in parallel.
-2. **Folder exclusivity:** each member touches only their owned folders; shared files changed only by Member 1.
-3. **Token economy:** one mega-prompt per module; fixes go back into the same builder thread.
-4. **Security baseline:** no secrets in repo — `.env.example` only; Gemini key lives only in Edge Function secrets.
-5. **RLS is the enforcement layer**; the UI only hides/redirects. Never trust client-side role checks for security.
-6. **Demo readiness:** all demo flows must work with the seeded accounts at any time (deterministic UUIDs, `CortexDemo123`).
+### 3.1 Frontend Engineering
+- **Next.js App Router** — route groups, layouts, protected-route guards, server vs. client components
+- **Tailwind CSS + shadcn/ui** — responsive mobile-first design, dark theme system, reusable component composition
+- **Progressive Web App (PWA)** basics — installable, mobile-first behavior
+- **Internationalization (i18n)** — key-based translations across three languages; no hardcoded user-facing strings
+
+### 3.2 Backend & Database Engineering
+- **PostgreSQL data modeling** — users, verifications, license_progress, bookings, wallets, transactions, sos_alerts, vehicle_logs
+- **Row-Level Security (RLS)** — 4-tier role policies so every row is isolated by role and owner; RLS is the *enforcement* layer, UI only hides
+- **Supabase Auth** — signup, session management, TOTP MFA/2FA enrollment and challenge flows
+- **Database triggers** — server-side profile creation on user signup (atomic, race-free)
+- **Transaction-ledger integrity** — escrow wallet state machine (`topup → escrow_hold → payout/refund`), platform-fee splitting, consistent balance chains
+
+### 3.3 AI / Multimodal Engineering
+- **Gemini 1.5 Flash vision API** — image input (CNIC/license photos, selfies), structured JSON output for OCR extraction
+- **Face-match scoring** — comparing selfie vs. document photo with a decision threshold (`verified` / `needs_review`)
+- **Prompt engineering** — deterministic, structured extraction prompts for identity documents
+- **Edge Function (Deno) integration** — calling Gemini securely server-side, API key management via function secrets, CORS and error handling
+
+### 3.4 Realtime & Geolocation
+- **Supabase Realtime** — live chat on bookings, live location broadcasting
+- **Browser Geolocation API** — periodic position sampling (3s interval), speed-delta computation
+- **Telematics event logic** — harsh braking/acceleration flagged at ≥10 km/h change between samples; storing derived events, not raw GPS trails
+
+### 3.5 Data Visualization
+- **Recharts** — vehicle expense dashboards, spend breakdowns, license-progress completion visuals
+
+### 3.6 Product & Domain Skills
+- **Driving-school domain understanding** — license-progress stage mapping, instructor availability/slot booking, lesson lifecycle (`booked → completed → refunded`)
+- **Payments/escrow concepts** — hold, release, refund, fee-split flows
+- **Pakistan-market localization** — CNIC document format awareness, city/language data, trilingual UX
+
+### 3.7 Security & DevOps
+- **Secrets hygiene** — API keys only in Edge Function secrets / `.env` (never in repo); `.env.example` pattern
+- **Auth-first UX** — route guards + role-based UI hiding layered *on top of* RLS
+- **Demo/seeding discipline** — deterministic seed data for reproducible demos
+- **Git workflow** — scoped commits, avoiding cross-folder conflicts in a shared repository
+
 ---
 
-no
+## 4. Skill Categories Summary
+
+| Category | Key Skills |
+|---|---|
+| Frontend | Next.js App Router, Tailwind, shadcn/ui, PWA, i18n |
+| Backend | PostgreSQL, RLS policies, triggers, Supabase Auth + MFA |
+| AI/ML | Gemini 1.5 Flash vision, OCR extraction, face-match scoring |
+| Realtime/Geo | Supabase Realtime, Geolocation API, telematics thresholds |
+| Payments | Escrow state machine, ledger integrity, fee splitting |
+| Data Viz | Recharts dashboards |
+| Security | Secrets management, RLS-enforced RBAC, route guarding |
+| Domain | Driving school operations, CNIC verification, Pakistani localization |
+
 ---
-yes
+
+## 5. Definition of "Done" for Any Feature
+
+- Works end-to-end for the demo path: signup → 2FA → CNIC upload
+
+```
