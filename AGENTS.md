@@ -1,359 +1,126 @@
 # AGENTS.md — CortexDrive AI Assistant Guide
 
-This AGENTS.md guides AI coding assistants working on the CortexDrive repository. It adapts the agentsmd base guidance to CortexDrive's conventions, development commands, architecture notes, and security safeguards. Use this file as the single source of truth for how an assistant should modify, test, and reason about the codebase.
+This AGENTS.md is the authoritative guide for AI coding assistants working on the CortexDrive repository. It outlines the project context, stack, conventions, safety rules, and folder ownership so all future builds and edits follow the same constraints.
 
-Important: Keep this file prose-first with fenced code blocks for commands, SQL/RLS examples, and env key examples. Do not add YAML/JSON frontmatter.
-
----
-
-## Table of contents
-
-- Purpose
-- Quick start (developer commands)
-- Project structure and stack
-- Coding conventions & formatting
-- Auth, wallets, sensitive data — safeguards
-- Database and RLS policies (examples)
-- Realtime SOS and admin monitoring notes
-- Gemini (LLM) integration guidance
-- Seeds, migrations, and supabase folder
-- Testing, linting, and CI
-- Deployment & secrets handling
-- Troubleshooting and agent safety checks
-
----
+Project: CortexDrive — AI-verified driving school + vehicle companion platform (Pakistan)
 
 Purpose
-
-This file instructs AI assistants how to safely and productively work on CortexDrive:
-- Prefer small focused edits and tests.
-- Never add secrets or service-role keys to the repo.
-- Use Supabase Auth as the source of truth for user identity; perform DB actions as the signed-in user where possible.
-
+- Provide clear, machine- and human-readable rules so assistants make safe, consistent changes.
+- Enforce the stack, theme, folder ownership, RLS-first security model, i18n rules, and DB table reuse from SPEC.md.
 
 Quick start (developer commands)
 
-Use these commands locally in development. Use npm/yarn/pnpm consistently with the repo lockfile.
-
 ```bash
-# install deps
 npm install
-
-# dev server (Next.js app at repo root)
 npm run dev
-
-# lint & format
 npm run lint
 npm run typecheck
-
-# run tests (light smoke tests)
 npm run test
-
-# build for production (only outside interactive agent sessions)
-npm run build
 ```
 
-Project structure and stack
-
-- Language: TypeScript (strict mode) — prefer .ts/.tsx for all new code.
+Stack & architecture
+- Language: TypeScript (strict mode). No JavaScript files for new code.
 - Framework: Next.js (App Router) at repository root.
-- DB: Supabase (Postgres); use @supabase/supabase-js ~2.109.0 in browser and server code.
-- UI: Tailwind CSS; theme tokens use CSS variables for dark-slate / electric-cyan / emerald.
-- Component library: shadcn/ui as base; co-locate component styles in the component folder.
-- State: Server state via Supabase client (React Query); minimal client state with Zustand only where required.
-- LLM: Gemini via @google/generative-ai SDK calls isolated in /lib/gemini; system prompts versioned files in /lib/gemini/prompts.
+- Database: Supabase (Postgres). Use @supabase/supabase-js for client and server. RLS is authoritative for RBAC.
+- Edge Functions: Supabase Edge Functions live in /supabase/functions for server-only privileged logic (e.g. wallet ledger operations).
+- UI: Tailwind CSS + shadcn/ui. Theme tokens use CSS variables (see Theme section). Never use raw hex values in components; use tokens.
+- LLM: Google Gemini via @google/generative-ai. All AI calls through /lib/gemini; system prompts stored in /lib/gemini/prompts and versioned.
+- State: Server state via Supabase client + React Query. Use Zustand only for small client UI state.
+- i18n: next-intl with locales at /locales (en.json, ur.json, roman_ur.json). No hardcoded visible strings in JSX — use translation keys.
+- Styling: mobile-first PWA. Use Tailwind utilities that reference CSS variables for theme colors.
+- Testing: ESLint + light E2E smoke tests (login, booking flow, wallet balance).
+- Hosting: Vercel for Next.js, Supabase Cloud for DB and Edge Functions.
 
-Recommended top-level layout (canonical):
+Theme tokens (must be used as CSS variables in tailwind.config)
+- --cd-bg: dark slate background (Hex: #0f172a) — use token, not hex directly
+- --cd-primary: electric cyan (Hex: #22d3ee)
+- --cd-success: emerald green (Hex: #10b981)
+
+Component library & styling rules
+- Use shadcn/ui as the base component set. Prefer existing components before adding new ones.
+- Co-locate component styles (if any) inside the component folder.
+- Do not hardcode visible strings inside JSX; use next-intl translation keys.
+- Keep components small (< ~200 lines), export a single main thing per file.
+
+Gemini & prompts
+- All Gemini logic goes under /lib/gemini. Create a small adapter around @google/generative-ai.
+- Load the Gemini key from process.env (e.g. GOOGLE_API_KEY). Fail gracefully with a clear message if missing.
+- System prompts must live in /lib/gemini/prompts/v1/*.txt and be versioned. A prompt manifest (JSON) may live next to prompts.
+- Use server-side calls (Edge Function or server route) for OCR, face-match, tutor chat, quiz generation — never call Gemini directly from client-side code.
+
+Supabase & DB rules
+- Use /supabase/migrations for SQL migrations. All migrations must be idempotent (create if not exists) and include RLS policies.
+- Seeds go in /supabase/seed and must create: one learner, one instructor, one vendor, one super admin, sample bookings, wallet transactions, fuel logs, and one sos alert.
+- Reuse table and column names from SPEC.md section 6 exactly. Do not rename or invent tables.
+- RBAC must be enforced using Row-Level Security (RLS) only. UI must never attempt to enforce RBAC in place of RLS.
+- Supabase client usage rules:
+  - Client-side code: use the public anon key (NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY).
+  - Server-side / Edge Functions: read SUPABASE_SERVICE_ROLE_KEY from process.env; never commit it.
+- Wallet ledger logic (escrow, fee split, payout, refund) must be implemented as Supabase Edge Functions under /supabase/functions. Client code must never write directly to wallets/transactions tables.
+
+Security & secrets
+- Never commit secrets or service role keys. Add any required secrets in the workspace Secrets panel or the Vercel dashboard.
+- Add a .env.example at the repo root listing required env vars (empty values + one-line comment). Do NOT commit .env.local.
+
+i18n rules
+- Use next-intl. Add translations to /locales/en.json, /locales/ur.json, /locales/roman_ur.json.
+- All visible UI copy must use translation keys via next-intl hooks or components.
+
+Folder ownership and allowed touch areas
+- Assistants must respect module ownership. For a given task only modify files inside the module folders listed below unless the task explicitly requires touching shared infra files (lib/, supabase/, app/):
+  - /modules/auth
+  - /modules/verification
+  - /modules/marketplace
+  - /modules/wallet
+  - /modules/vehicle
+  - /modules/safety
+  - /modules/admin
+- Shared infra (lib/, supabase/, app/, locales/, styles/) may be modified when implementing cross-cutting features, but document changes in PR description.
+
+Onboarding & roles
+- Implement a 4-step onboarding wizard for roles: learner, instructor, vendor, admin. Store role in profiles table and in auth.user_metadata when appropriate.
+
+SOS & realtime
+- SOS alerts are a realtime feed (sos_alerts table) to super admin dashboards only. Use Supabase Realtime for v1.0.
+- Do not implement push notifications or emergency contacts in v1.0.
+
+Payments & ledger
+- Payments: sandbox/stub gateway for v1.0.
+- Wallet ledger: implement real ledger behavior in Edge Functions with idempotency, audit columns (created_by, created_at), and deterministic fee split (10% platform, 90% instructor).
+
+Tests & CI
+- Add ESLint + TypeScript checks. Provide a few Playwright/Cypress smoke tests covering login, booking a lesson, and a wallet balance check.
+
+Migrations & seeds
+- Add initial migration at supabase/migrations/0001_init.sql defining core tables and RLS (profiles, instructor_profiles, vendor_profiles, services, bookings, wallets, transactions, verifications, documents, sos_alerts, fuel_logs, service_records, reviews, disputes).
+- Add seeds under supabase/seed that populate demo data (learner, instructor, vendor, admin, bookings, wallet txns, fuel logs, sos alert).
+
+Development safety checklist for PRs touching sensitive areas
+- Run lint and typecheck
+- Add migration and call database_schema() before apply_migration
+- Ensure RLS policies reference auth.uid() and cover new tables
+- Add an E2E smoke test exercising the primary user flow
+- Never expose SUPABASE_SERVICE_ROLE_KEY or other secrets in code or logs
+
+.env.example (must be present at repo root)
 
 ```
-/ (repo root)
-├─ app/                 # Next.js app router
-├─ pages/               # optional compatibility pages
-├─ supabase/            # migrations, functions, seed data
-│  ├─ migrations/
-│  ├─ functions/
-│  └─ seed/
-├─ lib/                 # shared helpers (supabase client, gemini wrapper)
-├─ components/          # React components (co-located styles)
-├─ styles/              # tailwind, global styles
-├─ locales/             # next-intl translations: en, ur, roman_ur
-├─ tests/               # e2e smoke tests
-├─ README.md
-└─ AGENTS.md
+NEXT_PUBLIC_SUPABASE_URL=    # public Supabase URL for client
+NEXT_PUBLIC_SUPABASE_ANON_KEY=    # public anon key for client
+SUPABASE_URL=    # server Supabase URL
+SUPABASE_SERVICE_ROLE_KEY=    # server-only service role key (DO NOT COMMIT)
+GOOGLE_API_KEY=    # Gemini / Generative AI key (server-side).
+NEXT_PUBLIC_GA_MEASUREMENT_ID=    # optional Google Analytics measurement id
 ```
 
-Coding conventions & formatting
-
-- Prefer functional React components and hooks.
-- Keep files small (<~200 lines) and export a single main thing.
-- TypeScript strict: type all public function inputs/outputs; prefer narrow types and discriminated unions for domain models.
-- Co-locate CSS modules or component styles in the same folder as the component.
-- Use next-intl for all UI strings — do not hardcode visible strings in JSX.
-- Use conventional commits for commit messages: feat/, fix/, docs/, chore/, refactor/, perf/.
-
-Example git workflow (agents should follow):
-
-```bash
-# create a feature branch
-git checkout -b feat/describe-feature
-# make small commits using conventional prefixes
-git commit -m "feat(user): add phone-based 2FA toggle"
-# push branch
-git push --set-upstream origin feat/describe-feature
-```
-
-Auth, wallets, sensitive data — safeguards
-
-As an assistant you must enforce safeguards when touching auth, wallet, documents, or SOS features.
-
-- Never log or commit secrets (API keys, service role keys). The SUPABASE_SERVICE_ROLE_KEY is never stored in the repo.
-- All per-user data should use Supabase Auth's auth.uid() and RLS. Don't perform privileged DB actions using a service key in code that could be dropped into the browser.
-- When writing server code that must run with elevated privileges (Edge Functions, server-only scripts), read SUPABASE_SERVICE_ROLE_KEY from process.env and do not print it. Note: the preview environment does not expose the service role key.
-- Wallet transactions and ledger updates must require explicit review: add idempotency tokens, audit columns (created_by, created_at), and tests that simulate concurrent operations.
-- Mark sensitive documents (e.g. ID scans) with explicit access policies and audit logs. Never return full document contents to unprivileged users.
-
-Database and RLS policies (examples)
-
-Always call database_schema before creating migrations. Apply changes through supabase migrations with apply_migration.
-
-Example RLS snippets you may include in migrations. These are examples — adapt column names to actual schema.
-
-```sql
--- Make per-user table
-create table if not exists wallets (
-  id uuid primary key default gen_random_uuid(),
-  user_id uuid references auth.users default auth.uid(),
-  balance numeric not null default 0,
-  metadata jsonb,
-  created_at timestamptz default now()
-);
-
-alter table wallets enable row level security;
-
--- allow users to select and insert their own wallet
-create policy "wallets_select_by_owner" on wallets
-  for select using (user_id = auth.uid());
-
-create policy "wallets_insert_by_owner" on wallets
-  for insert with check (user_id = auth.uid());
-
--- admins (identified by a role column in users or a custom claim)
-create policy "wallets_admin_full" on wallets
-  for all using (exists (select 1 from auth.users where id = auth.uid() and raw_user_meta_data->>'role' = 'admin'));
-```
-
-Recommended RLS patterns
-
-- For per-user resources (wallets, documents, bookings): add `user_id uuid references auth.users default auth.uid()` and RLS policies using auth.uid() = user_id.
-- For cross-user resources (bookings): allow SELECT for related parties (booking.user_id = auth.uid() OR booking.vendor_id = auth.uid()).
-- For admin dashboards: restrict access to users with a role='admin' claim stored in auth.user_metadata, and check in both DB policies and server routes.
-
-Realtime SOS and admin monitoring notes
-
-- v1.0: SOS alerts are a realtime feed to admin dashboards only. Do not implement push notifications yet.
-- Store sos_events with strict RLS: only the creating user (and admins) may insert; only admins may select all events; users may select their own events.
-
-Example sos_events RLS example:
-
-```sql
-create table if not exists sos_events (
-  id uuid primary key default gen_random_uuid(),
-  user_id uuid references auth.users default auth.uid(),
-  location jsonb,
-  message text,
-  severity text,
-  created_at timestamptz default now()
-);
-
-alter table sos_events enable row level security;
-
-create policy "sos_insert_owner" on sos_events
-  for insert with check (user_id = auth.uid());
-
-create policy "sos_select_owner" on sos_events
-  for select using (user_id = auth.uid());
-
-create policy "sos_admin_select_all" on sos_events
-  for select using (exists (select 1 from auth.users where id = auth.uid() and raw_user_meta_data->>'role' = 'admin'));
-```
-
-Gemini (LLM) integration guidance
-
-- All Gemini calls must be isolated under /lib/gemini. Implement a small adapter around @google/generative-ai that:
-  - loads the API key from process.env (do not commit the key),
-  - validates presence and fails gracefully with a clear message if missing,
-  - reads system prompts from versioned files under /lib/gemini/prompts/v1/*.txt,
-  - supports deterministic mode toggles and rate limits.
-- Keep prompt engineering files small and versioned. Store model/temperature settings next to each prompt file in a small JSON manifest (not as secrets).
-
-Seeds, migrations, and supabase folder
-
-- All DB schema changes must be applied via supabase/migrations SQL files and use apply_migration in this workspace when editing the schema.
-- Include an initial migration with core tables and RLS policies (supabase/migrations/0001_init.sql). The migration must be idempotent (create table if not exists, create policy if not exists where supported).
-- Provide seed/demo data in supabase/seed/ that creates one learner, one instructor, one vendor, one admin, sample bookings, wallet transactions, and fuel logs.
-- Do not commit real emails/passwords; seeds should use example addresses and clearly document how to replace them with real accounts in .env.local or the Supabase dashboard.
-
-Testing, linting, and CI
-
-- Provide ESLint and TypeScript checks. Keep tests light: a few E2E smoke tests for auth, a booking flow, and a wallet transaction.
-- Avoid heavyweight unit test suites in v1.0. Use Playwright or Cypress for basic E2E smoke tests if already present in the repo.
-
-Deployment & secrets handling
-
-- Deploy to Vercel. Environment variables for the browser client should use VITE_/NEXT_PUBLIC_ prefixes where needed. Server-only secrets (SUPABASE_SERVICE_ROLE_KEY) must be set only in the Vercel dashboard and never in the repo.
-- Add a .env.example at the repo root listing the env names (empty values) and a one-line comment for each. Do not commit .env.local.
-
-Example .env keys (show in examples only):
-
-```text
-VITE_SUPABASE_URL=   # public supabase url for client
-VITE_SUPABASE_ANON_KEY=   # public anon key for client
-SUPABASE_URL=   # server supabase URL
-SUPABASE_ANON_KEY=   # server anon key (if used server-side)
-SUPABASE_SERVICE_ROLE_KEY=   # DO NOT COMMIT: service role key for server-only scripts
-GOOGLE_API_KEY=   # Gemini/Generative AI key (server-side)
-```
-
-Troubleshooting and agent safety checks
-
-Before submitting any PR that touches auth, wallet, RLS, or SOS logic, an assistant should:
-
-1. Run `npm run lint` and `npm run typecheck` locally.
-2. Add or update a migration and run database_schema() to confirm current schema. Use apply_migration to modify the schema.
-3. Ensure every change that affects per-user data is covered by an RLS policy that uses auth.uid().
-4. Add an integration or E2E smoke test that runs against a seeded local Supabase (or the provided preview) demonstrating the happy path.
-5. Avoid long-running production build steps inside an interactive session; use `npm run dev` instead.
-
-Example PR checklist (for human reviewers)
-
-- [ ] Lint and typecheck pass
-- [ ] No secrets in diffs
-- [ ] Migrations added via supabase/migrations and reviewed
-- [ ] RLS policies present and sensible for new tables
-- [ ] Seed data included for demo accounts if applicable
-- [ ] E2E smoke test coverage for the primary flow
-
----
-
-Appendix — Example SQL snippets for common tables
-
-Users (note: Supabase provides auth.users; store app metadata in a separate profile table):
-
-```sql
-create table if not exists profiles (
-  id uuid primary key references auth.users on delete cascade,
-  display_name text,
-  role text default 'learner', -- 'learner','instructor','vendor','admin'
-  phone text,
-  created_at timestamptz default now()
-);
-
-alter table profiles enable row level security;
-
-create policy "profiles_select_own" on profiles
-  for select using (id = auth.uid());
-
-create policy "profiles_update_own" on profiles
-  for update using (id = auth.uid()) with check (id = auth.uid());
-
-create policy "profiles_admin" on profiles
-  for all using (exists (select 1 from auth.users where id = auth.uid() and raw_user_meta_data->>'role' = 'admin'));
-```
-
-Wallets (ledger design hints)
-
-```sql
-create table if not exists wallet_ledgers (
-  id uuid primary key default gen_random_uuid(),
-  user_id uuid references auth.users default auth.uid(),
-  amount numeric not null,
-  balance_after numeric not null,
-  type text not null, -- credit, debit, fee, refund
-  reference text,
-  metadata jsonb,
-  created_at timestamptz default now()
-);
-
-alter table wallet_ledgers enable row level security;
-
-create policy "wallet_ledgers_insert_owner" on wallet_ledgers
-  for insert with check (user_id = auth.uid());
-
-create policy "wallet_ledgers_select_owner" on wallet_ledgers
-  for select using (user_id = auth.uid());
-```
-
-Documents (sensitive)
-
-```sql
-create table if not exists documents (
-  id uuid primary key default gen_random_uuid(),
-  user_id uuid references auth.users default auth.uid(),
-  type text,
-  file_bucket text,
-  file_path text,
-  verified boolean default false,
-  created_at timestamptz default now()
-);
-
-alter table documents enable row level security;
-
-create policy "documents_insert_owner" on documents
-  for insert with check (user_id = auth.uid());
-
-create policy "documents_select_owner" on documents
-  for select using (user_id = auth.uid());
-
-create policy "documents_admin_verify" on documents
-  for update using (exists (select 1 from auth.users where id = auth.uid() and raw_user_meta_data->>'role' = 'admin')) with check (true);
-```
-
-Finish notes
-
-- Always call database_schema() before writing migrations.
-- Apply migrations via apply_migration so the preview environment records changes.
-- This AGENTS.md is the canonical guide for assistants — keep it updated as the project evolves.
-
-
-
-This repository contains a Next.js application located in the root of this repository. When
-working on the project interactively with an agent (e.g. the Codex CLI) please follow
-the guidelines below so that the development experience â€“ in particular Hot Module
-Replacement (HMR) â€“ continues to work smoothly.
-
-## 1. Use the Development Server, **not** `npm run build`
-
-* **Always use `npm run dev` (or `pnpm dev`, `yarn dev`, etc.)** while iterating on the
-  application.  This starts Next.js in development mode with hot-reload enabled.
-* **Do _not_ run `npm run build` inside the agent session.**  Running the production
-  build command switches the `.next` folder to production assets which disables hot
-  reload and can leave the development server in an inconsistent state.  If a
-  production build is required, do it outside of the interactive agent workflow.
-
-## 2. Keep Dependencies in Sync
-
-If you add or update dependencies remember to:
-
-1. Update the appropriate lockfile (`package-lock.json`, `pnpm-lock.yaml`, `yarn.lock`).
-2. Re-start the development server so that Next.js picks up the changes.
-
-## 3. Coding Conventions
-
-* Prefer TypeScript (`.tsx`/`.ts`) for new components and utilities.
-* Co-locate component-specific styles in the same folder as the component when
-  practical.
-
-## 4. Useful Commands Recap
-
-| Command            | Purpose                                            |
-| ------------------ | -------------------------------------------------- |
-| `npm run dev`      | Start the Next.js dev server with HMR.             |
-| `npm run lint`     | Run ESLint checks.                                 |
-| `npm run test`     | Execute the test suite (if present).               |
-| `npm run build`    | **Production build â€“ _do not run during agent sessions_** |
-
----
-
-Following these practices ensures that the agent-assisted development workflow stays
-fast and dependable.  When in doubt, restart the dev server rather than running the
-production build.
+Rules for assistants
+- AGENTS.md is authoritative: follow it for stack, theme, roles, i18n, DB table reuse, RLS, folder ownership and rules.
+- Make small focused edits and prefer editing existing files. Read files you will modify before changing them.
+- Do not add secrets or .env.local files. Fail gracefully when a required secret is missing.
+- Use conventional commits for commit messages and create feature branches like feat/wallet.
+
+Where to get help
+- Consult SPEC.md for table names and domain rules.
+- Ask a human reviewer for changes that affect RLS, wallets, or billing logic.
+
+This AGENTS.md must be kept up-to-date as project requirements evolve. All future builds and assistant actions should use this file as the single source of behavior and safety rules.
