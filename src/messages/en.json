@@ -1,0 +1,19 @@
+
+{
+  "Home": {
+    "title": "CortexDrive",
+    "subtitle": "Your Smart Driving Journey Starts Here",
+    "welcome": "Welcome to CortexDrive",
+    "tagline": "AI-assisted driving education and instructor marketplace for Pakistan.",
+    "ctaPrimary": "Find an Instructor",
+    "ctaSecondary": "Become an Instructor",
+    "ctaLearner": "Register as a Learner",
+    "ctaInstructor": "Register as an Instructor"
+  },
+  "Common": {
+    "language": "Language",
+    "selectLanguage": "Select Language",
+    "loading": "Loading...",
+    "error": "An error occurred. Please try again later."
+  }
+}
