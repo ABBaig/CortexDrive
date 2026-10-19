@@ -13,6 +13,9 @@ const locales = [
 export function LanguageSelector() {
   const router = useRouter();
   const pathname = usePathname() || '/en';
+  // normalize pathname to ensure it starts with a locale
+  // if user lands on root it will be redirected by middleware to /en
+
   const searchParams = useSearchParams();
   const t = useTranslations('Common');
 

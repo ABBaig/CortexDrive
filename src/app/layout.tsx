@@ -1,34 +1,16 @@
 import './globals.css';
 import { ReactNode } from 'react';
-import { NextIntlClientProvider } from 'next-intl';
-import { notFound } from 'next/navigation';
 
 export const metadata = {
   title: 'CortexDrive',
   description: 'AI-assisted driving education and instructor marketplace in Pakistan',
 };
 
-export default async function RootLayout({
-  children,
-  params,
-}: {
-  children: ReactNode;
-  params: { locale: string };
-}) {
-  let messages;
-  try {
-    messages = (await import(`../messages/${params.locale}.json`)).default;
-  } catch {
-    notFound();
-  }
-
+// Root layout for paths without a locale segment. Middleware redirects users to /en by default.
+export default function RootLayout({ children }: { children: ReactNode }) {
   return (
-    <html lang={params.locale} dir={params.locale === 'ur' ? 'rtl' : 'ltr'}>
-      <body>
-        <NextIntlClientProvider locale={params.locale} messages={messages}>
-          {children}
-        </NextIntlClientProvider>
-      </body>
+    <html lang="en" dir="ltr">
+      <body>{children}</body>
     </html>
   );
 }
