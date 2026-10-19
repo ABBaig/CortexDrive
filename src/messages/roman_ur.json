@@ -1,7 +1,11 @@
 {
   "Home": {
+    "title": "CortexDrive",
+    "subtitle": "Aap Ka Smart Driving Safar Yahan Se Shuru Hota Hai",
     "welcome": "CortexDrive mein khush amdeed",
-    "tagline": "Pakistan ke liye AI madad se chalti driving taleem aur instructor marketplace.",
+    "tagline": "Pakistan ke liye AI ki madad se driving taleem aur instructor marketplace.",
+    "ctaPrimary": "Instructor Talash Karein",
+    "ctaSecondary": "Instructor Banein",
     "ctaLearner": "Learner ke tor par register karein",
     "ctaInstructor": "Instructor ke tor par register karein"
   },
