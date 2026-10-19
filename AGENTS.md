@@ -4,6 +4,8 @@ This AGENTS.md is the authoritative guide for AI coding assistants working on th
 
 Project: CortexDrive — AI-verified driving school + vehicle companion platform (Pakistan)
 
+Context: CortexDrive — enforce stack: Next.js (App Router) + TypeScript (strict), Tailwind CSS + shadcn/ui, Supabase (Auth, Postgres+RLS, Realtime, Storage, Edge Functions), Google Gemini (@google/generative-ai). Theme tokens and role-based onboarding are required. See SPEC.md for exact table names and columns.
+
 Purpose
 - Provide clear, machine- and human-readable rules so assistants make safe, consistent changes.
 - Enforce the stack, theme, folder ownership, RLS-first security model, i18n rules, and DB table reuse from SPEC.md.
