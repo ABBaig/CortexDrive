@@ -1,0 +1,16 @@
+{
+  "auth": {
+    "signup": "Sign up",
+    "signin": "Sign in",
+    "email": "Email",
+    "password": "Password",
+    "phone": "Phone number",
+    "role": "Role",
+    "next": "Next",
+    "finish": "Finish",
+    "enable_2fa": "Enable two-factor authentication",
+    "verify_2fa": "Verify 2FA code",
+    "qr_instruction": "Scan this QR in your authenticator app and enter the code",
+    "signout": "Sign out"
+  }
+}
