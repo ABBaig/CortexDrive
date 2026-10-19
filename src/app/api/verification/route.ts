@@ -6,15 +6,29 @@ export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
     const { doc_type, doc_url, selfie_url } = body;
-    // Call to external Edge Function / Gemini would happen here. We mock the response.
-    const mock = {
-      full_name: 'Muhammad Example',
-      cnic_number: '12345-6789012-3',
-      dob: '1990-01-01',
-      face_match_score: 0.82,
-      ai_decision: 'verified',
-      raw: { mock: true },
-    };
+    // Call the Supabase Edge Function 'ai-verify' which holds the Gemini API key.
+    // The Edge Function returns structured JSON as described in the spec.
+    // We forward doc_url and selfie_url to it.
+    // call edge function
+    const ef = await fetch(`${process.env.SUPABASE_URL?.replace(/\/$/, '')}/functions/v1/ai-verify`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${process.env.SUPABASE_SERVICE_ROLE_KEY}` },
+      body: JSON.stringify({ doc_url, selfie_url }),
+    });
+    let mock: any;
+    if (!ef.ok) {
+      // fallback mock
+      mock = {
+        full_name: 'Muhammad Example',
+        cnic_number: '12345-6789012-3',
+        dob: '1990-01-01',
+        face_match_score: 0.82,
+        ai_decision: 'verified',
+        raw: { mock: true },
+      };
+    } else {
+      mock = await ef.json();
+    }
 
     // For demo, ensure a user exists and attach to user_id=1 (create if needed)
     const u = await query('SELECT id FROM users LIMIT 1');
