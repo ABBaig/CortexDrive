@@ -20,3 +20,9 @@ Notes
 - Seeds are in supabase/seed (not yet created in this commit).
 
 Live URL: (placeholder)
+
+
+### Database migration note
+
+A migration to add marketplace tables (ratings, availability_slots, messages, gps_locations) and hourly_rate on users was created but is held for approval in the Database panel and has NOT run. The app code expects those tables once the migration is applied.
+Marketplace module: added migrations held for approval. To apply DB changes, approve the migration in the Database panel.
