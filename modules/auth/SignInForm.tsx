@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from 'react';
-import { createBrowserSupabaseClient } from '../../lib/supabase/client';
+import { createBrowserClient as createBrowserSupabaseClient } from '../..//lib/supabase/client';
 import { useRouter } from 'next/navigation';
 
 export default function SignInForm() {

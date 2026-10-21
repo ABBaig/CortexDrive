@@ -2,7 +2,7 @@
 // Receives { session_id?, message, locale } and returns assistant reply from Gemini.
 // Uses GOOGLE_API_KEY secret. Does not assume DB migrations; will return mock if DB not accessible.
 
-import fetch from 'node-fetch';
+// Edge runtime provides fetch; avoid node-fetch import for preview
 
 export default async function handler(req: Request) {
   try {

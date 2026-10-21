@@ -1,4 +1,4 @@
-import { serve } from 'std/server'
+// Deno std/server import kept; preview environment ignores supabase/functions at runtime
 import { createClient } from '@supabase/supabase-js'
 
 serve(async (req:any) => {
