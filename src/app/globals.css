@@ -3,56 +3,27 @@
 @tailwind utilities;
 
 :root {
-  --color-dark-slate: #0B1220;
-  --color-elevated-slate: #172235;
-  --color-electric-cyan: #06B6D4;
-  --color-emerald: #10B981;
-  --color-neutral-text: #F8FAFC;
-  --color-muted-text: #94A3B8;
+  --cd-bg: #0f172a; /* dark-slate */
+  --cd-primary: #22d3ee; /* electric-cyan */
+  --cd-success: #10b981; /* emerald */
+  --cd-muted: #94A3B8;
 
   --font-body: 'Inter', sans-serif;
   --font-urdu: 'Noto Nastaliq Urdu', serif;
 }
 
 html {
-  background-color: var(--color-dark-slate);
-  color: var(--color-neutral-text);
+  background-color: var(--cd-bg);
+  color: #F8FAFC;
   font-family: var(--font-body);
   scroll-behavior: smooth;
 }
 
-html[dir='rtl'] {
-  direction: rtl;
-  font-family: var(--font-urdu);
-}
+body { margin: 0; min-height: 100vh; }
 
-body {
-  margin: 0;
-  min-height: 100vh;
-}
+.bg-dark-slate { background-color: var(--cd-bg); }
+.bg-electric-cyan { background-color: var(--cd-primary); }
+.text-muted { color: var(--cd-muted); }
 
-.btn-primary {
-  background-color: var(--color-electric-cyan);
-  color: var(--color-dark-slate);
-  padding: 0.5rem 1.5rem;
-  border-radius: 9999px;
-  font-weight: 700;
-  transition: background-color 0.2s ease-in-out;
-}
-
-.btn-primary:hover {
-  background-color: #0aa4bb;
-}
-
-.btn-secondary {
-  background-color: var(--color-emerald);
-  color: var(--color-dark-slate);
-  padding: 0.5rem 1.5rem;
-  border-radius: 9999px;
-  font-weight: 700;
-  transition: background-color 0.2s ease-in-out;
-}
-
-.btn-secondary:hover {
-  background-color: #0e8f6a;
-}
+.btn-primary { @apply px-6 py-2 rounded-full font-bold; background-color: var(--cd-primary); color: var(--cd-bg); }
+.btn-secondary { @apply px-6 py-2 rounded-full font-bold; background-color: var(--cd-success); color: var(--cd-bg); }

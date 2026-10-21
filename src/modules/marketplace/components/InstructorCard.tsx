@@ -1,6 +1,6 @@
 import React from 'react';
 import Link from 'next/link';
-import { Database } from '../../../types/supabase';
+import type Database from '@/types/database';
 
 export default function InstructorCard({ profile }: { profile: Database['public']['Tables']['profiles']['Row'] }) {
   const rating = (profile.avg_rating ?? 0).toFixed(1);
