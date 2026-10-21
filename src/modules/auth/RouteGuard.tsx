@@ -1,11 +1,13 @@
 "use client";
 
 import React, { useEffect, useState } from 'react';
-import { createBrowserSupabaseClient } from '@/lib/supabase/client';
+import { getSupabaseBrowserClient } from '@/lib/supabase/client';
+
 import { useRouter } from 'next/navigation';
 
 export default function RouteGuard({ children }: { children: React.ReactNode }){
-  const supabase = createBrowserSupabaseClient();
+  const supabase = getSupabaseBrowserClient();
+
   const router = useRouter();
   const [loading, setLoading] = useState(true);
   const [role, setRole] = useState<string | null>(null);
