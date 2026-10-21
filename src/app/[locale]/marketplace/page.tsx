@@ -1,6 +1,6 @@
 import Link from 'next/link';
-import InstructorCard from '../../../modules/marketplace/components/InstructorCard';
-import { getSupabase } from '../../../modules/marketplace/client';
+import InstructorCard from '@/modules/marketplace/components/InstructorCard';
+import { getSupabase } from '@/modules/marketplace/client';
 
 export default async function Marketplace() {
   const cities = ['Lahore','Karachi','Islamabad','Rawalpindi','Faisalabad','Peshawar','Multan'];

@@ -9,6 +9,7 @@ const config: Config = {
         'electric-cyan': 'var(--cd-primary)',
         'emerald': 'var(--cd-success)'
       }
+      }
     }
   },
   plugins: []
