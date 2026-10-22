@@ -1,12 +1,11 @@
-import { createBrowserClient as createBrowserSupabaseClient } from '@/lib/supabaseClient';
+import { getSupabaseBrowserClient } from '@/lib/supabase/client';
 
-import type Database from '@/types/database';
-
+/**
+ * Marketplace module Supabase accessor.
+ * Single source of truth: always delegate to the shared browser client at
+ * src/lib/supabase/client.ts. Never create a client copy or import
+ * createBrowserClient directly here.
+ */
 export function getSupabase() {
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL ?? '';
-  const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? '';
-  if (!supabaseUrl || !supabaseKey) {
-    console.warn('Missing NEXT_PUBLIC_SUPABASE_* env vars; Supabase client will fail in browser.');
-  }
-  return createBrowserSupabaseClient<Database>(supabaseUrl, supabaseKey);
+  return getSupabaseBrowserClient();
 }
