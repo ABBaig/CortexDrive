@@ -2,6 +2,8 @@
 
 import React from 'react';
 import { useTranslations, useLocale } from 'next-intl';
+import React, { useEffect, useState } from 'react';
+import { getSupabaseBrowserClient } from '@/lib/supabase/client';
 import { useRouter } from 'next/navigation';
 import { getSupabaseBrowserClient } from '@/lib/supabase/client';
 import BackButton from '@/components/BackButton';
@@ -16,6 +18,10 @@ export default function WalletPage() {
   const t = useTranslations('Wallet');
   const tc = useTranslations();
   const locale = useLocale();
+  const [wallet, setWallet] = useState<any>(null);
+  const [transactions, setTransactions] = useState<any[]>([]);
+  const [topupAmount, setTopupAmount] = useState('');
+  const [loading, setLoading] = useState(false);
   const router = useRouter();
 
   const backHref = `/${locale}`;
@@ -74,6 +80,13 @@ export default function WalletPage() {
     } finally {
       if (mountedRef.current) setLoading(false);
     }
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return router.push(`/${/* locale */ 'en'}/signin`);
+    const { data: w } = await supabase.from('wallets').select('*').eq('user_id', user.id).limit(1).maybeSingle();
+    setWallet(w);
+    const { data: tx } = await supabase.from('transactions').select('*').eq('wallet_id', w?.id ?? null).order('created_at', { ascending: false });
+    setTransactions(tx || []);
+    setLoading(false);
   }
 
   function formatPKR(n: number | string | null) {
