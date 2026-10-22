@@ -136,3 +136,17 @@
     }
   }
 }
+
+  ,
+  "Chat": {
+    "message": "Paigham bhejein",
+    "connectAdmin": "Admin se rabta karein",
+    "mockAiNotice": "(Mock AI jawab — real jawab ke liye GOOGLE_API_KEY set karein)"
+  },
+  "AiTutor": {
+    "title": "AI Tutor",
+    "open": "Open",
+    "close": "Close",
+    "ask": "Pooch"
+  }
+}
