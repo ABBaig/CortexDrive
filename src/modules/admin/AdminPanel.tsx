@@ -28,6 +28,7 @@ export default function AdminPanel() {
       .subscribe();
 
     return () => void channel.unsubscribe();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   async function fetchVerifications() {
@@ -131,7 +132,7 @@ export default function AdminPanel() {
             <div className="text-neutral-400">No SOS logs</div>
           ) : (
             sosLogs.map((s) => (
-              <div key={s.id} className="border p-2 rounded mb-2">{s.user_id} — {s.note ?? s.message} — {new Date(s.created_at).toLocaleString()}</div>
+              <div key={s.id} className="border p-2 rounded mb-2">{s.user_id} — {s.note} — {new Date(s.created_at).toLocaleString()}</div>
             ))
           )}
         </div>

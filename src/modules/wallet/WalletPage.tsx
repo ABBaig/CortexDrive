@@ -15,7 +15,7 @@ export default function WalletPage() {
   async function fetchData() {
     setLoading(true);
     const { data: { user } } = await supabase.auth.getUser();
-    if (!user) return router.push(`/${user?.locale ?? 'en'}/signin`);
+    if (!user) return router.push(`/${/* locale */ 'en'}/signin`);
     const { data: w } = await supabase.from('wallets').select('*').eq('user_id', user.id).limit(1).maybeSingle();
     setWallet(w);
     const { data: tx } = await supabase.from('transactions').select('*').eq('wallet_id', w?.id ?? null).order('created_at', { ascending: false });
