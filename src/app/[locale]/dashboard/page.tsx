@@ -6,17 +6,42 @@ import BackButton from '@/components/BackButton';
 import SOSButtonClientWrapper from '@/modules/safety/SOSButtonClientWrapper';
 
 export default async function DashboardPage({ params }: { params: { locale: string } }) {
-  const supabase = getSupabaseServerClient();
-  const { data: { session } } = await supabase.auth.getSession();
+  // Fix: await the server client factory which returns a Promise
+  const supabase = await getSupabaseServerClient();
+  if (!supabase?.auth)
+    throw new Error(
+      'Supabase init failed — check NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY in .env.local',
+    );
+
+  const {
+    data: { session },
+  } = await supabase.auth.getSession();
+
   if (!session) redirect(`/${params.locale}/signin`);
   const user = session.user;
 
   // fetch profile
   const { data: profile } = await supabase
     .from('users')
-    .select('full_name,city,role')
+    .select('full_name,city,role,hourly_rate')
     .eq('id', user.id)
     .maybeSingle();
+
+  // license progress (for learners)
+  const { data: lp } = await supabase
+    .from('license_progress')
+    .select('stage,notes,updated_at')
+    .eq('user_id', user.id)
+    .maybeSingle();
+  const stage = Math.min(Math.max(Number(lp?.stage ?? 1), 1), 5);
+
+  // bookings counts for learner
+  const { data: myBookings } = await supabase
+    .from('bookings')
+    .select('id,status')
+    .eq('learner_id', user.id);
+  const completed = myBookings?.filter((b: any) => b?.status === 'completed').length ?? 0;
+  const upcoming = myBookings?.filter((b: any) => b?.status === 'booked').length ?? 0;
 
   // wallet balance
   let balance: number | null = null;
@@ -25,22 +50,17 @@ export default async function DashboardPage({ params }: { params: { locale: stri
     .select('id,balance')
     .eq('user_id', user.id)
     .maybeSingle();
-
   if (wallet?.balance !== undefined && wallet?.balance !== null) balance = wallet.balance;
-  if (balance === null) {
-    // fallback: no transactions query by user_id because transactions table has no user_id column
-    balance = 0;
-  }
   if (balance === null) balance = 0;
-  const safeBalance: number = balance ?? 0;
+  const safeBalance: number = Number(balance ?? 0);
 
-  // verification badge
+  // verification status
   const { data: ver } = await supabase
     .from('verifications')
     .select('status')
     .eq('user_id', user.id)
     .maybeSingle();
-  const verified = ver?.status === 'verified';
+  const verificationStatus = ver?.status ?? 'unverified';
 
   // render earnings section for instructors
   let earningsSection: null | JSX.Element = null;
@@ -50,34 +70,112 @@ export default async function DashboardPage({ params }: { params: { locale: stri
     earningsSection = <InstructorEarnings instructorId={user.id} /> as unknown as JSX.Element;
   }
 
+  // Learner stages
+  const STAGES = ['Enrollment', 'Theory classes', 'Practical driving', 'Test prep', 'License issued'];
+  const progressPercent = Math.round((stage / STAGES.length) * 100);
+
   return (
     <AppShell>
       <div className="max-w-2xl mx-auto bg-slate-800 p-6 rounded">
         <BackButton />
         <h1 className="text-2xl text-white">Dashboard</h1>
-        <div className="mt-4 text-white">
-          <div><strong>Name:</strong> {profile?.full_name || user.email}</div>
-          <div><strong>City:</strong> {profile?.city || '—'}</div>
-          <div><strong>Role:</strong> {profile?.role || '—'}</div>
-          <div><strong>Verified:</strong> {verified ? 'Yes' : 'No'}</div>
-          <div className="mt-4"><strong>Wallet:</strong> PKR {safeBalance.toFixed(2)}</div>
-        </div>
 
-        <nav className="mt-6 grid grid-cols-2 gap-2">
-          <a href={`/${params.locale}/verification`} className="p-2 bg-slate-700 rounded text-white">Verification</a>
-          <a href={`/${params.locale}/marketplace`} className="p-2 bg-slate-700 rounded text-white">Marketplace</a>
-          <a href={`/${params.locale}/wallet`} className="p-2 bg-slate-700 rounded text-white">Wallet</a>
-          <a href={`/${params.locale}/ai-tutor`} className="p-2 bg-slate-700 rounded text-white">AI Tutor</a>
-          <a href={`/${params.locale}/vehicle`} className="p-2 bg-slate-700 rounded text-white">Vehicle</a>
-          <a href={`/${params.locale}/sos`} className="p-2 bg-slate-700 rounded text-white">SOS</a>
+        <p className="mt-2 text-sm text-slate-200">Welcome back, {profile?.full_name ?? user.email ?? '—'}</p>
 
-          <div className="col-span-2 mt-4">
-            {/* Mount client SOSButton via the existing client wrapper */}
-            <SOSButtonClientWrapper />
+        <div className="mt-4 grid grid-cols-1 gap-4">
+          <div className="p-4 bg-slate-700 rounded text-white">
+            <div className="flex flex-col gap-2 text-sm">
+              <div><strong>Name:</strong> {profile?.full_name ?? user.email ?? '—'}</div>
+              <div><strong>City:</strong> {profile?.city ?? '—'}</div>
+              <div><strong>Role:</strong> {profile?.role ?? '—'}</div>
+              <div>
+                <strong>Verification:</strong>{' '}
+                {verificationStatus === 'verified' ? (
+                  <span className="text-emerald-300">Verified</span>
+                ) : verificationStatus === 'pending' ? (
+                  <span className="text-amber-300">Pending</span>
+                ) : (
+                  <span className="text-slate-400">Unverified</span>
+                )}
+              </div>
+              <div className="mt-2"><strong>Wallet:</strong> PKR {safeBalance.toFixed(2)}</div>
+            </div>
           </div>
 
-          <a href={`/${params.locale}/security`} className="p-2 bg-slate-700 rounded text-white">Security</a>
-        </nav>
+          {/* Learner progress and stats */}
+          {profile?.role === 'learner' && (
+            <div className="p-4 bg-slate-700 rounded text-white">
+              <h2 className="text-lg font-semibold">Progress</h2>
+
+              <ol className="mt-3 space-y-2">
+                {STAGES.map((s, idx) => {
+                  const i = idx + 1;
+                  const done = i < stage;
+                  const active = i === stage;
+                  return (
+                    <li key={s} className="flex items-center gap-3">
+                      <div
+                        className={`h-8 w-8 flex items-center justify-center rounded-full text-sm font-semibold ${
+                          done ? 'bg-emerald-600 text-white' : active ? 'bg-sky-600 text-white' : 'bg-slate-700 text-slate-400'
+                        }`}
+                      >
+                        {done ? '✓' : i}
+                      </div>
+                      <div className={`text-sm ${active ? 'font-semibold' : 'text-slate-200'}`}>{s}</div>
+                    </li>
+                  );
+                })}
+              </ol>
+
+              <div className="mt-4">
+                <div className="h-3 w-full bg-slate-600 rounded overflow-hidden">
+                  <div
+                    className="h-3 bg-sky-600"
+                    style={{ width: `${progressPercent}%` }}
+                  />
+                </div>
+                <div className="mt-2 text-sm text-slate-200">Stage {stage} of {STAGES.length} ({progressPercent}%)</div>
+                {lp?.notes ? (
+                  <div className="mt-2 text-sm text-slate-300"><strong>Notes:</strong> {lp?.notes}</div>
+                ) : null}
+
+                <div className="mt-4 grid grid-cols-3 gap-2 text-sm">
+                  <div className="p-2 bg-slate-800 rounded text-center">
+                    <div className="text-slate-400">Completed</div>
+                    <div className="text-white font-semibold">{completed}</div>
+                  </div>
+                  <div className="p-2 bg-slate-800 rounded text-center">
+                    <div className="text-slate-400">Upcoming</div>
+                    <div className="text-white font-semibold">{upcoming}</div>
+                  </div>
+                  <div className="p-2 bg-slate-800 rounded text-center">
+                    <div className="text-slate-400">Wallet</div>
+                    <div className="text-white font-semibold">PKR {safeBalance.toFixed(2)}</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Instructor earnings (unchanged) */}
+          {earningsSection}
+
+          <nav className="grid grid-cols-2 gap-2">
+            <a href={`/${params.locale}/verification`} className="p-2 bg-slate-700 rounded text-white">Verification</a>
+            <a href={`/${params.locale}/marketplace`} className="p-2 bg-slate-700 rounded text-white">Marketplace</a>
+            <a href={`/${params.locale}/wallet`} className="p-2 bg-slate-700 rounded text-white">Wallet</a>
+            <a href={`/${params.locale}/ai-tutor`} className="p-2 bg-slate-700 rounded text-white">AI Tutor</a>
+            <a href={`/${params.locale}/vehicle`} className="p-2 bg-slate-700 rounded text-white">Vehicle</a>
+            <a href={`/${params.locale}/sos`} className="p-2 bg-slate-700 rounded text-white">SOS</a>
+
+            <div className="col-span-2 mt-4">
+              {/* Mount client SOSButton via the existing client wrapper */}
+              <SOSButtonClientWrapper />
+            </div>
+
+            <a href={`/${params.locale}/security`} className="p-2 bg-slate-700 rounded text-white">Security</a>
+          </nav>
+        </div>
       </div>
     </AppShell>
   );
