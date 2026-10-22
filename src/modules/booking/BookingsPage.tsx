@@ -35,7 +35,7 @@ export default function BookingsPage() {
     try {
       const { data: userData } = await supabase.auth.getUser();
       const user = userData.user;
-      if (!user) return void router.push(`/${locale}/auth/signin`);
+      if (!user) return void router.push(`/${locale}/signin`);
       setUserId(user.id);
 
       const { data: rows, error: bErr } = await supabase.from('bookings').select('*').eq('learner_id', user.id).order('created_at', { ascending: false });
@@ -67,7 +67,7 @@ export default function BookingsPage() {
     try {
       const { data: userData } = await supabase.auth.getUser();
       const user = userData.user;
-      if (!user) return void router.push(`/${locale}/auth/signin`);
+      if (!user) return void router.push(`/${locale}/signin`);
 
       // Defensive ownership check (RLS also restricts rows; this is for UI only)
       if (booking.learner_id !== user.id) {

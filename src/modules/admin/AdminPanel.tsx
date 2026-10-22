@@ -1,11 +1,11 @@
 'use client';
 import React, { useEffect, useState } from 'react';
 import { getSupabaseBrowserClient } from '@/lib/supabase/client';
-import { useLocale } from 'next-intl';
+import { useTranslations } from 'next-intl';
 
 export default function AdminPanel() {
   const supabase = getSupabaseBrowserClient();
-  const locale = useLocale();
+  const t = useTranslations('Admin');
   const [tab, setTab] = useState<'verifications' | 'bookings' | 'wallet' | 'sos'>('verifications');
   const [verifs, setVerifs] = useState<any[]>([]);
   const [sosLogs, setSosLogs] = useState<any[]>([]);
@@ -63,29 +63,30 @@ export default function AdminPanel() {
   return (
     <div className="mt-6">
       <div className="flex gap-2">
-        <button className={`px-3 py-1 ${tab === 'verifications' ? 'bg-slate-700 text-white' : ''}`} onClick={() => setTab('verifications')}>{'Pending Verifications'}</button>
-        <button className={`px-3 py-1 ${tab === 'bookings' ? 'bg-slate-700 text-white' : ''}`} onClick={() => setTab('bookings')}>{'Bookings'}</button>
-        <button className={`px-3 py-1 ${tab === 'wallet' ? 'bg-slate-700 text-white' : ''}`} onClick={() => setTab('wallet')}>{'Wallet Transactions'}</button>
-        <button className={`px-3 py-1 ${tab === 'sos' ? 'bg-slate-700 text-white' : ''}`} onClick={() => setTab('sos')}>{'SOS Log'}</button>
+        <button className={`px-3 py-1 ${tab === 'verifications' ? 'bg-slate-700 text-white' : ''}`} onClick={() => setTab('verifications')}>{t('tabs.verifications')}</button>
+        <button className={`px-3 py-1 ${tab === 'bookings' ? 'bg-slate-700 text-white' : ''}`} onClick={() => setTab('bookings')}>{t('tabs.bookings')}</button>
+        <button className={`px-3 py-1 ${tab === 'wallet' ? 'bg-slate-700 text-white' : ''}`} onClick={() => setTab('wallet')}>{t('tabs.wallet')}</button>
+        <button className={`px-3 py-1 ${tab === 'sos' ? 'bg-slate-700 text-white' : ''}`} onClick={() => setTab('sos')}>{t('tabs.sos')}</button>
       </div>
 
-      {loading && <div className="mt-4 text-sm text-neutral-500">Loading…</div>}
-      {error && <div className="mt-4 text-sm text-red-600">Error: {error}</div>}
+      {loading && <div className="mt-4 text-sm text-neutral-500">{t('loading')}</div>}
+      {error && <div className="mt-4 text-sm text-red-600">{t('error')}: {error}</div>}
 
       {tab === 'verifications' && (
         <div className="mt-4">
           {verifs.length === 0 ? (
-            <div className="text-neutral-400">No pending verifications</div>
+            <div className="text-neutral-400">{t('emptyVerifications')}</div>
           ) : (
             verifs.map((v) => (
               <div key={v.id} className="border p-3 rounded mb-2 flex justify-between items-center">
                 <div>
                   <div className="text-sm text-neutral-400">{v.type} — {v.status}</div>
                   <div className="font-medium">{v.doc_url}</div>
+                  <div className="text-sm text-neutral-400">{new Date(v.created_at).toLocaleString()}</div>
                 </div>
                 <div className="flex gap-2">
-                  {v.status === 'pending' && <button onClick={() => act(v.id, 'approve')} className="px-2 py-1 bg-emerald-600 rounded text-white">Approve</button>}
-                  {v.status === 'pending' && <button onClick={() => act(v.id, 'reject')} className="px-2 py-1 bg-red-600 rounded text-white">Reject</button>}
+                  {v.status === 'pending' && <button onClick={() => act(v.id, 'approve')} className="px-2 py-1 bg-emerald-600 rounded text-white">{t('approve')}</button>}
+                  {v.status === 'pending' && <button onClick={() => act(v.id, 'reject')} className="px-2 py-1 bg-red-600 rounded text-white">{t('reject')}</button>}
                 </div>
               </div>
             ))
@@ -96,7 +97,7 @@ export default function AdminPanel() {
       {tab === 'bookings' && (
         <div className="mt-4">
           {bookings.length === 0 ? (
-            <div className="text-neutral-400">No bookings</div>
+            <div className="text-neutral-400">{t('emptyBookings')}</div>
           ) : (
             bookings.map((b) => (
               <div key={b.id} className="border p-3 rounded mb-2">
@@ -113,13 +114,13 @@ export default function AdminPanel() {
       {tab === 'wallet' && (
         <div className="mt-4">
           {transactions.length === 0 ? (
-            <div className="text-neutral-400">No transactions</div>
+            <div className="text-neutral-400">{t('emptyTransactions')}</div>
           ) : (
-            transactions.map((t) => (
-              <div key={t.id} className="border p-3 rounded mb-2">
-                <div className="text-sm text-neutral-400">{t.kind} — {new Date(t.created_at).toLocaleString()}</div>
-                <div className="font-medium">{t.amount} PKR</div>
-                <div className="text-sm">Wallet: {t.wallet?.id ?? '—'} Owner: {t.wallet?.user_id ?? '—'}</div>
+            transactions.map((trow) => (
+              <div key={trow.id} className="border p-3 rounded mb-2">
+                <div className="text-sm text-neutral-400">{trow.kind} — {new Date(trow.created_at).toLocaleString()}</div>
+                <div className="font-medium">{trow.amount} PKR</div>
+                <div className="text-sm">Wallet: {trow.wallet?.id ?? '—'} Owner: {trow.wallet?.user_id ?? '—'}</div>
               </div>
             ))
           )}
@@ -129,7 +130,7 @@ export default function AdminPanel() {
       {tab === 'sos' && (
         <div className="mt-4">
           {sosLogs.length === 0 ? (
-            <div className="text-neutral-400">No SOS logs</div>
+            <div className="text-neutral-400">{t('emptySos')}</div>
           ) : (
             sosLogs.map((s) => (
               <div key={s.id} className="border p-2 rounded mb-2">{s.user_id} — {s.note} — {new Date(s.created_at).toLocaleString()}</div>

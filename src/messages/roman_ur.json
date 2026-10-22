@@ -48,8 +48,7 @@
     "unknownInstructor": "Unknown",
     "noWallet": "Aapke account ke liye koi wallet nahi mila.",
     "abort": "Cancel na karein"
-  }
-  ,
+  },
   "Earnings": {
     "title": "Aamdani",
     "pending": "Pending (escrow mein)",
@@ -60,5 +59,72 @@
     "bookingsCount": "bookings",
     "empty": "Abhi tak koi aamdani nahi.",
     "error": "Aamdani load nahi ho saki."
+  },
+  "Admin": {
+    "adminNotAuthorized": "Admin panel dekhne ki ijazat nahi hai.",
+    "title": "Admin",
+    "tabs": {
+      "verifications": "Pending Verifications",
+      "bookings": "Bookings",
+      "wallet": "Wallet Transactions",
+      "sos": "SOS Log"
+    },
+    "loading": "Loading...",
+    "error": "Koi masla hua hai",
+    "emptyVerifications": "Koi pending verifications nahi hain",
+    "emptyBookings": "Koi bookings nahi hain",
+    "emptyTransactions": "Koi transactions nahi hain",
+    "emptySos": "Koi SOS logs nahi hain",
+    "approve": "Manzoor Karein",
+    "reject": "Rad Karein",
+    "colWhen": "Kab",
+    "colType": "Qism",
+    "colStatus": "Status",
+    "colUser": "User"
+  },
+  "SOS": {
+    "title": "SOS",
+    "subtitle": "Yeh qareebi instructors aur admins ko realtime mein muttala karega.",
+    "send": "EMERGENCY: SOS Bhejein",
+    "sending": "Sending...",
+    "sent": "EMERGENCY SOS BHEJ DI GAYA",
+    "error": "SOS bhejne mein nakaami",
+    "note": "SOS trigger hua app se",
+    "sentAlert": "SOS bhej diya gaya",
+    "failedAlert": "SOS bhejne mein nakaami",
+    "recent": "Haaliya SOS waqiat",
+    "empty": "Abhi tak koi SOS waqiat nahi hain.",
+    "errors": {
+      "notSignedIn": "SOS bhejne ke liye sign in hona zaruri hai"
+    }
+  },
+  "Verification": {
+    "title": "Tasdeeq",
+    "subtitle": "Apne shanakhti documents review ke liye upload karein.",
+    "fields": {
+      "docType": "Document ki qism",
+      "upload": "Document upload karein"
+    },
+    "docTypes": {
+      "cnic": "CNIC / National ID",
+      "drivingLicense": "Driving License (instructors)"
+    },
+    "submit": "Tasdeeq ke liye submit karein",
+    "submitSuccess": "Tasdeeq submit ho gayi hai aur review ke intezar mein hai.",
+    "errors": {
+      "notSignedIn": "Sign in hona zaruri hai",
+      "noFile": "Barah-e-karam zaruri files select karein."
+    },
+    "currentStatus": {
+      "title": "Aapki tasdeeqat",
+      "empty": "Aapne koi tasdeeq submit nahi ki."
+    },
+    "status": {
+      "verified": "Tasdeeq Shuda",
+      "needsReview": "Review ki zarurat hai",
+      "rejected": "Rad Shuda",
+      "pending": "Pending"
+    },
+    "colWhen": "Kab"
   }
 }

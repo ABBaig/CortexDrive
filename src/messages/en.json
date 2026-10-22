@@ -48,8 +48,7 @@
     "unknownInstructor": "Unknown",
     "noWallet": "No wallet found for your account.",
     "abort": "Don't cancel"
-  }
-  ,
+  },
   "Earnings": {
     "title": "Earnings",
     "pending": "Pending (in escrow)",
@@ -60,5 +59,72 @@
     "bookingsCount": "bookings",
     "empty": "No earnings yet.",
     "error": "Unable to load earnings."
+  },
+  "Admin": {
+    "adminNotAuthorized": "Not authorized to view admin panel.",
+    "title": "Admin",
+    "tabs": {
+      "verifications": "Pending Verifications",
+      "bookings": "Bookings",
+      "wallet": "Wallet Transactions",
+      "sos": "SOS Log"
+    },
+    "loading": "Loading...",
+    "error": "An error occurred",
+    "emptyVerifications": "No pending verifications",
+    "emptyBookings": "No bookings",
+    "emptyTransactions": "No transactions",
+    "emptySos": "No SOS logs",
+    "approve": "Approve",
+    "reject": "Reject",
+    "colWhen": "When",
+    "colType": "Type",
+    "colStatus": "Status",
+    "colUser": "User"
+  },
+  "SOS": {
+    "title": "SOS",
+    "subtitle": "This will notify nearby instructors and admins in real-time.",
+    "send": "EMERGENCY: Send SOS",
+    "sending": "Sending...",
+    "sent": "EMERGENCY SOS SENT",
+    "error": "Failed to send SOS",
+    "note": "SOS triggered from app",
+    "sentAlert": "SOS sent",
+    "failedAlert": "Failed to send SOS",
+    "recent": "Recent SOS events",
+    "empty": "No SOS events yet.",
+    "errors": {
+      "notSignedIn": "You must be signed in to send SOS"
+    }
+  },
+  "Verification": {
+    "title": "Verification",
+    "subtitle": "Upload your identity documents for review.",
+    "fields": {
+      "docType": "Document type",
+      "upload": "Upload document"
+    },
+    "docTypes": {
+      "cnic": "CNIC / National ID",
+      "drivingLicense": "Driving License (instructors)"
+    },
+    "submit": "Submit for verification",
+    "submitSuccess": "Verification submitted and is pending review.",
+    "errors": {
+      "notSignedIn": "You must be signed in",
+      "noFile": "Please select the required files."
+    },
+    "currentStatus": {
+      "title": "Your verifications",
+      "empty": "You have not submitted any verifications."
+    },
+    "status": {
+      "verified": "Verified",
+      "needsReview": "Needs Review",
+      "rejected": "Rejected",
+      "pending": "Pending"
+    },
+    "colWhen": "When"
   }
 }

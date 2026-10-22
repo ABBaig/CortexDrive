@@ -4,19 +4,11 @@ import { getSupabaseServerClient } from '@/lib/supabase/server';
 import AppShell from '@/components/AppShell';
 import BackButton from '@/components/BackButton';
 import SOSButtonClientWrapper from '@/modules/safety/SOSButtonClientWrapper';
+import InstructorEarnings from '@/modules/earning/InstructorEarnings';
 
 export default async function DashboardPage({ params }: { params: { locale: string } }) {
-  // Fix: await the server client factory which returns a Promise
   const supabase = await getSupabaseServerClient();
-  if (!supabase?.auth)
-    throw new Error(
-      'Supabase init failed — check NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY in .env.local',
-    );
-
-  const {
-    data: { session },
-  } = await supabase.auth.getSession();
-
+  const { data: { session } } = await supabase.auth.getSession();
   if (!session) redirect(`/${params.locale}/signin`);
   const user = session.user;
 
@@ -62,44 +54,27 @@ export default async function DashboardPage({ params }: { params: { locale: stri
     .maybeSingle();
   const verificationStatus = ver?.status ?? 'unverified';
 
-  // render earnings section for instructors
-  let earningsSection: null | JSX.Element = null;
-  if (profile?.role === 'instructor') {
-    // importer: server component
-    const InstructorEarnings = (await import('@/modules/earning/InstructorEarnings')).default;
-    earningsSection = <InstructorEarnings instructorId={user.id} /> as unknown as JSX.Element;
-  }
-
-  // Learner stages
-  const STAGES = ['Enrollment', 'Theory classes', 'Practical driving', 'Test prep', 'License issued'];
-  const progressPercent = Math.round((stage / STAGES.length) * 100);
-
   return (
     <AppShell>
       <div className="max-w-2xl mx-auto bg-slate-800 p-6 rounded">
         <BackButton />
         <h1 className="text-2xl text-white">Dashboard</h1>
 
-        <p className="mt-2 text-sm text-slate-200">Welcome back, {profile?.full_name ?? user.email ?? '—'}</p>
+        {profile?.role === 'instructor' ? (
+          <InstructorEarnings instructorId={user.id} locale={params.locale} />
+        ) : null}
 
-        <div className="mt-4 grid grid-cols-1 gap-4">
-          <div className="p-4 bg-slate-700 rounded text-white">
-            <div className="flex flex-col gap-2 text-sm">
-              <div><strong>Name:</strong> {profile?.full_name ?? user.email ?? '—'}</div>
-              <div><strong>City:</strong> {profile?.city ?? '—'}</div>
-              <div><strong>Role:</strong> {profile?.role ?? '—'}</div>
-              <div>
-                <strong>Verification:</strong>{' '}
-                {verificationStatus === 'verified' ? (
-                  <span className="text-emerald-300">Verified</span>
-                ) : verificationStatus === 'pending' ? (
-                  <span className="text-amber-300">Pending</span>
-                ) : (
-                  <span className="text-slate-400">Unverified</span>
-                )}
-              </div>
-              <div className="mt-2"><strong>Wallet:</strong> PKR {safeBalance.toFixed(2)}</div>
-            </div>
+        <nav className="mt-6 grid grid-cols-2 gap-2">
+          <a href={`/${params.locale}/verification`} className="p-2 bg-slate-700 rounded text-white">Verification</a>
+          <a href={`/${params.locale}/marketplace`} className="p-2 bg-slate-700 rounded text-white">Marketplace</a>
+          <a href={`/${params.locale}/wallet`} className="p-2 bg-slate-700 rounded text-white">Wallet</a>
+          <a href={`/${params.locale}/ai-tutor`} className="p-2 bg-slate-700 rounded text-white">AI Tutor</a>
+          {/* vehicle link removed intentionally */}
+          <a href={`/${params.locale}/sos`} className="p-2 bg-slate-700 rounded text-white">SOS</a>
+
+          <div className="col-span-2 mt-4">
+            {/* Mount client SOSButton via the existing client wrapper */}
+            <SOSButtonClientWrapper />
           </div>
 
           {/* Learner progress and stats */}
