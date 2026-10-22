@@ -1,4 +1,3 @@
-
 {
   "Home": {
     "title": "CortexDrive",
@@ -14,6 +13,51 @@
     "language": "Language",
     "selectLanguage": "Select Language",
     "loading": "Loading...",
-    "error": "An error occurred. Please try again later."
+    "error": "An error occurred. Please try again later.",
+    "cancel": "Cancel"
+  },
+  "Wallet": {
+    "title": "Wallet",
+    "noWallet": "No wallet found for your account.",
+    "balance": "Balance",
+    "topupLabel": "Top Up (sandbox)",
+    "topupButton": "Top Up",
+    "transactions": "Transactions",
+    "noTransactions": "No transactions yet.",
+    "colWhen": "When",
+    "colKind": "Kind",
+    "colAmount": "Amount",
+    "colBalanceAfter": "Balance After",
+    "topupFailed": "Top-up failed"
+  },
+  "Booking": {
+    "title": "My Bookings",
+    "empty": "You have no bookings yet.",
+    "cancel": "Cancel",
+    "confirmCancel": "Confirm Cancel",
+    "cancelSuccess": "Booking cancelled and refund processed.",
+    "cancelFailed": "Failed to cancel booking",
+    "colWhen": "When",
+    "colStatus": "Status",
+    "colInstructor": "Instructor",
+    "colAmount": "Amount",
+    "statusBooked": "Booked",
+    "statusRefunded": "Refunded",
+    "missingAmountColumn": "This booking has no stored amount; refund cannot be computed.",
+    "unknownInstructor": "Unknown",
+    "noWallet": "No wallet found for your account.",
+    "abort": "Don't cancel"
+  }
+  ,
+  "Earnings": {
+    "title": "Earnings",
+    "pending": "Pending (in escrow)",
+    "released": "Released",
+    "gross": "Gross",
+    "net": "Net",
+    "fee": "Platform fee",
+    "bookingsCount": "bookings",
+    "empty": "No earnings yet.",
+    "error": "Unable to load earnings."
   }
 }
