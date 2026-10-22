@@ -45,6 +45,7 @@ export default async function DashboardPage({ params }: { params: { locale: stri
     .maybeSingle();
   if (wallet?.balance !== undefined && wallet.balance !== null) balance = wallet.balance;
   const safeBalance: number = Number(balance ?? 0);
+  const formattedBalance = safeBalance.toLocaleString('en-PK', { style: 'currency', currency: 'PKR' });
 
   // verification status
   const { data: ver } = await supabase
@@ -53,6 +54,7 @@ export default async function DashboardPage({ params }: { params: { locale: stri
     .eq('user_id', user.id)
     .maybeSingle();
   const verificationStatus = ver?.status ?? 'unverified';
+  const isVerified = verificationStatus === 'verified';
 
   return (
     <AppShell>
@@ -64,11 +66,17 @@ export default async function DashboardPage({ params }: { params: { locale: stri
           <div><strong>Name:</strong> {profile?.full_name || user.email}</div>
           <div><strong>City:</strong> {profile?.city || '—'}</div>
           <div><strong>Role:</strong> {profile?.role || '—'}</div>
-          <div>
-            <strong>Verified:</strong>{' '}
-            {verificationStatus === 'verified' ? 'Yes' : 'No'} ({verificationStatus})
+          <div className="flex items-center gap-2">
+            <strong>Verification:</strong>
+            <span
+              className={`px-2 py-1 rounded-full text-sm font-medium ${
+                isVerified ? 'bg-emerald-500 text-white' : 'bg-slate-600 text-slate-100'
+              }`}
+            >
+              {isVerified ? 'Verified' : 'Not verified'}
+            </span>
           </div>
-          <div className="mt-4"><strong>Wallet:</strong> PKR {safeBalance.toFixed(2)}</div>
+          <div className="mt-4"><strong>Wallet:</strong> {formattedBalance}</div>
         </div>
 
         {profile?.role === 'instructor' && InstructorEarnings ? (
@@ -119,7 +127,7 @@ export default async function DashboardPage({ params }: { params: { locale: stri
                 </div>
                 <div className="p-2 bg-slate-800 rounded text-center">
                   <div className="text-slate-400">Wallet</div>
-                  <div className="text-white font-semibold">PKR {safeBalance.toFixed(2)}</div>
+                  <div className="text-white font-semibold">{formattedBalance}</div>
                 </div>
               </div>
             </div>
