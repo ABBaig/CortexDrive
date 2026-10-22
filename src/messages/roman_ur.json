@@ -39,6 +39,7 @@
     "cancelSuccess": "Booking cancel ho gai aur refund process ho gaya.",
     "cancelFailed": "Booking cancel karne mein nakaami",
     "colWhen": "Kab",
+    "colcolStatus": "Status",
     "colStatus": "Status",
     "colInstructor": "Instructor",
     "colAmount": "Raqam",
@@ -136,12 +137,3 @@
     }
   }
 }
-
-    ,"aiResult": {
-      "verified": "AI ne aap ki document tasdeeq kar di (score: {score})",
-      "needsReview": "AI mukammal tasdeeq nahi kar saka — document manual review ke liye intezar mein hai.",
-      "rejected": "AI tasdeeq nakam ho gai. Barah-e-karam wazeh tasaveer dobara submit karein.",
-      "unavailable": "AI waqt bhar ke liye available nahi — submission manual review ke liye queue mein hai."
-    },
-    "colAiScore": "AI score"
-  }
