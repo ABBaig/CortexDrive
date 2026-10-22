@@ -1,8 +1,8 @@
-
 import '../globals.css';
 import type { ReactNode } from 'react';
 import { NextIntlClientProvider } from 'next-intl';
 import { notFound } from 'next/navigation';
+import FloatingAIChat from '@/modules/chat/FloatingAIChat';
 
 export const metadata = {
   title: 'CortexDrive',
@@ -21,16 +21,16 @@ export default async function LocaleLayout({
 }) {
   const locale = params.locale;
 
-  // Reject unsupported locales
+// Reject unsupported locales
   if (!locales.includes(locale)) {
     notFound();
   }
 
-  const messages = (
+const messages = (
     await import(`../../messages/${locale}.json`)
   ).default;
 
-  return (
+return (
     <html
       lang={locale === 'roman_ur' ? 'en-PK' : locale}
       dir={locale === 'ur' ? 'rtl' : 'ltr'}
@@ -41,17 +41,8 @@ export default async function LocaleLayout({
           messages={messages}
         >
           {children}
-          {/* Floating AI widget mounted client-side */}
-          {/* @ts-ignore */}
-          <script dangerouslySetInnerHTML={{ __html: `(() => { const el = document.createElement('div'); el.id = 'ai-widget-root'; document.body.appendChild(el); })()` }} />
-
         </NextIntlClientProvider>
-      </body>
-    </html>
-  );
-}
-
-        </NextIntlClientProvider>
+        <FloatingAIChat locale={locale} />
       </body>
     </html>
   );
