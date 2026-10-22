@@ -134,10 +134,7 @@
       "rejected": "AI tasdeeq nakam ho gai. Barah-e-karam wazeh tasaveer dobara submit karein.",
       "unavailable": "AI waqt bhar ke liye available nahi — submission manual review ke liye queue mein hai."
     }
-  }
-}
-
-  ,
+  },
   "Chat": {
     "message": "Paigham bhejein",
     "connectAdmin": "Admin se rabta karein",

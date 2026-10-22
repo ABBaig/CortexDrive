@@ -6,17 +6,18 @@ import { useTranslations } from 'next-intl';
 export default function AdminPanel() {
   const supabase = getSupabaseBrowserClient();
   const t = useTranslations('Admin');
-  const [tab, setTab] = useState<'verifications' | 'bookings' | 'wallet' | 'sos'>('verifications');
+  const [tab, setTab] = useState<'verifications' | 'bookings' | 'wallet' | 'sos' | 'escalated'>('verifications');
   const [verifs, setVerifs] = useState<any[]>([]);
   const [sosLogs, setSosLogs] = useState<any[]>([]);
   const [bookings, setBookings] = useState<any[]>([]);
   const [transactions, setTransactions] = useState<any[]>([]);
+  const [escalated, setEscalated] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     setLoading(true);
-    Promise.all([fetchVerifications(), fetchBookings(), fetchWalletTransactions(), fetchSos()])
+    Promise.all([fetchVerifications(), fetchBookings(), fetchWalletTransactions(), fetchSos(), fetchEscalated()])
       .catch((e) => setError(String(e)))
       .finally(() => setLoading(false));
 
@@ -27,7 +28,17 @@ export default function AdminPanel() {
       })
       .subscribe();
 
-    return () => void channel.unsubscribe();
+    // listen for escalated conversations
+    const ch2 = supabase
+      .channel('public:conversations')
+      .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'conversations' }, (payload) => {
+        if (payload.new && payload.new.escalated) {
+          setEscalated((e) => [payload.new, ...e]);
+        }
+      })
+      .subscribe();
+
+    return () => { channel.unsubscribe(); ch2.unsubscribe(); };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -41,6 +52,12 @@ export default function AdminPanel() {
     const { data, error } = await supabase.from('bookings').select('id,learner_id,instructor_id,slot_start,status,created_at').order('created_at', { ascending: false }).limit(200);
     if (error) throw error;
     setBookings(data || []);
+  }
+
+  async function fetchEscalated() {
+    const { data, error } = await supabase.from('conversations').select('id,first_user_id,second_user_id,subject,last_message_at,escalated').eq('escalated', true).order('last_message_at', { ascending: false }).limit(200);
+    if (error) throw error;
+    setEscalated(data || []);
   }
 
   async function fetchWalletTransactions() {
@@ -67,6 +84,7 @@ export default function AdminPanel() {
         <button className={`px-3 py-1 ${tab === 'bookings' ? 'bg-slate-700 text-white' : ''}`} onClick={() => setTab('bookings')}>{t('tabs.bookings')}</button>
         <button className={`px-3 py-1 ${tab === 'wallet' ? 'bg-slate-700 text-white' : ''}`} onClick={() => setTab('wallet')}>{t('tabs.wallet')}</button>
         <button className={`px-3 py-1 ${tab === 'sos' ? 'bg-slate-700 text-white' : ''}`} onClick={() => setTab('sos')}>{t('tabs.sos')}</button>
+        <button className={`px-3 py-1 ${tab === 'escalated' ? 'bg-slate-700 text-white' : ''}`} onClick={() => setTab('escalated')}>Escalated Chats</button>
       </div>
 
       {loading && <div className="mt-4 text-sm text-neutral-500">{t('loading')}</div>}
@@ -144,3 +162,21 @@ export default function AdminPanel() {
     </div>
   );
 }
+      {tab === 'escalated' && (
+        <div className="mt-4">
+          {escalated.length === 0 ? (
+            <div className="text-neutral-400">No escalated chats</div>
+          ) : (
+            escalated.map((c) => (
+              <div key={c.id} className="border p-3 rounded mb-2">
+                <div className="text-sm text-neutral-400">Last: {new Date(c.last_message_at).toLocaleString()}</div>
+                <div className="font-medium">Conversation {c.id}</div>
+                <div className="text-sm">Participants: {c.first_user_id} — {c.second_user_id}</div>
+                <div className="mt-2">
+                  <a className="text-sky-500" href={`/${'en'}/chat/${c.id}`}>Open</a>
+                </div>
+              </div>
+            ))
+          )}
+        </div>
+      )}

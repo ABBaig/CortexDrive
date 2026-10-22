@@ -4,6 +4,7 @@ import React from 'react';
 import Link from 'next/link';
 import { useLocale } from 'next-intl';
 import type Database from '@/types/database';
+import MessageButton from './MessageButton';
 
 export default function InstructorCard({ profile }: { profile: Database['public']['Tables']['profiles']['Row'] }) {
   const locale = useLocale();
@@ -26,7 +27,6 @@ export default function InstructorCard({ profile }: { profile: Database['public'
         <div className="ml-4">
           {/* Message CTA */}
           {/* dynamic import to avoid server-side error */}
-          {/* @ts-ignore */}
           <MessageButton instructorId={profile.user_id} />
         </div>
       </div>
