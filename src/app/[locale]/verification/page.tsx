@@ -3,6 +3,8 @@
 import React, { useEffect, useState } from 'react';
 import { getSupabaseBrowserClient } from '@/lib/supabase/client';
 import { useTranslations } from 'next-intl';
+import useSelfieCapture from '@/modules/verification/useSelfieCapture';
+import AiResultBanner from '@/modules/verification/AiResultBanner';
 
 function StatusBadge({ status }: { status: string }) {
   const t = useTranslations('Verification');
@@ -22,6 +24,8 @@ export default function VerificationPage() {
   const tc = useTranslations('Common');
   const [cnic, setCnic] = useState<File | null>(null);
   const [license, setLicense] = useState<File | null>(null);
+  const selfie = useSelfieCapture();
+  const [aiResult, setAiResult] = useState<any | null>(null);
   const [docType, setDocType] = useState<'cnic' | 'driving_license'>('cnic');
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
@@ -63,6 +67,7 @@ export default function VerificationPage() {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error(t('errors.notSignedIn'));
       if (!cnic || (docType === 'driving_license' && !license)) throw new Error(t('errors.noFile'));
+      if (!selfie.file) throw new Error(t('errors.noFile'));
 
       // Upload files to private storage under verifications/{user.id}/...
       const cnicPath = await uploadToStorage(cnic!, user.id, 'cnic');
@@ -70,20 +75,39 @@ export default function VerificationPage() {
       if (docType === 'driving_license' && license) {
         licensePath = await uploadToStorage(license, user.id, 'license');
       }
+      const selfiePath = await uploadToStorage(selfie.file, user.id, 'selfie');
 
       // Insert verification row
       const payload: any = {
         user_id: user.id,
         type: docType,
         doc_url: licensePath ?? cnicPath,
-        selfie_url: null,
+        selfie_url: selfiePath,
         status: 'pending',
       };
 
-      const { data, error } = await supabase.from('verifications').insert(payload).select('*').single();
+      const { data, error } = await supabase.from('verifications').insert(payload).select('id').single();
       if (error) throw new Error(error.message);
 
       setMessage(t('submitSuccess'));
+
+      // Call server API to trigger AI verification
+      try {
+        const res = await fetch(`/api/verification`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ verification_id: data.id, doc_url: payload.doc_url, selfie_url: payload.selfie_url }),
+        });
+        const json = await res.json();
+        if (json.ai_unavailable) {
+          setAiResult({ ai_unavailable: true });
+        } else {
+          setAiResult(json);
+        }
+      } catch (e: any) {
+        setAiResult({ ai_unavailable: true });
+      }
+
       // reload rows
       const { data: list } = await supabase.from('verifications').select('id,type,status,created_at').eq('user_id', user.id).order('created_at', { ascending: false });
       setRows(list || []);
@@ -126,6 +150,12 @@ export default function VerificationPage() {
           </div>
         )}
 
+        <div>
+          <label className="block mb-1 font-medium">{t('fields.selfie')}</label>
+          <input type="file" accept="image/*" onChange={selfie.onChange} />
+          {selfie.preview && <img src={selfie.preview} alt="selfie preview" className="mt-2 w-32 h-32 object-cover rounded" />}
+        </div>
+
         <div className="flex items-center gap-3">
           <button onClick={submit} disabled={loading} className="px-4 py-2 bg-sky-600 text-white rounded">
             {loading ? tc('loading') : t('submit')}
@@ -133,6 +163,8 @@ export default function VerificationPage() {
         </div>
 
         {message && <div className="text-sm text-neutral-700">{message}</div>}
+
+        <div className="mt-4">{aiResult && <AiResultBanner result={aiResult} />}</div>
 
         <div className="mt-6">
           <h2 className="text-lg font-semibold">{t('currentStatus.title')}</h2>

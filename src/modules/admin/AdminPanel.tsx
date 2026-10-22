@@ -82,11 +82,14 @@ export default function AdminPanel() {
                 <div>
                   <div className="text-sm text-neutral-400">{v.type} — {v.status}</div>
                   <div className="font-medium">{v.doc_url}</div>
+                  {v.face_match_score !== null && v.face_match_score !== undefined && (
+                    <div className="text-sm text-neutral-400">{t('colAiScore')}: {Number(v.face_match_score).toFixed(2)}</div>
+                  )}
                   <div className="text-sm text-neutral-400">{new Date(v.created_at).toLocaleString()}</div>
                 </div>
                 <div className="flex gap-2">
-                  {v.status === 'pending' && <button onClick={() => act(v.id, 'approve')} className="px-2 py-1 bg-emerald-600 rounded text-white">{t('approve')}</button>}
-                  {v.status === 'pending' && <button onClick={() => act(v.id, 'reject')} className="px-2 py-1 bg-red-600 rounded text-white">{t('reject')}</button>}
+                  {(v.status === 'pending' || v.status === 'needs_review') && <button onClick={() => act(v.id, 'approve')} className="px-2 py-1 bg-emerald-600 rounded text-white">{t('approve')}</button>}
+                  {(v.status === 'pending' || v.status === 'needs_review') && <button onClick={() => act(v.id, 'reject')} className="px-2 py-1 bg-red-600 rounded text-white">{t('reject')}</button>}
                 </div>
               </div>
             ))

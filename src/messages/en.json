@@ -103,7 +103,8 @@
     "subtitle": "Upload your identity documents for review.",
     "fields": {
       "docType": "Document type",
-      "upload": "Upload document"
+      "upload": "Upload document",
+      "selfie": "Selfie photo"
     },
     "docTypes": {
       "cnic": "CNIC / National ID",
@@ -128,3 +129,12 @@
     "colWhen": "When"
   }
 }
+
+    ,"aiResult": {
+      "verified": "AI verified your document (score: {score})",
+      "needsReview": "AI could not fully verify — your document is queued for manual review.",
+      "rejected": "AI verification failed. Please resubmit clearer photos.",
+      "unavailable": "AI is temporarily unavailable — your submission is queued for manual review."
+    },
+    "colAiScore": "AI score"
+  }
