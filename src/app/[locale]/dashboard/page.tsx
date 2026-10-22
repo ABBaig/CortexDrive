@@ -42,6 +42,14 @@ export default async function DashboardPage({ params }: { params: { locale: stri
     .maybeSingle();
   const verified = ver?.status === 'verified';
 
+  // render earnings section for instructors
+  let earningsSection: null | JSX.Element = null;
+  if (profile?.role === 'instructor') {
+    // importer: server component
+    const InstructorEarnings = (await import('@/modules/earning/InstructorEarnings')).default;
+    earningsSection = <InstructorEarnings instructorId={user.id} /> as unknown as JSX.Element;
+  }
+
   return (
     <AppShell>
       <div className="max-w-2xl mx-auto bg-slate-800 p-6 rounded">

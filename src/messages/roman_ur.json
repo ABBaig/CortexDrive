@@ -13,7 +13,8 @@
     "language": "Zaban",
     "selectLanguage": "Zaban ka intikhab karein",
     "loading": "Loading...",
-    "error": "Koi masla hua hai. Barah-e-karam baad mein koshish karein."
+    "error": "Koi masla hua hai. Barah-e-karam baad mein koshish karein.",
+    "cancel": "Cancel"
   },
   "Wallet": {
     "title": "Wallet",
@@ -28,5 +29,35 @@
     "colAmount": "Raqam",
     "colBalanceAfter": "Balance ke baad",
     "topupFailed": "Top-up nakam"
+  },
+  "Booking": {
+    "title": "Meri Bookings",
+    "empty": "Aapki koi bookings maujood nahi hain.",
+    "cancel": "Cancel karein",
+    "confirmCancel": "Cancel ki tasdeeq karein",
+    "cancelSuccess": "Booking cancel ho gai aur refund process ho gaya.",
+    "cancelFailed": "Booking cancel karne mein nakaami",
+    "colWhen": "Kab",
+    "colStatus": "Status",
+    "colInstructor": "Instructor",
+    "colAmount": "Raqam",
+    "statusBooked": "Booked",
+    "statusRefunded": "Refunded",
+    "missingAmountColumn": "Is booking mein raqam save nahin; refund ka hisaab nahin kiya ja sakta.",
+    "unknownInstructor": "Unknown",
+    "noWallet": "Aapke account ke liye koi wallet nahi mila.",
+    "abort": "Cancel na karein"
+  }
+  ,
+  "Earnings": {
+    "title": "Aamdani",
+    "pending": "Pending (escrow mein)",
+    "released": "Released",
+    "gross": "Gross",
+    "net": "Net",
+    "fee": "Platform fee",
+    "bookingsCount": "bookings",
+    "empty": "Abhi tak koi aamdani nahi.",
+    "error": "Aamdani load nahi ho saki."
   }
 }
