@@ -48,4 +48,16 @@
     "noWallet": "No wallet found for your account.",
     "abort": "Don't cancel"
   }
+  ,
+  "Earnings": {
+    "title": "Earnings",
+    "pending": "Pending (in escrow)",
+    "released": "Released",
+    "gross": "Gross",
+    "net": "Net",
+    "fee": "Platform fee",
+    "bookingsCount": "bookings",
+    "empty": "No earnings yet.",
+    "error": "Unable to load earnings."
+  }
 }
