@@ -1,16 +1,32 @@
-'use client';
+''use client';
 import React, { useEffect, useState } from 'react';
 import { getSupabaseBrowserClient } from '@/lib/supabase/client';
 import { useLocale } from 'next-intl';
 
 export default function AdminPanel(){
+  // keep file focused and small; all client supabase access must use getSupabaseBrowserClient
+
   const supabase = getSupabaseBrowserClient();
   const locale = useLocale();
   const [tab, setTab] = useState<'verifications'|'bookings'|'wallet'|'sos'>('verifications');
   const [verifs, setVerifs] = useState<any[]>([]);
   const [sosLogs, setSosLogs] = useState<any[]>([]);
+  const [bookings, setBookings] = useState<any[]>([]);
+  const [transactions, setTransactions] = useState<any[]>([]);
 
-  useEffect(()=>{ fetchVerifications(); const sub = supabase.channel('public:sos_logs').on('postgres_changes', {event:'INSERT', schema:'public', table:'sos_logs'}, payload=>{ setSosLogs(s=>[payload.new,...s]); }).subscribe(); fetchSos(); return ()=>{ sub.unsubscribe(); } },[]);
+  useEffect(()=>{
+    fetchVerifications();
+    fetchBookings();
+    fetchWalletTransactions();
+    const sub = supabase
+      .channel('public:sos_logs')
+      .on('postgres_changes', {event:'INSERT', schema:'public', table:'sos_logs'}, payload=>{
+        setSosLogs(s=>[payload.new,...s]);
+      })
+      .subscribe();
+    fetchSos();
+    return ()=>{ sub.unsubscribe(); }
+  },[]);
 
   async function fetchVerifications(){
     const { data } = await supabase.from('verifications').select('*').order('created_at',{ascending:false});
@@ -56,14 +72,59 @@ export default function AdminPanel(){
       {tab==='sos' && (
         <div className="mt-4">
           {sosLogs.map(s=> (
-            <div key={s.id} className="border p-2 rounded mb-2">{s.user_id} — {s.message} — {new Date(s.created_at).toLocaleString()}</div>
+            <div key={s.id} className="border p-2 rounded mb-2">{s.user_id} — {s.note ?? s.message} — {new Date(s.created_at).toLocaleString()}</div>
           ))}
         </div>
       )}
 
-      {(tab==='bookings' || tab==='wallet') && (
-        <div className="mt-4 text-neutral-400">Not implemented in this preview</div>
+      {(tab==='bookings') && (
+        <div className="mt-4">
+          {bookings.length===0 && <div className="text-neutral-400">No bookings</div>}
+          {bookings.map(b=> (
+            <div key={b.id} className="border p-3 rounded mb-2">
+              <div className="text-sm text-neutral-400">{b.status} — {new Date(b.created_at).toLocaleString()}</div>
+              <div className="font-medium">Booking {b.id}</div>
+              <div className="text-sm">Learner: {b.learner_id} — Instructor: {b.instructor_id}</div>
+              <div className="text-sm">Slot: {b.slot_start}</div>
+            </div>
+          ))}
+        </div>
+      )
+      }
+
+      {tab==='wallet' && (
+        <div className="mt-4">
+          {transactions.length===0 && <div className="text-neutral-400">No transactions</div>}
+          {transactions.map(t=> (
+            <div key={t.id} className="border p-3 rounded mb-2">
+              <div className="text-sm text-neutral-400">{t.kind} — {new Date(t.created_at).toLocaleString()}</div>
+              <div className="font-medium">{t.amount} PKR</div>
+              <div className="text-sm">Wallet: {t.wallet?.id ?? '—'} Owner: {t.wallet?.user_id ?? '—'}</div>
+            </div>
+          ))}
+        </div>
       )}
     </div>
   );
 }
+
+  async function fetchBookings(){
+    const { data } = await supabase.from('bookings').select('*').order('created_at',{ascending:false});
+    setBookings(data || []);
+  }
+
+  async function fetchWalletTransactions(){
+    // transactions table and wallets table; fetch recent transactions and include wallet via foreign key if present
+    const { data } = await supabase.from('transactions').select('id,kind,amount,created_at,wallets(id,user_id,balance)').order('created_at',{ascending:false}).limit(50);
+    setTransactions(data || []);
+  }
+
+  async function fetchSos(){
+    const { data } = await supabase.from('sos_logs').select('*').order('created_at',{ascending:false});
+    setSosLogs(data || []);
+  }
+
+  async function act(id:string, action:'approve'|'reject'){
+    await supabase.from('verifications').update({status: action==='approve'? 'verified':'rejected'}).eq('id', id);
+    fetchVerifications();
+  }

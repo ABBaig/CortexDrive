@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+import { getSupabaseBrowserClient } from '@/lib/supabase/client';
 import { useRouter } from 'next/navigation';
 
 export default function WalletPage() {
-  const supabase = createClientComponentClient();
+  const supabase = getSupabaseBrowserClient();
   const [wallet, setWallet] = useState<any>(null);
   const [transactions, setTransactions] = useState<any[]>([]);
   const [topupAmount, setTopupAmount] = useState('');
@@ -15,10 +15,10 @@ export default function WalletPage() {
   async function fetchData() {
     setLoading(true);
     const { data: { user } } = await supabase.auth.getUser();
-    if (!user) return router.push('/en/auth/signin');
-    const { data: w } = await supabase.from('wallets').select('*').eq('user_id', user.id).limit(1).single();
+    if (!user) return router.push(`/${user?.locale ?? 'en'}/signin`);
+    const { data: w } = await supabase.from('wallets').select('*').eq('user_id', user.id).limit(1).maybeSingle();
     setWallet(w);
-    const { data: tx } = await supabase.from('transactions').select('*').eq('wallet_id', w.id).order('created_at', { ascending: false });
+    const { data: tx } = await supabase.from('transactions').select('*').eq('wallet_id', w?.id ?? null).order('created_at', { ascending: false });
     setTransactions(tx || []);
     setLoading(false);
   }

@@ -3,6 +3,7 @@ import { redirect } from 'next/navigation';
 import { getSupabaseServerClient } from '@/lib/supabase/server';
 import AppShell from '@/components/AppShell';
 import BackButton from '@/components/BackButton';
+import SOSButtonClientWrapper from '@/modules/safety/SOSButtonClientWrapper';
 
 export default async function DashboardPage({ params }: { params: { locale: string } }) {
   const supabase = getSupabaseServerClient();
@@ -27,12 +28,8 @@ export default async function DashboardPage({ params }: { params: { locale: stri
 
   if (wallet?.balance !== undefined && wallet?.balance !== null) balance = wallet.balance;
   if (balance === null) {
-    // fallback to transactions sum for this user
-    const { data: txs } = await supabase
-      .from('transactions')
-      .select('amount')
-      .eq('user_id', user.id);
-    if (txs) balance = (txs as any[]).reduce((s: number, r: any) => s + Number(r.amount || 0), 0);
+    // fallback: no transactions query by user_id because transactions table has no user_id column
+    balance = 0;
   }
   if (balance === null) balance = 0;
   const safeBalance: number = balance ?? 0;
@@ -68,12 +65,7 @@ export default async function DashboardPage({ params }: { params: { locale: stri
 
           <div className="col-span-2 mt-4">
             {/* Mount client SOSButton via the existing client wrapper */}
-            <div id="sos-button-root" />
-            <script
-              dangerouslySetInnerHTML={{
-                __html: `(function(){try{const root=document.getElementById('sos-button-root'); if(!root) return; const s=document.createElement('script'); s.type='module'; s.innerHTML="import React from 'react';import { createRoot } from 'react-dom/client';import Wrapper from '/src/modules/safety/SOSButtonClientWrapper';const container=document.getElementById('sos-button-root'); if(container) { const root2=createRoot(container); root2.render(React.createElement(Wrapper)); }"; document.body.appendChild(s);}catch(e){console.error(e)}})();`,
-              }}
-            />
+            <SOSButtonClientWrapper />
           </div>
 
           <a href={`/${params.locale}/security`} className="p-2 bg-slate-700 rounded text-white">Security</a>
