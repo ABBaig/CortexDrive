@@ -80,7 +80,8 @@
     "colWhen": "Kab",
     "colType": "Qism",
     "colStatus": "Status",
-    "colUser": "User"
+    "colUser": "User",
+    "colAiScore": "AI score"
   },
   "SOS": {
     "title": "SOS",
@@ -103,7 +104,8 @@
     "subtitle": "Apne shanakhti documents review ke liye upload karein.",
     "fields": {
       "docType": "Document ki qism",
-      "upload": "Document upload karein"
+      "upload": "Document upload karein",
+      "selfie": "Selfie photo"
     },
     "docTypes": {
       "cnic": "CNIC / National ID",
@@ -125,6 +127,12 @@
       "rejected": "Rad Shuda",
       "pending": "Pending"
     },
-    "colWhen": "Kab"
+    "colWhen": "Kab",
+    "aiResult": {
+      "verified": "AI ne aap ki document tasdeeq kar di (score: {score})",
+      "needsReview": "AI mukammal tasdeeq nahi kar saka — document manual review ke liye intezar mein hai.",
+      "rejected": "AI tasdeeq nakam ho gai. Barah-e-karam wazeh tasaveer dobara submit karein.",
+      "unavailable": "AI waqt bhar ke liye available nahi — submission manual review ke liye queue mein hai."
+    }
   }
 }
