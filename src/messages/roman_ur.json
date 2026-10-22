@@ -14,5 +14,14 @@
     "selectLanguage": "Zaban ka intikhab karein",
     "loading": "Loading...",
     "error": "Koi masla hua hai. Barah-e-karam baad mein koshish karein."
+  },
+  "Wallet": {
+    "title": "Wallet",
+    "noWallet": "Aapke account ke liye koi wallet nahi mila.",
+    "balance": "Balance",
+    "topupLabel": "Top Up (sandbox)",
+    "topupButton": "Top Up",
+    "transactions": "Transactions",
+    "noTransactions": "Abhi tak koi transactions nahi."
   }
 }
