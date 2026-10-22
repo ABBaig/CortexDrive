@@ -136,12 +136,3 @@
     }
   }
 }
-
-    ,"aiResult": {
-      "verified": "AI verified your document (score: {score})",
-      "needsReview": "AI could not fully verify — your document is queued for manual review.",
-      "rejected": "AI verification failed. Please resubmit clearer photos.",
-      "unavailable": "AI is temporarily unavailable — your submission is queued for manual review."
-    },
-    "colAiScore": "AI score"
-  }
