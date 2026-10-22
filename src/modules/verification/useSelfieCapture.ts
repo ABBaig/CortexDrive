@@ -1,19 +1,12 @@
-'use client';
+"use client";
 
-import { useCallback, useEffect, useState, useRef } from 'react';
-import type { ChangeEvent } from 'react';
+import { useEffect, useState, useRef } from 'react';
 
-/**
- * Captures a selfie from a plain file input.
- * preview is an object URL for display ONLY (never sent to the server).
- * Object URLs are revoked on replace and unmount so blob URLs never leak.
- */
 export default function useSelfieCapture() {
   const [file, setFile] = useState<File | null>(null);
   const [preview, setPreview] = useState<string | null>(null);
   const prevUrl = useRef<string | null>(null);
 
-  // Revoke on unmount
   useEffect(() => {
     return () => {
       if (prevUrl.current) {
@@ -23,14 +16,13 @@ export default function useSelfieCapture() {
     };
   }, []);
 
-  const onChange = useCallback((e: ChangeEvent<HTMLInputElement>) => {
+  function onChange(e: React.ChangeEvent<HTMLInputElement>) {
     const f = e.target.files?.[0] ?? null;
-    // Revoke any previous object URL before creating a new one
+    setFile(f);
     if (prevUrl.current) {
       URL.revokeObjectURL(prevUrl.current);
       prevUrl.current = null;
     }
-    setFile(f);
     if (f) {
       const url = URL.createObjectURL(f);
       prevUrl.current = url;
@@ -38,16 +30,16 @@ export default function useSelfieCapture() {
     } else {
       setPreview(null);
     }
-  }, []);
+  }
 
-  const clear = useCallback(() => {
+  function clear() {
     if (prevUrl.current) {
       URL.revokeObjectURL(prevUrl.current);
       prevUrl.current = null;
     }
     setFile(null);
     setPreview(null);
-  }, []);
+  }
 
-  return { file, setFile, preview, onChange, clear } as const;
+  return { file, preview, onChange, clear, setFile } as const;
 }

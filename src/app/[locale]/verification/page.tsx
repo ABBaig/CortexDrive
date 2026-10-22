@@ -26,7 +26,7 @@ export default function VerificationPage() {
   const [cnic, setCnic] = useState<File | null>(null);
   const [license, setLicense] = useState<File | null>(null);
   const selfie = useSelfieCapture();
-  const [aiResult, setAiResult] = useState<AiResult | null>(null);
+  const [aiResult, setAiResult] = useState<any | null>(null);
   const [docType, setDocType] = useState<'cnic' | 'driving_license'>('cnic');
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
@@ -110,6 +110,24 @@ export default function VerificationPage() {
       }
 
       setMessage(t('submitSuccess'));
+
+      // Call server API to trigger AI verification
+      try {
+        const res = await fetch(`/api/verification`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ verification_id: data.id, doc_url: payload.doc_url, selfie_url: payload.selfie_url }),
+        });
+        const json = await res.json();
+        if (json.ai_unavailable) {
+          setAiResult({ ai_unavailable: true });
+        } else {
+          setAiResult(json);
+        }
+      } catch (e: any) {
+        setAiResult({ ai_unavailable: true });
+      }
+
       // reload rows
       const { data: list } = await supabase.from('verifications').select('id,type,status,created_at').eq('user_id', user.id).order('created_at', { ascending: false });
       setRows(list || []);
@@ -166,7 +184,7 @@ export default function VerificationPage() {
 
         {message && <div className="text-sm text-neutral-700">{message}</div>}
 
-        {aiResult && <div className="mt-4"><AiResultBanner result={aiResult} /></div>}
+        <div className="mt-4">{aiResult && <AiResultBanner result={aiResult} />}</div>
 
         <div className="mt-6">
           <h2 className="text-lg font-semibold">{t('currentStatus.title')}</h2>
