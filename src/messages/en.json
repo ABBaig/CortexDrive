@@ -1,4 +1,3 @@
-
 {
   "Home": {
     "title": "CortexDrive",
@@ -15,5 +14,19 @@
     "selectLanguage": "Select Language",
     "loading": "Loading...",
     "error": "An error occurred. Please try again later."
+  },
+  "Wallet": {
+    "title": "Wallet",
+    "noWallet": "No wallet found for your account.",
+    "balance": "Balance",
+    "topupLabel": "Top Up (sandbox)",
+    "topupButton": "Top Up",
+    "transactions": "Transactions",
+    "noTransactions": "No transactions yet.",
+    "colWhen": "When",
+    "colKind": "Kind",
+    "colAmount": "Amount",
+    "colBalanceAfter": "Balance After",
+    "topupFailed": "Top-up failed"
   }
 }

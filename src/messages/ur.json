@@ -14,5 +14,19 @@
     "selectLanguage": "زبان منتخب کریں",
     "loading": "لوڈ ہو رہا ہے...",
     "error": "ایک خرابی پیش آگئی۔ براہ کرم بعد میں دوبارہ کوشش کریں۔"
+  },
+  "Wallet": {
+    "title": "والیٹ",
+    "noWallet": "آپ کے اکاؤنٹ کے لیے کوئی والیٹ نہیں ملا۔",
+    "balance": "بیلنس",
+    "topupLabel": "ٹاپ اپ (سینڈ باکس)",
+    "topupButton": "ٹاپ اپ",
+    "transactions": "لین دین",
+    "noTransactions": "ابھی تک کوئی لین دین نہیں۔",
+    "colWhen": "کب",
+    "colKind": "قسم",
+    "colAmount": "رقم",
+    "colBalanceAfter": "بیلنس کے بعد",
+    "topupFailed": "ٹاپ اپ ناکام"
   }
 }
