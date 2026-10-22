@@ -41,8 +41,8 @@ return (
           messages={messages}
         >
           {children}
+          <FloatingAIChat locale={locale} />
         </NextIntlClientProvider>
-        <FloatingAIChat locale={locale} />
       </body>
     </html>
   );
