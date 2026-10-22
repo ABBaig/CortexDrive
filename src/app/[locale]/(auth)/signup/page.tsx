@@ -1,3 +1,4 @@
+'use client';
 import BackButton from '@/components/BackButton';
 import AuthPanel from '@/components/auth/AuthPanel';
 import { useRouter } from 'next/navigation';
