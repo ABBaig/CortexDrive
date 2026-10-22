@@ -32,9 +32,9 @@ export default function SOSPage(){
       const loc = await getLocation();
       const { data, error } = await supabase.from('sos_logs').insert([{ user_id: user.id, lat: loc?.lat ?? null, lng: loc?.lng ?? null, note: t('note') }]);
       if (error) throw error;
-      alert(t('sent'));
+      alert(t('sentAlert'));
     }catch(e:any){
-      alert(t('error')+': '+(e.message||String(e)));
+      alert(t('failedAlert')+': '+(e.message||String(e)));
     }finally{ setSending(false); }
   }
 
@@ -58,15 +58,18 @@ export default function SOSPage(){
 
         <div>
           <h2 className="text-xl mb-2">{t('recent')}</h2>
-          <ul className="space-y-2">
-            {events.map((ev,i)=> (
-              <li key={i} className="p-3 bg-slate-800 rounded">
-                <div className="text-sm text-neutral-400">User: {ev.user_id}</div>
-                <div>Note: {ev.note}</div>
-                <div className="text-sm text-neutral-400">At: {new Date(ev.created_at).toLocaleString()}</div>
-              </li>
-            ))}
-          </ul>
+          {events.length === 0 ? (
+            <div className="text-sm text-neutral-400">{t('empty')}</div>
+          ) : (
+            <ul className="space-y-2">
+              {events.map((ev,i)=> (
+                <li key={i} className="p-3 bg-slate-800 rounded">
+                  <div className="text-sm text-neutral-400">{ev.user_id} — {ev.note}</div>
+                  <div className="text-sm text-neutral-400">{new Date(ev.created_at).toLocaleString()}</div>
+                </li>
+              ))}
+            </ul>
+          )}
         </div>
       </div>
     </AppShell>
