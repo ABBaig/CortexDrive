@@ -1,0 +1,69 @@
+'use client';
+import React, { useEffect, useState } from 'react';
+import { getSupabaseBrowserClient } from '@/lib/supabase/client';
+import { useLocale } from 'next-intl';
+
+export default function AdminPanel(){
+  const supabase = getSupabaseBrowserClient();
+  const locale = useLocale();
+  const [tab, setTab] = useState<'verifications'|'bookings'|'wallet'|'sos'>('verifications');
+  const [verifs, setVerifs] = useState<any[]>([]);
+  const [sosLogs, setSosLogs] = useState<any[]>([]);
+
+  useEffect(()=>{ fetchVerifications(); const sub = supabase.channel('public:sos_logs').on('postgres_changes', {event:'INSERT', schema:'public', table:'sos_logs'}, payload=>{ setSosLogs(s=>[payload.new,...s]); }).subscribe(); fetchSos(); return ()=>{ sub.unsubscribe(); } },[]);
+
+  async function fetchVerifications(){
+    const { data } = await supabase.from('verifications').select('*').order('created_at',{ascending:false});
+    setVerifs(data || []);
+  }
+  async function fetchSos(){
+    const { data } = await supabase.from('sos_logs').select('*').order('created_at',{ascending:false});
+    setSosLogs(data || []);
+  }
+
+  async function act(id:string, action:'approve'|'reject'){
+    await supabase.from('verifications').update({status: action==='approve'? 'verified':'rejected'}).eq('id', id);
+    fetchVerifications();
+  }
+
+  return (
+    <div className="mt-6">
+      <div className="flex gap-2">
+        <button className={`px-3 py-1 ${tab==='verifications'?'bg-slate-700':''}`} onClick={()=>setTab('verifications')}>Pending Verifications</button>
+        <button className={`px-3 py-1 ${tab==='bookings'?'bg-slate-700':''}`} onClick={()=>setTab('bookings')}>Bookings</button>
+        <button className={`px-3 py-1 ${tab==='wallet'?'bg-slate-700':''}`} onClick={()=>setTab('wallet')}>Wallet</button>
+        <button className={`px-3 py-1 ${tab==='sos'?'bg-slate-700':''}`} onClick={()=>setTab('sos')}>SOS Log</button>
+      </div>
+
+      {tab==='verifications' && (
+        <div className="mt-4">
+          {verifs.length===0 && <div>No verifications</div>}
+          {verifs.map(v=> (
+            <div key={v.id} className="border p-3 rounded mb-2 flex justify-between items-center">
+              <div>
+                <div className="text-sm text-neutral-400">{v.doc_type} - {v.status}</div>
+                <div className="font-medium">{v.doc_url}</div>
+              </div>
+              <div className="flex gap-2">
+                {v.status==='pending' && <button onClick={()=>act(v.id,'approve')} className="px-2 py-1 bg-emerald-600 rounded">Approve</button>}
+                {v.status==='pending' && <button onClick={()=>act(v.id,'reject')} className="px-2 py-1 bg-red-600 rounded">Reject</button>}
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {tab==='sos' && (
+        <div className="mt-4">
+          {sosLogs.map(s=> (
+            <div key={s.id} className="border p-2 rounded mb-2">{s.user_id} — {s.message} — {new Date(s.created_at).toLocaleString()}</div>
+          ))}
+        </div>
+      )}
+
+      {(tab==='bookings' || tab==='wallet') && (
+        <div className="mt-4 text-neutral-400">Not implemented in this preview</div>
+      )}
+    </div>
+  );
+}
