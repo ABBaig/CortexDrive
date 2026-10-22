@@ -2,11 +2,11 @@
 import BackButton from '@/components/BackButton';
 import AuthPanel from '@/components/auth/AuthPanel';
 import { useRouter } from 'next/navigation';
-import { createBrowserSupabaseClient } from '@/lib/supabase/client';
+import { getSupabaseBrowserClient } from '@/lib/supabase/client';
 import { useEffect } from 'react';
 
 export default function SignInPage(){
-  const supabase = createBrowserSupabaseClient();
+  const supabase = getSupabaseBrowserClient();
   const router = useRouter();
 
   useEffect(()=>{
