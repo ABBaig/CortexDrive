@@ -94,7 +94,7 @@ export default function WalletPage() {
       const newBalance = Number(w.balance) + amt;
       // existing sandbox top-up behavior (pre-existing) — keep intact
       const { error: err } = await supabase.from('transactions').insert([{ wallet_id: w.id, kind: 'topup', amount: amt, balance_after: newBalance, meta: { source: 'demo' } }]);
-      if (err) { alert('Failed: ' + err.message); setLoading(false); return; }
+      if (err) { setError(t('topupFailed') + ': ' + err.message); setLoading(false); return; }
       await supabase.from('wallets').update({ balance: newBalance }).eq('id', w.id);
       setTopupAmount('');
       await fetchData();
