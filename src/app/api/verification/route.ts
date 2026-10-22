@@ -14,10 +14,9 @@ export async function POST(req: NextRequest) {
     }
 
     // Call Edge Function with service role key
-    let aiRes: Response | null = null;
     let aiJson: any = null;
     try {
-      aiRes = await fetch(`${process.env.SUPABASE_URL?.replace(/\/$/, '')}/functions/v1/ai-verify`, {
+      const aiRes = await fetch(`${process.env.SUPABASE_URL?.replace(/\/$/, '')}/functions/v1/ai-verify`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -48,10 +47,28 @@ export async function POST(req: NextRequest) {
     if (aiJson.raw !== undefined) updates.ocr_payload = aiJson.raw;
     if (aiJson.face_match_score !== undefined) updates.face_match_score = aiJson.face_match_score;
 
-    const { data, error: updateError } = await supabase.from('verifications').update(updates).eq('id', verification_id).eq('user_id', user.id).select().limit(1).single();
-    if (updateError) {
-      // If columns missing or other db error, still return ai result summary but report error
-      return NextResponse.json({ message: updateError.message }, { status: 500 });
+    try {
+      const { data, error: updateError } = await supabase.from('verifications').update(updates).eq('id', verification_id).eq('user_id', user.id).select().limit(1).single();
+      if (updateError) throw updateError;
+    } catch (err: any) {
+      // If columns missing or other db error, retry with only status and report missing columns
+      try {
+        const { data: d2, error: e2 } = await supabase.from('verifications').update({ status }).eq('id', verification_id).eq('user_id', user.id).select().limit(1).single();
+        if (e2) throw e2;
+        const out = {
+          status,
+          face_match_score: aiJson.face_match_score ?? null,
+          ocr: {
+            full_name: aiJson.full_name ?? null,
+            cnic_number: aiJson.cnic_number ?? null,
+            dob: aiJson.dob ?? null,
+          },
+          missing_columns: ['ocr_payload', 'face_match_score'],
+        };
+        return NextResponse.json(out);
+      } catch (e3: any) {
+        return NextResponse.json({ message: e3.message }, { status: 500 });
+      }
     }
 
     const out = {

@@ -67,7 +67,7 @@ export default function VerificationPage() {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error(t('errors.notSignedIn'));
       if (!cnic || (docType === 'driving_license' && !license)) throw new Error(t('errors.noFile'));
-      if (!selfie.file) throw new Error(t('Validation.selfieRequired') ?? t('errors.noFile'));
+      if (!selfie.file) throw new Error(t('errors.noFile'));
 
       // Upload files to private storage under verifications/{user.id}/...
       const cnicPath = await uploadToStorage(cnic!, user.id, 'cnic');
@@ -149,6 +149,12 @@ export default function VerificationPage() {
             <input type="file" accept="image/*" onChange={(e) => setLicense(e.target.files?.[0] ?? null)} />
           </div>
         )}
+
+        <div>
+          <label className="block mb-1 font-medium">{t('fields.selfie')}</label>
+          <input type="file" accept="image/*" onChange={selfie.onChange} />
+          {selfie.preview && <img src={selfie.preview} alt="selfie preview" className="mt-2 w-32 h-32 object-cover rounded" />}
+        </div>
 
         <div className="flex items-center gap-3">
           <button onClick={submit} disabled={loading} className="px-4 py-2 bg-sky-600 text-white rounded">
