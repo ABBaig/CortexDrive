@@ -5,6 +5,7 @@ import { getSupabaseBrowserClient } from '@/lib/supabase/client';
 import { useTranslations } from 'next-intl';
 import useSelfieCapture from '@/modules/verification/useSelfieCapture';
 import AiResultBanner from '@/modules/verification/AiResultBanner';
+import type { AiResult } from '@/modules/verification/types';
 
 function StatusBadge({ status }: { status: string }) {
   const t = useTranslations('Verification');
@@ -25,7 +26,7 @@ export default function VerificationPage() {
   const [cnic, setCnic] = useState<File | null>(null);
   const [license, setLicense] = useState<File | null>(null);
   const selfie = useSelfieCapture();
-  const [aiResult, setAiResult] = useState<any | null>(null);
+  const [aiResult, setAiResult] = useState<AiResult | null>(null);
   const [docType, setDocType] = useState<'cnic' | 'driving_license'>('cnic');
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
@@ -62,6 +63,7 @@ export default function VerificationPage() {
 
   async function submit() {
     setMessage(null);
+    setAiResult(null);
     setLoading(true);
     try {
       const { data: { user } } = await supabase.auth.getUser();
@@ -77,7 +79,7 @@ export default function VerificationPage() {
       }
       const selfiePath = await uploadToStorage(selfie.file, user.id, 'selfie');
 
-      // Insert verification row
+      // Insert verification row (pending)
       const payload: any = {
         user_id: user.id,
         type: docType,
@@ -89,25 +91,25 @@ export default function VerificationPage() {
       const { data, error } = await supabase.from('verifications').insert(payload).select('id').single();
       if (error) throw new Error(error.message);
 
-      setMessage(t('submitSuccess'));
-
-      // Call server API to trigger AI verification
+      // Trigger AI verification via the server route (owner-checked) — called ONCE
       try {
-        const res = await fetch(`/api/verification`, {
+        const res = await fetch('/api/verification', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ verification_id: data.id, doc_url: payload.doc_url, selfie_url: payload.selfie_url }),
         });
         const json = await res.json();
         if (json.ai_unavailable) {
-          setAiResult({ ai_unavailable: true });
+          setAiResult({ ai_unavailable: true, status: 'unavailable' });
         } else {
-          setAiResult(json);
+          setAiResult(json as AiResult);
         }
-      } catch (e: any) {
-        setAiResult({ ai_unavailable: true });
+      } catch {
+        // Network failure of the AI step must not fail the submission (row stays 'pending')
+        setAiResult({ ai_unavailable: true, status: 'unavailable' });
       }
 
+      setMessage(t('submitSuccess'));
       // reload rows
       const { data: list } = await supabase.from('verifications').select('id,type,status,created_at').eq('user_id', user.id).order('created_at', { ascending: false });
       setRows(list || []);
@@ -164,7 +166,7 @@ export default function VerificationPage() {
 
         {message && <div className="text-sm text-neutral-700">{message}</div>}
 
-        <div className="mt-4">{aiResult && <AiResultBanner result={aiResult} />}</div>
+        {aiResult && <div className="mt-4"><AiResultBanner result={aiResult} /></div>}
 
         <div className="mt-6">
           <h2 className="text-lg font-semibold">{t('currentStatus.title')}</h2>

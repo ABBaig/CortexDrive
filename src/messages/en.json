@@ -80,7 +80,8 @@
     "colWhen": "When",
     "colType": "Type",
     "colStatus": "Status",
-    "colUser": "User"
+    "colUser": "User",
+    "colAiScore": "AI score"
   },
   "SOS": {
     "title": "SOS",
@@ -99,8 +100,8 @@
     }
   },
   "Verification": {
-    "title": "Verification",
-    "subtitle": "Upload your identity documents for review.",
+    "title": "Document verification",
+    "subtitle": "Upload your ID and a selfie for automated verification",
     "fields": {
       "docType": "Document type",
       "upload": "Upload document",
@@ -126,15 +127,12 @@
       "rejected": "Rejected",
       "pending": "Pending"
     },
-    "colWhen": "When"
-  }
-}
-
-    ,"aiResult": {
+    "colWhen": "When",
+    "aiResult": {
       "verified": "AI verified your document (score: {score})",
       "needsReview": "AI could not fully verify — your document is queued for manual review.",
       "rejected": "AI verification failed. Please resubmit clearer photos.",
       "unavailable": "AI is temporarily unavailable — your submission is queued for manual review."
-    },
-    "colAiScore": "AI score"
+    }
   }
+}
