@@ -4,6 +4,7 @@ import { getSupabaseServerClient } from '@/lib/supabase/server';
 import AppShell from '@/components/AppShell';
 import BackButton from '@/components/BackButton';
 import SOSButtonClientWrapper from '@/modules/safety/SOSButtonClientWrapper';
+import InstructorEarnings from '@/modules/earning/InstructorEarnings';
 
 export default async function DashboardPage({ params }: { params: { locale: string } }) {
   const supabase = getSupabaseServerClient();
@@ -42,14 +43,6 @@ export default async function DashboardPage({ params }: { params: { locale: stri
     .maybeSingle();
   const verified = ver?.status === 'verified';
 
-  // render earnings section for instructors
-  let earningsSection: null | JSX.Element = null;
-  if (profile?.role === 'instructor') {
-    // importer: server component
-    const InstructorEarnings = (await import('@/modules/earning/InstructorEarnings')).default;
-    earningsSection = <InstructorEarnings instructorId={user.id} /> as unknown as JSX.Element;
-  }
-
   return (
     <AppShell>
       <div className="max-w-2xl mx-auto bg-slate-800 p-6 rounded">
@@ -62,6 +55,10 @@ export default async function DashboardPage({ params }: { params: { locale: stri
           <div><strong>Verified:</strong> {verified ? 'Yes' : 'No'}</div>
           <div className="mt-4"><strong>Wallet:</strong> PKR {safeBalance.toFixed(2)}</div>
         </div>
+
+        {profile?.role === 'instructor' ? (
+          <InstructorEarnings instructorId={user.id} locale={params.locale} />
+        ) : null}
 
         <nav className="mt-6 grid grid-cols-2 gap-2">
           <a href={`/${params.locale}/verification`} className="p-2 bg-slate-700 rounded text-white">Verification</a>
