@@ -1,5 +1,6 @@
 'use client';
 import React, { useRef, useState } from 'react';
+import BackButton from '@/components/BackButton';
 
 export default function BookingPage() {
   const [tracking, setTracking] = useState(false);
@@ -46,6 +47,7 @@ export default function BookingPage() {
 
   return (
     <div className="p-8 max-w-3xl mx-auto">
+      <BackButton/>
       <h1 className="text-2xl font-semibold mb-4">Booking Trip Telematics</h1>
       <div className="mb-4">
         {tracking ? (

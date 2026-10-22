@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import InstructorCard from '@/modules/marketplace/components/InstructorCard';
+import BackButton from '@/components/BackButton';
 import { getSupabase } from '@/modules/marketplace/client';
 
 export default async function Marketplace() {
@@ -20,6 +21,7 @@ export default async function Marketplace() {
         <header className="flex items-center justify-between">
           <h1 className="text-2xl font-semibold">Instructors</h1>
         </header>
+        <BackButton/>
         <p className="mt-4 text-muted">Browse instructors by city, verification status, and rating.</p>
         <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-4">
           {(profiles ?? cities.map((c)=>({ user_id: c, full_name: c, city: c, verification_status:'unverified', hourly_rate:0 }))).map((p:any) => (
