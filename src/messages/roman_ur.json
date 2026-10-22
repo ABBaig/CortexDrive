@@ -47,8 +47,7 @@
     "unknownInstructor": "Unknown",
     "noWallet": "Aapke account ke liye koi wallet nahi mila.",
     "abort": "Cancel na karein"
-  }
-  ,
+  },
   "Earnings": {
     "title": "Aamdani",
     "pending": "Pending (escrow mein)",

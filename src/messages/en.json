@@ -47,8 +47,7 @@
     "unknownInstructor": "Unknown",
     "noWallet": "No wallet found for your account.",
     "abort": "Don't cancel"
-  }
-  ,
+  },
   "Earnings": {
     "title": "Earnings",
     "pending": "Pending (in escrow)",
