@@ -41,7 +41,7 @@ export default function WalletPage() {
     try {
       const { data: userData } = await supabase.auth.getUser();
       const user = userData.user;
-      if (!user) return void router.push(`/${locale}/auth/signin`);
+      if (!user) return void router.push(`/${locale}/signin`);
 
       const { data: w, error: wErr } = await supabase.from('wallets').select('*').eq('user_id', user.id).limit(1).single();
       if (wErr && wErr.code !== 'PGRST116') {
@@ -89,7 +89,7 @@ export default function WalletPage() {
     try {
       const { data: userData } = await supabase.auth.getUser();
       const user = userData.user;
-      if (!user) return void router.push(`/${locale}/auth/signin`);
+      if (!user) return void router.push(`/${locale}/signin`);
       const { data: w } = await supabase.from('wallets').select('*').eq('user_id', user.id).limit(1).single();
       const newBalance = Number(w.balance) + amt;
       // existing sandbox top-up behavior (pre-existing) — keep intact

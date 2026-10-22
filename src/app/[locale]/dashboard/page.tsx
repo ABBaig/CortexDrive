@@ -7,7 +7,7 @@ import SOSButtonClientWrapper from '@/modules/safety/SOSButtonClientWrapper';
 import InstructorEarnings from '@/modules/earning/InstructorEarnings';
 
 export default async function DashboardPage({ params }: { params: { locale: string } }) {
-  const supabase = getSupabaseServerClient();
+  const supabase = await getSupabaseServerClient();
   const { data: { session } } = await supabase.auth.getSession();
   if (!session) redirect(`/${params.locale}/signin`);
   const user = session.user;
@@ -65,7 +65,7 @@ export default async function DashboardPage({ params }: { params: { locale: stri
           <a href={`/${params.locale}/marketplace`} className="p-2 bg-slate-700 rounded text-white">Marketplace</a>
           <a href={`/${params.locale}/wallet`} className="p-2 bg-slate-700 rounded text-white">Wallet</a>
           <a href={`/${params.locale}/ai-tutor`} className="p-2 bg-slate-700 rounded text-white">AI Tutor</a>
-          <a href={`/${params.locale}/vehicle`} className="p-2 bg-slate-700 rounded text-white">Vehicle</a>
+          {/* vehicle link removed intentionally */}
           <a href={`/${params.locale}/sos`} className="p-2 bg-slate-700 rounded text-white">SOS</a>
 
           <div className="col-span-2 mt-4">
