@@ -3,11 +3,11 @@
 import React, { useEffect, useState } from 'react';
 import AppShell from '@/components/AppShell';
 import { getSupabaseBrowserClient } from '@/lib/supabase/client';
-import { useLocale } from 'next-intl';
+import { useTranslations } from 'next-intl';
 
 export default function SOSPage(){
   const supabase = getSupabaseBrowserClient();
-  const locale = useLocale();
+  const t = useTranslations('SOS');
   const [sending,setSending]=useState(false);
   const [events,setEvents]=useState<any[]>([]);
 
@@ -26,12 +26,15 @@ export default function SOSPage(){
   async function sendSOS(){
     setSending(true);
     try{
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error(t('errors.notSignedIn'));
+
       const loc = await getLocation();
-      const { data, error } = await supabase.from('sos_logs').insert([{ user_id: (await supabase.auth.getUser()).data.user?.id, lat: loc?.lat, lng: loc?.lng, note: 'SOS triggered from app' }]);
+      const { data, error } = await supabase.from('sos_logs').insert([{ user_id: user.id, lat: loc?.lat ?? null, lng: loc?.lng ?? null, note: t('note') }]);
       if (error) throw error;
-      alert('SOS sent');
+      alert(t('sent'));
     }catch(e:any){
-      alert('Failed to send SOS: '+(e.message||String(e)));
+      alert(t('error')+': '+(e.message||String(e)));
     }finally{ setSending(false); }
   }
 
@@ -45,16 +48,16 @@ export default function SOSPage(){
   return (
     <AppShell>
       <div className="max-w-3xl mx-auto">
-        <h1 className="text-2xl font-semibold mb-4">SOS</h1>
+        <h1 className="text-2xl font-semibold mb-4">{t('title')}</h1>
         <div className="mb-6">
           <button onClick={sendSOS} disabled={sending} className="w-full py-6 text-lg font-bold bg-red-600 text-white rounded shadow-lg hover:bg-red-700">
-            {sending? 'Sending...' : 'EMERGENCY: Send SOS'}
+            {sending? t('sending') : t('send')}
           </button>
-          <p className="text-sm text-neutral-400 mt-2">This will notify nearby instructors and admins in real-time.</p>
+          <p className="text-sm text-neutral-400 mt-2">{t('subtitle')}</p>
         </div>
 
         <div>
-          <h2 className="text-xl mb-2">Recent SOS events</h2>
+          <h2 className="text-xl mb-2">{t('recent')}</h2>
           <ul className="space-y-2">
             {events.map((ev,i)=> (
               <li key={i} className="p-3 bg-slate-800 rounded">

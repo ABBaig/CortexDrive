@@ -59,5 +59,71 @@
     "bookingsCount": "bookings",
     "empty": "Abhi tak koi aamdani nahi.",
     "error": "Aamdani load nahi ho saki."
+  },
+  "Admin": {
+    "adminNotAuthorized": "Not authorized to view admin panel.",
+    "title": "Admin",
+    "tabs": {
+      "verifications": "Pending Verifications",
+      "bookings": "Bookings",
+      "wallet": "Wallet Transactions",
+      "sos": "SOS Log"
+    },
+    "loading": "Loading...",
+    "error": "An error occurred",
+    "emptyVerifications": "No pending verifications",
+    "emptyBookings": "No bookings",
+    "emptyTransactions": "No transactions",
+    "emptySos": "No SOS logs",
+    "approve": "Approve",
+    "reject": "Reject",
+    "colWhen": "When",
+    "colType": "Type",
+    "colStatus": "Status",
+    "colUser": "User"
+  },
+  "SOS": {
+    "title": "SOS",
+    "subtitle": "Yeh qareebi instructors aur admins ko realtime mein muttala karega.",
+    "send": "EMERGENCY: Send SOS",
+    "sending": "Sending...",
+    "sent": "EMERGENCY SOS SENT",
+    "error": "Failed to send SOS",
+    "note": "SOS trigger hua app se",
+    "sentAlert": "SOS sent",
+    "failedAlert": "Failed to send SOS",
+    "recent": "Recent SOS events",
+    "empty": "No SOS events yet.",
+    "errors": {
+      "notSignedIn": "Aapko SOS bhejne ke liye sign in hona zaruri hai"
+    }
+  },
+  "Verification": {
+    "title": "Verification",
+    "subtitle": "Apne identity documents upload karein review ke liye.",
+    "fields": {
+      "docType": "Document type",
+      "upload": "Upload document"
+    },
+    "docTypes": {
+      "cnic": "CNIC / National ID",
+      "drivingLicense": "Driving License (instructors)"
+    },
+    "submit": "Submit for verification",
+    "submitSuccess": "Verification submitted and is pending review.",
+    "errors": {
+      "notSignedIn": "Aapko sign in hona zaruri hai"
+    },
+    "currentStatus": {
+      "title": "Your verifications",
+      "empty": "Aapne koi verification submit nahi ki"
+    },
+    "status": {
+      "verified": "Verified",
+      "needsReview": "Needs Review",
+      "rejected": "Rejected",
+      "pending": "Pending"
+    },
+    "colWhen": "When"
   }
 }
