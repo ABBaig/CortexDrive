@@ -1,5 +1,6 @@
 'use client';
 import React, { useEffect, useState } from 'react';
+import BackButton from '@/components/BackButton';
 
 export default function AITutorPage() {
   const [message, setMessage] = useState('');
@@ -32,6 +33,7 @@ export default function AITutorPage() {
 
   return (
     <div className="p-8 max-w-3xl mx-auto">
+      <BackButton/>
       <h1 className="text-2xl font-semibold mb-4">AI Driving Tutor</h1>
       <div className="border rounded p-4 mb-4 max-h-96 overflow-auto space-y-2 bg-white">
         {messages.length===0 && <div className="text-neutral-500">Start a conversation with the AI driving tutor. Replies are short and practical.</div>}
