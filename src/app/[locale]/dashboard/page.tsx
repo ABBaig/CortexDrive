@@ -1,16 +1,17 @@
 import { getSupabaseServerClient } from '@/lib/supabase/server';
 import AppShell from '@/components/AppShell';
+import BackButton from '@/components/BackButton';
 
 export default async function DashboardPage({ params }:{ params:any }){
-  const supabase = createServerSupabaseClient();
+  const supabase = getSupabaseServerClient();
   const { data } = await supabase.auth.getSession();
   if (!data.session) return new Response(null,{ status:302, headers:{ Location:`/${params.locale}/signin`} });
   const user = data.session.user;
   // fetch profile
-  const { data: profile } = await supabase.from('users').select('full_name,city,role').eq('id', user.id).single().maybeSingle();
+  const { data: profile } = await supabase.from('users').select('full_name,city,role').eq('id', user.id).maybeSingle();
   // wallet balance
   let balance: number | null = null;
-  const { data: wallet } = await supabase.from('wallets').select('balance').eq('user_id', user.id).single().maybeSingle();
+  const { data: wallet } = await supabase.from('wallets').select('balance').eq('user_id', user.id).maybeSingle();
   if (wallet?.balance !== undefined) balance = wallet.balance;
   if (balance === null){
     const { data: agg } = await supabase.from('transactions').select('amount').eq('user_id', user.id);
@@ -19,12 +20,13 @@ export default async function DashboardPage({ params }:{ params:any }){
   if (balance === null) balance = 0;
 
   // verification badge
-  const { data: ver } = await supabase.from('verifications').select('status').eq('user_id', user.id).single().maybeSingle();
+  const { data: ver } = await supabase.from('verifications').select('status').eq('user_id', user.id).maybeSingle();
   const verified = ver?.status === 'verified';
 
   return (
     <AppShell>
       <div className="max-w-2xl mx-auto bg-slate-800 p-6 rounded">
+        <BackButton/>
         <h1 className="text-2xl" style={{color:'var(--cd-primary)'}}>Dashboard</h1>
         <div className="mt-4">
           <div><strong>Name:</strong> {profile?.full_name || user.email}</div>
