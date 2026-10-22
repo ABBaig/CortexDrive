@@ -41,6 +41,16 @@ export default async function LocaleLayout({
           messages={messages}
         >
           {children}
+          {/* Floating AI widget mounted client-side */}
+          {/* @ts-ignore */}
+          <script dangerouslySetInnerHTML={{ __html: `(() => { const el = document.createElement('div'); el.id = 'ai-widget-root'; document.body.appendChild(el); })()` }} />
+
+        </NextIntlClientProvider>
+      </body>
+    </html>
+  );
+}
+
         </NextIntlClientProvider>
       </body>
     </html>

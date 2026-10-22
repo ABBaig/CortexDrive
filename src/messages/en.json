@@ -136,3 +136,17 @@
     }
   }
 }
+
+  ,
+  "Chat": {
+    "message": "Message",
+    "connectAdmin": "Connect with admin",
+    "mockAiNotice": "(Mock AI answer — set GOOGLE_API_KEY to enable real answers)"
+  },
+  "AiTutor": {
+    "title": "AI Tutor",
+    "open": "Open",
+    "close": "Close",
+    "ask": "Ask"
+  }
+}
