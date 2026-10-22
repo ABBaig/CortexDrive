@@ -13,15 +13,39 @@ export default async function InstructorEarnings({
 }) {
   const t = await getTranslations({ locale, namespace: 'Earnings' });
 
-  // Single read-only query: rates by status. Sums are computed in JS to avoid
-  // PostgREST aggregate-alias pitfalls ("sum:col" is an alias, not a SUM).
-  const { data: rows, error: bErr } = await getSupabaseServerClient()
-    .from('bookings')
-    .select('instructor_rate, status')
-    .eq('instructor_id', instructorId)
-    .in('status', ['booked', 'completed']);
+  // Strategy: compute earnings FROM the transactions table.
+  // We first fetch the instructor's wallet(s) and then read transactions for them.
+  // Classify released earnings as transactions of kind 'payout' and pending as other positive
+  // credit-like transactions (escrow/hold). The live schema uses kinds such as
+  // 'payout' and 'fee_split' (see edge function). This heuristic is defensive
+  // and works with the existing dataset; adjust when more kinds are known.
+  const sb = await getSupabaseServerClient();
 
-  if (bErr) {
+  // get wallets for instructor
+  const { data: wallets, error: wErr } = await sb.from('wallets').select('id').eq('user_id', instructorId);
+  if (wErr) {
+    return (
+      <section className="mt-6 p-4 bg-slate-700 rounded text-red-300">
+        {t('error')}
+      </section>
+    );
+  }
+  const walletIds = (wallets ?? []).map((w: any) => w.id);
+  if (walletIds.length === 0) {
+    return (
+      <section className="mt-6 p-4 bg-slate-700 rounded text-neutral-300">
+        {t('empty')}
+      </section>
+    );
+  }
+
+  const { data: txRows, error: txErr } = await sb
+    .from('transactions')
+    .select('id,kind,amount,related_booking,created_at')
+    .in('wallet_id', walletIds)
+    .order('created_at', { ascending: false });
+
+  if (txErr) {
     return (
       <section className="mt-6 p-4 bg-slate-700 rounded text-red-300">
         {t('error')}
@@ -29,11 +53,8 @@ export default async function InstructorEarnings({
     );
   }
 
-  const list = rows ?? [];
-  const pending = list.filter((b) => b.status === 'booked');
-  const released = list.filter((b) => b.status === 'completed');
-
-  if (pending.length === 0 && released.length === 0) {
+  const txList = txRows ?? [];
+  if (txList.length === 0) {
     return (
       <section className="mt-6 p-4 bg-slate-700 rounded text-neutral-300">
         {t('empty')}
@@ -42,15 +63,20 @@ export default async function InstructorEarnings({
   }
 
   // platform_settings is a key-value table (key = 'platform_fee_percent')
-  const { data: feeRow } = await getSupabaseServerClient()
+  const { data: feeRow } = await sb
     .from('platform_settings')
     .select('value')
     .eq('key', 'platform_fee_percent')
     .maybeSingle();
   const feePercent = feeRow?.value != null ? Number(feeRow.value) || 0 : 0;
 
-  const pendingGross = pending.reduce((s, b) => s + Number(b.instructor_rate ?? 0), 0);
-  const releasedGross = released.reduce((s, b) => s + Number(b.instructor_rate ?? 0), 0);
+  // classify transactions: released = payouts, pending = other positive credits
+  const released = txList.filter((tx: any) => tx.kind === 'payout');
+  const pending = txList.filter((tx: any) => tx.kind !== 'payout' && tx.kind !== 'fee_split' && Number(tx.amount || 0) > 0);
+
+  const releasedGross = released.reduce((s: number, tx: any) => s + Number(tx.amount || 0), 0);
+  const pendingGross = pending.reduce((s: number, tx: any) => s + Number(tx.amount || 0), 0);
+
   const pendingNet = pendingGross - (pendingGross * feePercent) / 100;
   const releasedNet = releasedGross - (releasedGross * feePercent) / 100;
 
