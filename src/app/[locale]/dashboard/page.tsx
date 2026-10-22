@@ -7,7 +7,7 @@ import SOSButtonClientWrapper from '@/modules/safety/SOSButtonClientWrapper';
 import InstructorEarnings from '@/modules/earning/InstructorEarnings';
 
 export default async function DashboardPage({ params }: { params: { locale: string } }) {
-  const supabase = getSupabaseServerClient();
+  const supabase = await getSupabaseServerClient();
   const { data: { session } } = await supabase.auth.getSession();
   if (!session) redirect(`/${params.locale}/signin`);
   const user = session.user;
