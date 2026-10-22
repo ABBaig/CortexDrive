@@ -3,12 +3,13 @@
 import React from 'react';
 import { useRouter } from 'next/navigation';
 import { useLocale } from 'next-intl';
-import { createBrowserSupabaseClient } from '@/lib/supabase/client';
+import { getSupabaseBrowserClient } from '@/lib/supabase/client';
+
 
 export default function MessageButton({ instructorId }: { instructorId: string }) {
   const router = useRouter();
   const locale = useLocale();
-  const supabase = createBrowserSupabaseClient();
+  const supabase = getSupabaseBrowserClient();
 
   async function handleMessage(e: React.MouseEvent) {
     e.preventDefault();

@@ -1,10 +1,10 @@
 import { NextResponse } from 'next/server';
-import { createServerSupabaseClient } from '@/lib/supabase/server';
+import { getSupabaseServerClient } from '@/lib/supabase/server';
 
 const userCooldowns = new Map(); // in-memory 5s cooldown per user
 
 export async function POST(req: Request) {
-  const supabase = createServerSupabaseClient({});
+  const supabase = await getSupabaseServerClient();
   const body = await req.json();
   const { conversation_id, body: text } = body;
   const { data: session } = await supabase.auth.getSession();
@@ -28,7 +28,7 @@ export async function POST(req: Request) {
 }
 
 export async function GET(req: Request) {
-  const supabase = createServerSupabaseClient({});
+  const supabase = await getSupabaseServerClient();
   const url = new URL(req.url);
   const conversation_id = url.searchParams.get('conversation_id');
   if (!conversation_id) return NextResponse.json({ error: 'missing conversation_id' }, { status: 400 });
@@ -36,7 +36,17 @@ export async function GET(req: Request) {
   const user = session?.session?.user;
   if (!user) return NextResponse.json({ error: 'unauthenticated' }, { status: 401 });
 
-  const messages = await supabase.from('conversation_messages').select('*, sender:auth.users(id, email)').eq('conversation_id', conversation_id).order('created_at', { ascending: true });
+  // select messages and join sender profile
+  const messages = await supabase.from('conversation_messages').select('*').eq('conversation_id', conversation_id).order('created_at', { ascending: true });
   if (messages.error) return NextResponse.json({ error: messages.error.message }, { status: 500 });
-  return NextResponse.json({ items: messages.data });
+  const senderIds = Array.from(new Set(messages.data.map((m: any) => m.sender_id)));
+  let profilesMap: Record<string, any> = {};
+  if (senderIds.length > 0) {
+    const profiles = await supabase.from('profiles').select('id, full_name, city').in('id', senderIds);
+    if (!profiles.error && profiles.data) {
+      profiles.data.forEach((p: any) => { profilesMap[p.id] = p; });
+    }
+  }
+  const items = messages.data.map((m: any) => ({ ...m, sender: profilesMap[m.sender_id] || null }));
+  return NextResponse.json({ items });
 }

@@ -134,10 +134,7 @@
       "rejected": "AI verification failed. Please resubmit clearer photos.",
       "unavailable": "AI is temporarily unavailable — your submission is queued for manual review."
     }
-  }
-}
-
-  ,
+  },
   "Chat": {
     "message": "Message",
     "connectAdmin": "Connect with admin",
