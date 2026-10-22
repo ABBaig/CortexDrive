@@ -1,13 +1,13 @@
 'use client';
 import React, { useState } from 'react';
-import { useLocale } from 'next-intl';
+import { useTranslations } from 'next-intl';
 
 export default function FloatingAIChat({ locale }: { locale: string }) {
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [messages, setMessages] = useState<{id:string, from:'user'|'ai', text:string}[]>([]);
   const [input, setInput] = useState('');
-  const i18n = useLocale();
+  const t = useTranslations('Chat');
 
   async function send() {
     if (!input) return;
@@ -20,7 +20,7 @@ export default function FloatingAIChat({ locale }: { locale: string }) {
       const res = await fetch('/api/ai-tutor', { method: 'POST', headers: {'content-type':'application/json'}, body: JSON.stringify({ message: text, locale }) });
       const json = await res.json();
       const aiText = json.answer || json.data || '[MOCK ANSWER]';
-      const aiMsg = { id: Date.now().toString()+':ai', from: 'ai' as const, text: aiText + (json.mock? ' \n\n'+i18n('Chat.mockAiNotice'): '') };
+      const aiMsg = { id: Date.now().toString()+':ai', from: 'ai' as const, text: aiText + (json.mock? ' \n\n'+t('mockAiNotice'): '') };
       setMessages(m=>[...m, aiMsg]);
     } catch (err) {
       setMessages(m=>[...m, { id: Date.now().toString()+':err', from: 'ai', text: 'Error contacting AI' }]);
