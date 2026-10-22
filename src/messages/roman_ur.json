@@ -22,6 +22,11 @@
     "topupLabel": "Top Up (sandbox)",
     "topupButton": "Top Up",
     "transactions": "Transactions",
-    "noTransactions": "Abhi tak koi transactions nahi."
+    "noTransactions": "Abhi tak koi transactions nahi.",
+    "colWhen": "Kab",
+    "colKind": "Qism",
+    "colAmount": "Raqam",
+    "colBalanceAfter": "Balance ke baad",
+    "topupFailed": "Top-up nakam"
   }
 }

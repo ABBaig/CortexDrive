@@ -1,10 +1,10 @@
 'use client';
 
 import React from 'react';
-import { useTranslations } from 'next-intl';
-import { useLocale } from 'next-intl';
+import { useTranslations, useLocale } from 'next-intl';
 import { useRouter } from 'next/navigation';
 import { getSupabaseBrowserClient } from '@/lib/supabase/client';
+import BackButton from '@/components/BackButton';
 
 // This very small wrapper component exists because the project previously used
 // @supabase/auth-helpers-nextjs in this file. To avoid adding that dependency
@@ -13,14 +13,17 @@ import { getSupabaseBrowserClient } from '@/lib/supabase/client';
 
 export default function WalletPage() {
   const supabase = getSupabaseBrowserClient();
-  const t = useTranslations();
+  const t = useTranslations('Wallet');
+  const tc = useTranslations();
   const locale = useLocale();
   const router = useRouter();
+
+  const backHref = `/${locale}`;
 
   const [wallet, setWallet] = React.useState<any | null>(null);
   const [transactions, setTransactions] = React.useState<any[]>([]);
   const [topupAmount, setTopupAmount] = React.useState('');
-  const [loading, setLoading] = React.useState(false);
+  const [loading, setLoading] = React.useState(true);
   const [error, setError] = React.useState<string | null>(null);
   const mountedRef = React.useRef(true);
   const realtimeChannelRef = React.useRef<any | null>(null);
@@ -60,7 +63,7 @@ export default function WalletPage() {
           setTransactions(tx || []);
         }
 
-        // subscribe to realtime INSERTs for transactions
+        // subscribe to realtime INSERTs for transactions (Supabase Realtime channel)
         subscribeRealtime(w.id);
       } else {
         // No wallet row — empty state
@@ -104,23 +107,23 @@ export default function WalletPage() {
   function subscribeRealtime(walletId: number) {
     try {
       if (realtimeChannelRef.current) return; // already subscribed
+      // Supabase Realtime channel for INSERT events on public.transactions
       const channel = supabase.channel(`public:transactions:wallet_${walletId}`)
         .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'transactions' }, (payload: any) => {
           const newRow = payload.new;
           if (!newRow) return;
-          if (newRow.wallet_id !== walletId) return;
+          // payload.new.wallet_id may be string or number depending on DB lib
+          if (String(newRow.wallet_id) !== String(walletId)) return;
           setTransactions((prev) => [newRow, ...prev]);
         })
-        .subscribe((status) => {
-          // status could be SUBSCRIBED / etc. we don't act on it here
-        });
+        .subscribe();
       realtimeChannelRef.current = channel;
     } catch (e) {
       console.warn('Realtime subscription failed', e);
     }
   }
 
-  function unsubscribeRealtime() {
+function unsubscribeRealtime() {
     try {
       if (realtimeChannelRef.current) {
         supabase.removeChannel(realtimeChannelRef.current);
@@ -131,42 +134,44 @@ export default function WalletPage() {
     }
   }
 
-  if (loading) return <div className="p-4">{t('Common.loading') ?? 'Loading...'}</div>;
-  if (error) return <div className="p-4 text-red-400">{t('Common.error')}: {error}</div>;
+  if (loading) return <div className="p-4">{tc('Common.loading')}</div>;
+  if (error) return <div className="p-4 text-red-400">{tc('Common.error')}: {error}</div>;
 
   // wallet null = empty state (no wallet row)
   if (!wallet) return (
     <div className="p-6">
-      <h1 className="text-2xl font-semibold">{t('Wallet.title') ?? 'Wallet'}</h1>
-      <p className="mt-3 text-neutral-400">{t('Wallet.noWallet') ?? 'No wallet found for your account.'}</p>
+      <BackButton />
+      <h1 className="text-2xl font-semibold">{t('title')}</h1>
+      <p className="mt-3 text-neutral-400">{t('noWallet')}</p>
     </div>
   );
 
   return (
     <div className="p-6">
-      <h1 className="text-2xl font-semibold">{t('Wallet.title') ?? 'Wallet'}</h1>
-      <p className="mt-2 text-sm text-neutral-400">{t('Wallet.balance') ?? 'Balance'}: <span className="font-mono ml-2">{formatPKR(wallet.balance)}</span></p>
+      <BackButton />
+      <h1 className="text-2xl font-semibold">{t('title')}</h1>
+      <p className="mt-2 text-sm text-neutral-400">{t('balance')}: <span className="font-mono ml-2">{formatPKR(wallet.balance)}</span></p>
 
       <form onSubmit={handleTopUp} className="mt-4 flex items-center gap-3">
         <label className="flex items-center gap-2">
-          <span className="text-sm text-neutral-400">{t('Wallet.topupLabel') ?? 'Top Up (sandbox):'}</span>
+          <span className="text-sm text-neutral-400">{t('topupLabel')}</span>
           <input className="rounded-md bg-neutral-900 px-2 py-1 text-sm" value={topupAmount} onChange={e => setTopupAmount(e.target.value)} />
         </label>
-        <button type="submit" disabled={loading} className="rounded bg-cyan-400 px-3 py-1.5 text-sm font-semibold text-slate-900 disabled:opacity-50">{t('Wallet.topupButton') ?? 'Top Up'}</button>
+        <button type="submit" disabled={loading} className="rounded bg-cyan-400 px-3 py-1.5 text-sm font-semibold text-slate-900 disabled:opacity-50">{t('topupButton')}</button>
       </form>
 
-      <h2 className="mt-6 text-lg font-medium">{t('Wallet.transactions') ?? 'Transactions'}</h2>
+      <h2 className="mt-6 text-lg font-medium">{t('transactions')}</h2>
 
       {transactions.length === 0 ? (
-        <div className="mt-4 text-neutral-500">{t('Wallet.noTransactions') ?? 'No transactions yet.'}</div>
+        <div className="mt-4 text-neutral-500">{t('noTransactions')}</div>
       ) : (
         <table className="mt-4 w-full table-auto text-sm">
           <thead>
             <tr className="text-left text-neutral-400">
-              <th>When</th>
-              <th>Kind</th>
-              <th>Amount</th>
-              <th>Balance After</th>
+              <th>{t('colWhen')}</th>
+              <th>{t('colKind')}</th>
+              <th>{t('colAmount')}</th>
+              <th>{t('colBalanceAfter')}</th>
             </tr>
           </thead>
           <tbody>

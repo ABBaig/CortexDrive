@@ -22,6 +22,11 @@
     "topupLabel": "ٹاپ اپ (سینڈ باکس)",
     "topupButton": "ٹاپ اپ",
     "transactions": "لین دین",
-    "noTransactions": "ابھی تک کوئی لین دین نہیں۔"
+    "noTransactions": "ابھی تک کوئی لین دین نہیں۔",
+    "colWhen": "کب",
+    "colKind": "قسم",
+    "colAmount": "رقم",
+    "colBalanceAfter": "بیلنس کے بعد",
+    "topupFailed": "ٹاپ اپ ناکام"
   }
 }

@@ -22,6 +22,11 @@
     "topupLabel": "Top Up (sandbox)",
     "topupButton": "Top Up",
     "transactions": "Transactions",
-    "noTransactions": "No transactions yet."
+    "noTransactions": "No transactions yet.",
+    "colWhen": "When",
+    "colKind": "Kind",
+    "colAmount": "Amount",
+    "colBalanceAfter": "Balance After",
+    "topupFailed": "Top-up failed"
   }
 }
