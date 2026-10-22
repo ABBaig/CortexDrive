@@ -1,5 +1,5 @@
 import { createServerClient, createBrowserClient } from '@supabase/ssr';
-import type { Database } from '../types/supabase';
+import type { Database } from '@/types/database';
 
 export function createServerSupabaseClient(opts?: { req?: any; res?: any }) {
   // Next.js App Router route handlers pass request/response through

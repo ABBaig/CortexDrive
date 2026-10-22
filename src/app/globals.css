@@ -2,28 +2,16 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  --cd-bg: #0f172a; /* dark-slate */
-  --cd-primary: #22d3ee; /* electric-cyan */
-  --cd-success: #10b981; /* emerald */
-  --cd-muted: #94A3B8;
+:root { --cd-bg: #0f172a; --cd-primary: #22d3ee; --cd-success: #10b981; }
 
-  --font-body: 'Inter', sans-serif;
-  --font-urdu: 'Noto Nastaliq Urdu', serif;
-}
-
-html {
-  background-color: var(--cd-bg);
-  color: #F8FAFC;
-  font-family: var(--font-body);
-  scroll-behavior: smooth;
-}
-
-body { margin: 0; min-height: 100vh; }
+body { background-color: var(--cd-bg); color: #e2e8f0; }
 
 .bg-dark-slate { background-color: var(--cd-bg); }
-.bg-electric-cyan { background-color: var(--cd-primary); }
-.text-muted { color: var(--cd-muted); }
 
-.btn-primary { @apply px-6 py-2 rounded-full font-bold; background-color: var(--cd-primary); color: var(--cd-bg); }
-.btn-secondary { @apply px-6 py-2 rounded-full font-bold; background-color: var(--cd-success); color: var(--cd-bg); }
+.bg-electric-cyan { background-color: var(--cd-primary); }
+
+.text-muted { color: #94a3b8; }
+
+.btn-primary { padding: 1.5rem 2rem; border-radius: 9999px; font-weight: 700; background-color: var(--cd-primary); color: var(--cd-bg); }
+
+.btn-secondary { padding: 1.5rem 2rem; border-radius: 9999px; font-weight: 700; background-color: var(--cd-success); color: var(--cd-bg); }

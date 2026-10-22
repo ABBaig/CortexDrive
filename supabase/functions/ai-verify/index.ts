@@ -6,7 +6,7 @@
 // following the project spec; in the preview environment the call will be skipped if
 // GOOGLE_API_KEY is missing and a mock response will be returned.
 
-import fetch from 'node-fetch';
+// Edge runtime provides fetch; avoid node-fetch import for preview
 import type { IncomingMessage, ServerResponse } from 'http';
 // The Edge Function runtime will supply the request/response types; we use lightweight types here.
 export type VercelRequest = Request & { body?: any };
