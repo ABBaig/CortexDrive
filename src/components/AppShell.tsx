@@ -1,15 +1,19 @@
+"use client";
+
 import React from 'react';
 import LanguageSelector from './LanguageSelector';
 import { getSupabaseBrowserClient } from '@/lib/supabase/client';
 import { useRouter } from 'next/navigation';
+import { useLocale } from 'next-intl';
 
 export default function AppShell({ children }:{ children:React.ReactNode }){
   const supabase = getSupabaseBrowserClient();
 
   const router = useRouter();
+  const locale = useLocale();
   async function signOut(){
     await supabase.auth.signOut();
-    router.push('/signin');
+    router.push(`/${locale}/signin`);
   }
   return (
     <div className="min-h-screen bg-slate-900 text-slate-100">
