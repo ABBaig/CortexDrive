@@ -112,7 +112,8 @@
     "submit": "Submit for verification",
     "submitSuccess": "Verification submitted and is pending review.",
     "errors": {
-      "notSignedIn": "You must be signed in"
+      "notSignedIn": "You must be signed in",
+      "noFile": "Please select the required files."
     },
     "currentStatus": {
       "title": "Your verifications",
