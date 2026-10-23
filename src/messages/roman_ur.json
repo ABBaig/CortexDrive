@@ -155,5 +155,41 @@
     "close": "Close",
     "ask": "Pooch",
     "empty": "Driving sawal poochein..."
+  },
+  "Dashboard": {
+    "greeting": "Salam, {name}",
+    "wallet": "Wallet",
+    "walletUnavailable": "Wallet available nahi",
+    "verification": "Tasdeeq",
+    "verificationManage": "Tasdeeq sambhalein",
+    "verificationStatus": {
+      "verified": "Tasdeeq Shuda",
+      "needs_review": "Review ki zarurat hai",
+      "pending": "Pending",
+      "rejected": "Rad Shuda",
+      "unverified": "Ghair-e-tasdeeq shuda"
+    },
+    "licenseProgress": "License ki pesh rafti",
+    "licenseManage": "Manage karein",
+    "licenseLegacyNote": "Purana numeric stage mila ({num}) — display ke liye interpret kar diya gaya.",
+    "stages": {
+      "learner_permit": "Learner permit",
+      "test_scheduled": "Test schedule ho gaya",
+      "test_passed": "Test pass",
+      "provisional": "Provisional license",
+      "permanent": "Permanent license"
+    },
+    "lessonsTitle": "Lessons",
+    "lessonsUpcoming": "Aane wali classes",
+    "lessonsCompleted": "Mukammal shuda classes",
+    "myBookings": "Meri bookings",
+    "findInstructor": "Instructor talash karein",
+    "vehicleCard": "Gaari",
+    "sosCard": "SOS",
+    "securityCard": "Security",
+    "aiTutorCard": "AI Tutor",
+    "chatCardBody": "Marketplace mein apne instructor ke card se unhein paigham bhejein.",
+    "chatCardAction": "Apne instructor ko paigham bhejein",
+    "otherRolePending": "Is role ka dashboard tayar ho raha hai"
   }
 }

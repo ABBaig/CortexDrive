@@ -155,5 +155,41 @@
     "close": "Close",
     "ask": "Ask",
     "empty": "Ask a driving question..."
+  },
+  "Dashboard": {
+    "greeting": "Hello, {name}",
+    "wallet": "Wallet",
+    "walletUnavailable": "Wallet unavailable",
+    "verification": "Verification",
+    "verificationManage": "Manage verification",
+    "verificationStatus": {
+      "verified": "Verified",
+      "needs_review": "Needs review",
+      "pending": "Pending",
+      "rejected": "Rejected",
+      "unverified": "Unverified"
+    },
+    "licenseProgress": "License progress",
+    "licenseManage": "Manage",
+    "licenseLegacyNote": "Legacy numeric stage detected ({num}) — interpreting it for display.",
+    "stages": {
+      "learner_permit": "Learner permit",
+      "test_scheduled": "Test scheduled",
+      "test_passed": "Test passed",
+      "provisional": "Provisional license",
+      "permanent": "Permanent license"
+    },
+    "lessonsTitle": "Lessons",
+    "lessonsUpcoming": "Upcoming lessons",
+    "lessonsCompleted": "Completed lessons",
+    "myBookings": "My bookings",
+    "findInstructor": "Find an instructor",
+    "vehicleCard": "Vehicle",
+    "sosCard": "SOS",
+    "securityCard": "Security",
+    "aiTutorCard": "AI Tutor",
+    "chatCardBody": "Message your instructor from their card in the marketplace.",
+    "chatCardAction": "Message your instructor",
+    "otherRolePending": "This role's dashboard is being set up"
   }
 }

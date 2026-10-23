@@ -155,6 +155,41 @@
     "close": "بند کریں",
     "ask": "پوچھیں",
     "empty": "ڈرائیونگ سوال پوچھیں..."
+  },
+  "Dashboard": {
+    "greeting": "سلام، {name}",
+    "wallet": "والیٹ",
+    "walletUnavailable": "والیٹ دستیاب نہیں",
+    "verification": "تصدیق",
+    "verificationManage": "تصدیق سنبھالیں",
+    "verificationStatus": {
+      "verified": "تصدیق شدہ",
+      "needs_review": "جائزے کی ضرورت",
+      "pending": "زیر التواء",
+      "rejected": "رد شدہ",
+      "unverified": "غیر تصدیق شدہ"
+    },
+    "licenseProgress": "لائسنس کی پیش رفت",
+    "licenseManage": "مینج کریں",
+    "licenseLegacyNote": "پرانا عددی مرحلہ ملا ({num}) — دکھانے کے لیے تشریح کر دی گئی۔",
+    "stages": {
+      "learner_permit": "لرنر پرمٹ",
+      "test_scheduled": "ٹیسٹ شیڈول ہو گیا",
+      "test_passed": "ٹیسٹ پاس",
+      "provisional": "عارضی لائسنس",
+      "permanent": "مستقل لائسنس"
+    },
+    "lessonsTitle": "لیسنز",
+    "lessonsUpcoming": "آنے والی کلاسیں",
+    "lessonsCompleted": "مکمل شدہ کلاسیں",
+    "myBookings": "میری بکنگز",
+    "findInstructor": "انسٹرکٹر تلاش کریں",
+    "vehicleCard": "گاڑی",
+    "sosCard": "ایس او ایس",
+    "securityCard": "سیکیورٹی",
+    "aiTutorCard": "AI ٹیوٹر",
+    "chatCardBody": "مارکیٹ پلیس میں اپنے انسٹرکٹر کے کارڈ سے انہیں پیغام بھیجیں۔",
+    "chatCardAction": "اپنے انسٹرکٹر کو پیغام بھیجیں",
+    "otherRolePending": "اس رول کا ڈیش بورڈ ترتیب دیا جا رہا ہے"
   }
 }
-
