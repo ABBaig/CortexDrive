@@ -48,6 +48,74 @@ export type Database = {
           user_id?: string;
         };
       };
+      vehicle_logs: {
+        Row: {
+          id: string;
+          user_id: string | null;
+          vehicle_id: string | null;
+          type: string | null;
+          event_type: string | null;
+          odometer_km: string | null;
+          liters: string | null;
+          amount_pkr: string | null;
+          meta: Json | null;
+          created_at: string | null;
+        };
+        Insert: {
+          id?: string;
+          user_id?: string | null;
+          vehicle_id?: string | null;
+          type?: string | null;
+          event_type?: string | null;
+          odometer_km?: string | number | null;
+          liters?: string | number | null;
+          amount_pkr?: string | number | null;
+          meta?: Json | null;
+          created_at?: string | null;
+        };
+        Update: {
+          user_id?: string | null;
+          vehicle_id?: string | null;
+          type?: string | null;
+          event_type?: string | null;
+          odometer_km?: string | number | null;
+          liters?: string | number | null;
+          amount_pkr?: string | number | null;
+          meta?: Json | null;
+          created_at?: string | null;
+        };
+      };
+      vehicles: {
+        Row: {
+          id: string;
+          user_id: string | null;
+          name: string | null;
+          registration: string | null;
+          make: string | null;
+          model: string | null;
+          created_at: string | null;
+          updated_at: string | null;
+        };
+        Insert: {
+          id?: string;
+          user_id?: string | null;
+          name?: string | null;
+          registration?: string | null;
+          make?: string | null;
+          model?: string | null;
+          created_at?: string | null;
+          updated_at?: string | null;
+        };
+        Update: {
+          user_id?: string | null;
+          name?: string | null;
+          registration?: string | null;
+          make?: string | null;
+          model?: string | null;
+          created_at?: string | null;
+          updated_at?: string | null;
+        };
+      };
     };
   };
 };
