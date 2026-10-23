@@ -15,6 +15,7 @@ export default function BookingsPage() {
   const tt = useTranslations('Telematics');
   const tg = useTranslations('GpsTracking');
   const tn = useTranslations('NoShow');
+  const tch = useTranslations('Chat');
   const tc = useTranslations('Common');
   const locale = useLocale();
   const router = useRouter();
@@ -30,6 +31,7 @@ export default function BookingsPage() {
   const [noShowId, setNoShowId] = React.useState<string | null>(null);
   const [graceMinutes, setGraceMinutes] = React.useState<number>(15);
   const [now, setNow] = React.useState(Date.now());
+  const [messagingId, setMessagingId] = React.useState<string | null>(null);
   const mountedRef = React.useRef(true);
 
   React.useEffect(() => {
@@ -81,6 +83,25 @@ export default function BookingsPage() {
   function formatPKR(n: number | string | null) {
     const num = Number(n || 0);
     return num.toLocaleString('en-PK', { style: 'currency', currency: 'PKR' });
+  }
+
+  async function handleMessageInstructor(booking: any) {
+    if (!booking || !booking.instructor_id) return;
+    setMessagingId(booking.id);
+    try {
+      const res = await fetch('/api/chat/open', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ other_user_id: booking.instructor_id, booking_id: booking.id }),
+      });
+      if (!res.ok) throw new Error('open failed');
+      const json = await res.json();
+      router.push(`/${locale}/chat/${json.conversation_id}`);
+    } catch (err) {
+      console.error(err);
+      setError(tch('sendError'));
+      setMessagingId(null);
+    }
   }
 
   async function handleCancel(booking: any) {
@@ -294,6 +315,14 @@ export default function BookingsPage() {
                             className={`rounded border px-3 py-1.5 text-sm ${gracePassed ? 'border-red-700 text-red-300 hover:bg-red-900/40' : 'border-neutral-700 text-neutral-500 cursor-not-allowed'}`}
                           >
                             {gracePassed ? tn('reportNoShow') : tn('graceCountdown', { minutes: minutesLeft ?? 0 })}
+                          </button>
+                          <button
+                            type="button"
+                            disabled={messagingId === b.id}
+                            onClick={() => handleMessageInstructor(b)}
+                            className="rounded border border-sky-700 text-sky-300 px-3 py-1.5 text-sm hover:bg-sky-900/40 disabled:opacity-50"
+                          >
+                            {messagingId === b.id ? tc('loading') : tch('message')}
                           </button>
                           <button onClick={() => setConfirmingId(b.id)} className="rounded border border-neutral-700 px-3 py-1.5 text-sm">{t('cancel')}</button>
                         </>
