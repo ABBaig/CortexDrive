@@ -190,6 +190,17 @@
     "aiTutorCard": "AI ٹیوٹر",
     "chatCardBody": "مارکیٹ پلیس میں اپنے انسٹرکٹر کے کارڈ سے انہیں پیغام بھیجیں۔",
     "chatCardAction": "اپنے انسٹرکٹر کو پیغام بھیجیں",
-    "otherRolePending": "اس رول کا ڈیش بورڈ ترتیب دیا جا رہا ہے"
+    "otherRolePending": "اس رول کا ڈیش بورڈ ترتیب دیا جا رہا ہے",
+    "instructorTitle": "انسٹرکٹر ڈیش بورڈ",
+    "earnings": "آمدنی",
+    "myLessons": "میرے لیسنز",
+    "lessonsUpcomingInstructor": "آنے والی کلاسیں",
+    "lessonsCompletedInstructor": "مکمل شدہ کلاسیں",
+    "verificationCard": "تصدیق",
+    "walletCard": "والیٹ",
+    "profileCard": "پروفائل اور دستیابی",
+    "comingSoon": "جلد آ رہا ہے",
+    "marketplaceCard": "لرنرز کو آپ کیسے دکھائی دیتے ہیں",
+    "safetyCard": "سیکیورٹی و حفاظت"
   }
 }
