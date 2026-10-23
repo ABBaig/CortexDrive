@@ -153,11 +153,12 @@
     "escalatedFail": "Admin se rabta nah ho saka"
   },
   "AiTutor": {
-    "title": "AI Tutor",
+    "title": "Cortexa",
     "open": "Open",
     "close": "Close",
     "ask": "Pooch",
-    "empty": "Driving sawal poochein..."
+    "empty": "Driving sawal poochein...",
+    "greeting": "Hi! Main Cortexa hoon, aaj main aap ki kya madad kar sakta hoon!"
   },
   "Dashboard": {
     "greeting": "Salam, {name}",
