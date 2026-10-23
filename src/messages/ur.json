@@ -23,7 +23,7 @@
     "balance": "بیلنس",
     "topupLabel": "ٹاپ اپ (سینڈ باکس)",
     "topupButton": "ٹاپ اپ",
-    "transactions": "لين دين",
+    "transactions": "لین دين",
     "noTransactions": "ابھی تک کوئی لین دین نہیں۔",
     "colWhen": "کب",
     "colKind": "قسم",
@@ -153,11 +153,12 @@
     "escalatedFail": "ایڈمن سے رابطہ نہیں ہو سکا"
   },
   "AiTutor": {
-    "title": "AI ٹیوٹر",
+    "title": "کورٹیکسا",
     "open": "کھولیں",
     "close": "بند کریں",
     "ask": "پوچھیں",
-    "empty": "ڈرائیونگ سوال پوچھیں..."
+    "empty": "ڈرائیونگ سوال پوچھیں...",
+    "greeting": "ہیلو! میں کورٹیکسا ہوں، آج میں آپ کی کیا مدد کر سکتی ہوں!"
   },
   "Dashboard": {
     "greeting": "سلام، {name}",
