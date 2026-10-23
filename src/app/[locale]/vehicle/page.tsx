@@ -1,93 +1,288 @@
-import { redirect } from 'next/navigation';
-import { getSupabaseServerClient } from '@/lib/supabase/server';
-import AppShell from '@/components/AppShell';
+'use client';
+
+import { useCallback, useEffect, useState } from 'react';
+import { getSupabaseBrowserClient } from '@/lib/supabase/client';
+import { useTranslations } from 'next-intl';
 import BackButton from '@/components/BackButton';
-import dynamic from 'next/dynamic';
+import FuelChart from '@/components/FuelChart';
 
-const FuelChart = dynamic(() => import('@/components/FuelChart'), { ssr: false });
+type Log = {
+  id: string;
+  type: string;
+  odometer_km: number | string | null;
+  liters: number | string | null;
+  amount_pkr: number | string | null;
+  meta: { note?: string } | null;
+  created_at: string;
+};
 
-export default async function VehiclePage({ params }: { params: { locale: string } }) {
-  const supabase = await getSupabaseServerClient();
-  const { data: { session } } = await supabase.auth.getSession();
-  if (!session) redirect(`/${params.locale}/signin`);
-  const user = session.user;
+export default function VehiclePage() {
+  const t = useTranslations('Vehicle');
+  const tc = useTranslations('Common');
+  const supabase = getSupabaseBrowserClient();
+  const [logs, setLogs] = useState<Log[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [signedOut, setSignedOut] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [type, setType] = useState('fuel');
+  const [odometer, setOdometer] = useState('');
+  const [liters, setLiters] = useState('');
+  const [amount, setAmount] = useState('');
+  const [note, setNote] = useState('');
+  const [busy, setBusy] = useState(false);
 
-  const { data: logs } = await supabase
-    .from('vehicle_logs')
-    .select('id,event_type,amount_pkr,odometer_km,liters,created_at')
-    .eq('user_id', user.id)
-    .order('created_at', { ascending: true });
-
-  const entries = (logs || []).map((l: any) => ({
-    id: l.id,
-    event_type: l.event_type || 'fuel',
-    amount_pkr: l.amount_pkr ?? null,
-    odometer_km: l.odometer_km ?? null,
-    liters: l.liters ?? null,
-    created_at: l.created_at
-  }));
-
-  // compute kmPerLiter: when liters >0 and previous odometer exists
-  const fuelEntries = entries.filter((e:any)=> e.liters && e.odometer_km).map((e:any)=> ({...e, odometer_km: Number(e.odometer_km), liters: Number(e.liters)}));
-  const chartData: { date: string; kmPerLiter: number }[] = [];
-  for (let i = 1; i < fuelEntries.length; i++){
-    const prev = fuelEntries[i-1];
-    const cur = fuelEntries[i];
-    const dist = cur.odometer_km - prev.odometer_km;
-    if (dist > 0 && cur.liters > 0){
-      chartData.push({ date: new Date(cur.created_at).toISOString().slice(0,10), kmPerLiter: Math.round((dist/cur.liters)*100)/100 });
+  const load = useCallback(async () => {
+    setLoading(true);
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    if (!user) {
+      setSignedOut(true);
+      setLoading(false);
+      return;
     }
+    // live schema: vehicle_logs has `type` (not event_type) and `meta` jsonb
+    const { data, error: dbError } = await supabase
+      .from('vehicle_logs')
+      .select('id,type,odometer_km,liters,amount_pkr,meta,created_at')
+      .eq('user_id', user.id)
+      .order('created_at', { ascending: true });
+    if (dbError) {
+      setError(t('loadFailed'));
+      setLogs([]);
+    } else {
+      setLogs((data ?? []) as Log[]);
+    }
+    setLoading(false);
+  }, [supabase, t]);
+
+  useEffect(() => {
+    void load();
+  }, [load]);
+
+  async function addLog(e: React.FormEvent) {
+    e.preventDefault();
+    setError(null);
+    const odometerNum = odometer.trim() === '' ? null : Number(odometer);
+    const litersNum = liters.trim() === '' ? null : Number(liters);
+    const amountNum = amount.trim() === '' ? null : Number(amount);
+    if (amountNum === null || Number.isNaN(amountNum) || amountNum < 0) {
+      setError(t('amountInvalid'));
+      return;
+    }
+    if (type === 'fuel' && (litersNum === null || Number.isNaN(litersNum) || litersNum <= 0)) {
+      setError(t('litersInvalid'));
+      return;
+    }
+    if (odometerNum !== null && (Number.isNaN(odometerNum) || odometerNum < 0)) {
+      setError(t('odometerInvalid'));
+      return;
+    }
+    setBusy(true);
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    if (!user) {
+      setBusy(false);
+      setError(t('loadFailed'));
+      return;
+    }
+    const { error: dbError } = await supabase.from('vehicle_logs').insert({
+      user_id: user.id,
+      type,
+      odometer_km: odometerNum,
+      liters: litersNum,
+      amount_pkr: amountNum,
+      meta: note.trim() ? { note: note.trim() } : {},
+    });
+    setBusy(false);
+    if (dbError) {
+      setError(t('loadFailed'));
+      return;
+    }
+    setType('fuel');
+    setOdometer('');
+    setLiters('');
+    setAmount('');
+    setNote('');
+    void load();
   }
 
-  // totals
-  const totalLiters = fuelEntries.reduce((s:any,e:any)=> s + (e.liters||0), 0);
-  const totalKm = (()=>{ if (entries.length===0) return 0; const first = entries[0].odometer_km||0; const last = entries[entries.length-1].odometer_km||0; return (Number(last) - Number(first)) || 0; })();
-  const avgKmPerLiter = totalLiters > 0 ? Math.round((totalKm/totalLiters)*100)/100 : 0;
+  // ---- fuel efficiency ----
+  const fuelEntries = logs
+    .filter((l) => l.type === 'fuel' && Number(l.odometer_km) > 0 && Number(l.liters) > 0)
+    .map((l) => ({ ...l, odo: Number(l.odometer_km), lit: Number(l.liters) }));
+  const chartData: { date: string; kmPerLiter: number }[] = [];
+  for (let i = 1; i < fuelEntries.length; i++) {
+    const dist = fuelEntries[i].odo - fuelEntries[i - 1].odo;
+    if (dist > 0 && fuelEntries[i].lit > 0) {
+      chartData.push({
+        date: new Date(fuelEntries[i].created_at).toISOString().slice(0, 10),
+        kmPerLiter: Math.round((dist / fuelEntries[i].lit) * 100) / 100,
+      });
+    }
+  }
+  const totalLiters = fuelEntries.reduce((s, e) => s + e.lit, 0);
+  const fuelTotal = fuelEntries.reduce((s, e) => s + Number(e.amount_pkr ?? 0), 0);
+  const firstOdo = fuelEntries.length > 0 ? fuelEntries[0].odo : 0;
+  const lastOdo = fuelEntries.length > 0 ? fuelEntries[fuelEntries.length - 1].odo : 0;
+  const totalKm = Math.max(0, lastOdo - firstOdo);
+  const avgKmPerLiter = totalLiters > 0 ? Math.round((totalKm / totalLiters) * 100) / 100 : 0;
+  const pkrPerKm = totalKm > 0 ? Math.round((fuelTotal / totalKm) * 100) / 100 : 0;
+
+  // ---- parts breakdown ----
+  const parts = logs.filter((l) => l.type !== 'fuel');
+  const partsTotal = parts.reduce((s, e) => s + Number(e.amount_pkr ?? 0), 0);
+  const byType = new Map<string, number>();
+  parts.forEach((p) => {
+    byType.set(p.type, (byType.get(p.type) ?? 0) + Number(p.amount_pkr ?? 0));
+  });
+
+  const inputClass =
+    'w-full p-2 rounded bg-slate-900 text-white border border-slate-600 focus:border-sky-500 focus:outline-none text-sm';
+
+  if (signedOut) {
+    return (
+      <main className="p-6 max-w-2xl mx-auto">
+        <BackButton />
+        <h1 className="mt-2 text-2xl font-semibold text-white">{t('title')}</h1>
+        <div className="mt-4 text-slate-400">{t('signInRequired')}</div>
+      </main>
+    );
+  }
 
   return (
-    <AppShell>
-      <div className="max-w-3xl mx-auto bg-slate-800 p-6 rounded text-white">
-        <BackButton />
-        <h1 className="text-2xl">Vehicle</h1>
+    <main className="p-6 max-w-2xl mx-auto">
+      <BackButton />
+      <h1 className="mt-2 text-2xl font-semibold text-white">{t('title')}</h1>
 
-        <div className="mt-4 grid grid-cols-3 gap-3">
-          <div className="p-3 bg-slate-700 rounded">
-            <div className="text-sm text-slate-300">Total KM</div>
-            <div className="text-xl font-semibold">{totalKm}</div>
-          </div>
-          <div className="p-3 bg-slate-700 rounded">
-            <div className="text-sm text-slate-300">Total Liters</div>
-            <div className="text-xl font-semibold">{totalLiters}</div>
-          </div>
-          <div className="p-3 bg-slate-700 rounded">
-            <div className="text-sm text-slate-300">Avg km/L</div>
-            <div className="text-xl font-semibold">{avgKmPerLiter}</div>
-          </div>
+      <div className="mt-6 grid grid-cols-2 md:grid-cols-4 gap-2">
+        <div className="p-3 bg-slate-800 rounded-xl ring-1 ring-slate-700">
+          <div className="text-xs text-slate-400">{t('totalKm')}</div>
+          <div className="text-lg text-white font-semibold">{totalKm}</div>
         </div>
+        <div className="p-3 bg-slate-800 rounded-xl ring-1 ring-slate-700">
+          <div className="text-xs text-slate-400">{t('totalLiters')}</div>
+          <div className="text-lg text-white font-semibold">{Math.round(totalLiters * 100) / 100}</div>
+        </div>
+        <div className="p-3 bg-slate-800 rounded-xl ring-1 ring-slate-700">
+          <div className="text-xs text-slate-400">{t('avgKmPerLiter')}</div>
+          <div className="text-lg text-white font-semibold">{avgKmPerLiter}</div>
+        </div>
+        <div className="p-3 bg-slate-800 rounded-xl ring-1 ring-slate-700">
+          <div className="text-xs text-slate-400">{t('pkrPerKm')}</div>
+          <div className="text-lg text-white font-semibold">{pkrPerKm}</div>
+        </div>
+      </div>
 
-        <div className="mt-6 bg-slate-700 p-4 rounded">
-          <h2 className="font-semibold">Fuel efficiency</h2>
+      <div className="mt-4 bg-slate-800 rounded-xl ring-1 ring-slate-700 p-4">
+        <h2 className="text-sm font-semibold text-white">{t('fuelEfficiency')}</h2>
+        {chartData.length > 0 ? (
           <div className="mt-2">
-            {/* @ts-ignore */}
             <FuelChart data={chartData} />
           </div>
-        </div>
+        ) : (
+          <div className="mt-2 text-sm text-slate-400">{t('needTwoFuelLogs')}</div>
+        )}
+      </div>
 
-        <div className="mt-6">
-          <h2 className="text-lg font-semibold">Logs</h2>
-          <ul className="mt-3 space-y-2">
-            {entries.map((e:any)=> (
-              <li key={e.id} className="p-3 bg-slate-700 rounded">
-                <div className="text-sm text-slate-300">{new Date(e.created_at).toLocaleString()}</div>
-                <div className="mt-1">Type: {e.event_type}</div>
-                <div>Odometer: {e.odometer_km ?? '—'} km</div>
-                <div>Liters: {e.liters ?? '—'}</div>
-                <div>Amount: {e.amount_pkr ?? '—'}</div>
+      <form onSubmit={addLog} className="mt-4 p-4 bg-slate-800 rounded-xl ring-1 ring-slate-700 space-y-3">
+        <h2 className="text-sm font-semibold text-white">{t('addLog')}</h2>
+        <div className="grid grid-cols-2 gap-2">
+          <div>
+            <label className="block text-xs text-slate-400 mb-1" htmlFor="vl-type">{t('logType')}</label>
+            <select id="vl-type" className={inputClass} value={type} onChange={(e) => setType(e.target.value)}>
+              <option value="fuel">{t('typeFuel')}</option>
+              <option value="spare_part">{t('typeSparePart')}</option>
+              <option value="service">{t('typeService')}</option>
+            </select>
+          </div>
+          <div>
+            <label className="block text-xs text-slate-400 mb-1" htmlFor="vl-odo">{t('odometerKm')}</label>
+            <input id="vl-odo" className={inputClass} type="number" min="0" step="1" value={odometer} onChange={(e) => setOdometer(e.target.value)} />
+          </div>
+        </div>
+        <div className="grid grid-cols-2 gap-2">
+          {type === 'fuel' && (
+            <div>
+              <label className="block text-xs text-slate-400 mb-1" htmlFor="vl-liters">{t('liters')}</label>
+              <input id="vl-liters" className={inputClass} type="number" min="0" step="0.01" value={liters} onChange={(e) => setLiters(e.target.value)} />
+            </div>
+          )}
+          <div>
+            <label className="block text-xs text-slate-400 mb-1" htmlFor="vl-amount">{t('amountPkr')}</label>
+            <input id="vl-amount" className={inputClass} type="number" min="0" step="0.01" value={amount} onChange={(e) => setAmount(e.target.value)} />
+          </div>
+        </div>
+        <div>
+          <label className="block text-xs text-slate-400 mb-1" htmlFor="vl-note">{t('note')}</label>
+          <input id="vl-note" className={inputClass} maxLength={200} value={note} onChange={(e) => setNote(e.target.value)} />
+        </div>
+        {error && <div className="text-sm text-red-400">{error}</div>}
+        <div className="flex justify-end">
+          <button
+            type="submit"
+            disabled={busy}
+            className="px-3 py-1.5 rounded-lg text-sm font-medium bg-sky-600 text-white hover:bg-sky-500 disabled:opacity-50"
+          >
+            {busy ? tc('loading') : t('saveLog')}
+          </button>
+        </div>
+      </form>
+
+      <div className="mt-4 p-4 bg-slate-800 rounded-xl ring-1 ring-slate-700">
+        <h2 className="text-sm font-semibold text-white">{t('partsBreakdown')}</h2>
+        {parts.length === 0 ? (
+          <div className="mt-2 text-sm text-slate-400">{t('noPartsYet')}</div>
+        ) : (
+          <div className="mt-2 space-y-2">
+            {Array.from(byType.entries()).map(([k, v]) => (
+              <div key={k} className="flex items-center justify-between text-sm">
+                <span className="text-slate-300">
+                  {k === 'spare_part' ? t('typeSparePart') : k === 'service' ? t('typeService') : k}
+                </span>
+                <span className="text-white font-semibold tabular-nums">
+                  {t('amountDisplay', { amount: v.toFixed(2) })}
+                </span>
+              </div>
+            ))}
+            <div className="flex items-center justify-between text-sm pt-2 border-t border-slate-700">
+              <span className="text-slate-300">{t('partsTotal')}</span>
+              <span className="text-white font-semibold tabular-nums">
+                {t('amountDisplay', { amount: partsTotal.toFixed(2) })}
+              </span>
+            </div>
+          </div>
+        )}
+      </div>
+
+      <div className="mt-4">
+        <h2 className="text-sm font-semibold text-white">{t('allLogs')}</h2>
+        {loading && <div className="mt-2 text-sm text-slate-400">{tc('loading')}</div>}
+        {!loading && logs.length === 0 && (
+          <div className="mt-2 text-sm text-slate-400">{t('noLogsYet')}</div>
+        )}
+        {!loading && logs.length > 0 && (
+          <ul className="mt-2 space-y-2">
+            {logs.map((l) => (
+              <li key={l.id} className="p-3 bg-slate-800 rounded-lg ring-1 ring-slate-700/60 text-sm">
+                <div className="flex items-center justify-between">
+                  <span className="text-white font-medium">
+                    {l.type === 'fuel' ? t('typeFuel') : l.type === 'spare_part' ? t('typeSparePart') : l.type === 'service' ? t('typeService') : l.type}
+                  </span>
+                  <span className="text-xs text-slate-400">{new Date(l.created_at).toLocaleString()}</span>
+                </div>
+                <div className="mt-1 text-xs text-slate-400">
+                  {l.odometer_km !== null && <span>{t('odometerDisplay', { km: String(l.odometer_km) })} · </span>}
+                  {l.liters !== null && <span>{String(l.liters)} {t('litersShort')} · </span>}
+                  {l.amount_pkr !== null && <span>{t('amountDisplay', { amount: Number(l.amount_pkr).toFixed(2) })}</span>}
+                </div>
+                {l.meta?.note && <div className="mt-1 text-xs text-slate-400">{l.meta.note}</div>}
               </li>
             ))}
           </ul>
-        </div>
+        )}
       </div>
-    </AppShell>
+    </main>
   );
 }
