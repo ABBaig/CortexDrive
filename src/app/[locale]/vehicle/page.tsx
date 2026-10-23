@@ -5,6 +5,8 @@ import { getSupabaseBrowserClient } from '@/lib/supabase/client';
 import { useTranslations } from 'next-intl';
 import BackButton from '@/components/BackButton';
 import FuelChart from '@/components/FuelChart';
+import VehicleCsvImport from '@/components/VehicleCsvImport';
+import FuelTrackerSummary from '@/components/FuelTrackerSummary';
 
 type Log = {
   id: string;
@@ -44,14 +46,24 @@ export default function VehiclePage() {
     // live schema: vehicle_logs has `type` (not event_type) and `meta` jsonb
     const { data, error: dbError } = await supabase
       .from('vehicle_logs')
-      .select('id,type,odometer_km,liters,amount_pkr,meta,created_at')
+      .select('id,type,event_type,odometer_km,liters,amount_pkr,meta,created_at')
       .eq('user_id', user.id)
       .order('created_at', { ascending: true });
     if (dbError) {
       setError(t('loadFailed'));
       setLogs([]);
     } else {
-      setLogs((data ?? []) as Log[]);
+      // normalize rows: some schemas use `event_type` instead of `type`, and some store meta differently
+      const normalized = (data ?? []).map((r: any) => ({
+        id: r.id,
+        type: r.type ?? r.event_type ?? 'fuel',
+        odometer_km: r.odometer_km ?? null,
+        liters: r.liters ?? null,
+        amount_pkr: r.amount_pkr ?? null,
+        meta: r.meta ?? (r.note ? { note: r.note } : {}),
+        created_at: r.created_at,
+      }));
+      setLogs(normalized as Log[]);
     }
     setLoading(false);
   }, [supabase, t]);
@@ -156,24 +168,9 @@ export default function VehiclePage() {
       <BackButton />
       <h1 className="mt-2 text-2xl font-semibold text-white">{t('title')}</h1>
 
-      <div className="mt-6 grid grid-cols-2 md:grid-cols-4 gap-2">
-        <div className="p-3 bg-slate-800 rounded-xl ring-1 ring-slate-700">
-          <div className="text-xs text-slate-400">{t('totalKm')}</div>
-          <div className="text-lg text-white font-semibold">{totalKm}</div>
-        </div>
-        <div className="p-3 bg-slate-800 rounded-xl ring-1 ring-slate-700">
-          <div className="text-xs text-slate-400">{t('totalLiters')}</div>
-          <div className="text-lg text-white font-semibold">{Math.round(totalLiters * 100) / 100}</div>
-        </div>
-        <div className="p-3 bg-slate-800 rounded-xl ring-1 ring-slate-700">
-          <div className="text-xs text-slate-400">{t('avgKmPerLiter')}</div>
-          <div className="text-lg text-white font-semibold">{avgKmPerLiter}</div>
-        </div>
-        <div className="p-3 bg-slate-800 rounded-xl ring-1 ring-slate-700">
-          <div className="text-xs text-slate-400">{t('pkrPerKm')}</div>
-          <div className="text-lg text-white font-semibold">{pkrPerKm}</div>
-        </div>
-      </div>
+      <FuelTrackerSummary totalKm={totalKm} totalLiters={totalLiters} avgKmPerLiter={avgKmPerLiter} pkrPerKm={pkrPerKm} />
+
+      <div className="mt-4 bg-slate-800 rounded-xl ring-1 ring-slate-700 p-4">
 
       <div className="mt-4 bg-slate-800 rounded-xl ring-1 ring-slate-700 p-4">
         <h2 className="text-sm font-semibold text-white">{t('fuelEfficiency')}</h2>
@@ -257,7 +254,10 @@ export default function VehiclePage() {
       </div>
 
       <div className="mt-4">
-        <h2 className="text-sm font-semibold text-white">{t('allLogs')}</h2>
+        <div className="flex items-center justify-between">
+          <h2 className="text-sm font-semibold text-white">{t('allLogs')}</h2>
+          <VehicleCsvImport onDone={() => void load()} />
+        </div>
         {loading && <div className="mt-2 text-sm text-slate-400">{tc('loading')}</div>}
         {!loading && logs.length === 0 && (
           <div className="mt-2 text-sm text-slate-400">{t('noLogsYet')}</div>

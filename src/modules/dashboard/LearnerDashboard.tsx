@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { getTranslations } from 'next-intl/server';
 import AppShell from '@/components/AppShell';
+import { Icons } from '@/modules/dashboard/DashboardIcons';
 import BackButton from '@/components/BackButton';
 import SOSButtonClientWrapper from '@/modules/safety/SOSButtonClientWrapper';
 import { getSupabaseServerClient } from '@/lib/supabase/server';
@@ -123,12 +124,15 @@ export default async function LearnerDashboard({ locale, userId, fullName, city 
               {formattedBalance !== null ? formattedBalance : t('walletUnavailable')}
             </div>
           </div>
-          <div className="p-3 bg-slate-700 rounded">
-            <div className="text-sm text-slate-400">{t('verification')}</div>
-            <div className="mt-1">
-              <span className={`px-2 py-1 rounded-full text-xs font-medium ${badgeClass}`}>
-                {t(`verificationStatus.${verificationStatus}`)}
-              </span>
+          <div className="p-3 bg-slate-700 rounded flex items-center gap-3">
+            <div className="flex-shrink-0 text-slate-300"><svg className="h-6 w-6" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 2l2.5 1.8L18 2l1.2 2.8L22 6l-1.8 2.2L22 11l-2.8.8L18 14l-3.5-1.8L11 16l-2.5-3.8L5 14l-1.2-2.8L2 11l1.8-2.2L2 6l2.8-.2L7 2l3 2z" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" /><path d="M9.5 12.5l1.5 1.5L15 10" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" /></svg></div>
+            <div>
+              <div className="text-sm text-slate-400">{t('verification')}</div>
+              <div className="mt-1">
+                <span className={`px-2 py-1 rounded-full text-xs font-medium ${badgeClass}`}>
+                  {t(`verificationStatus.${verificationStatus}`)}
+                </span>
+              </div>
             </div>
           </div>
         </div>
@@ -182,16 +186,46 @@ export default async function LearnerDashboard({ locale, userId, fullName, city 
         </div>
 
         <nav className="mt-6 grid grid-cols-2 gap-2">
-          <Link href={`/${locale}/bookings`} className="p-2 bg-slate-700 rounded text-white">{t('myBookings')}</Link>
-          <Link href={`/${locale}/marketplace`} className="p-2 bg-slate-700 rounded text-white">{t('findInstructor')}</Link>
-          <Link href={`/${locale}/services`} className="p-2 bg-slate-700 rounded text-white">{t('browseServicesCard')}</Link>
-          <Link href={`/${locale}/service-bookings`} className="p-2 bg-slate-700 rounded text-white">{t('myServiceBookings')}</Link>
-          <Link href={`/${locale}/verification`} className="p-2 bg-slate-700 rounded text-white">{t('verificationManage')}</Link>
-          <Link href={`/${locale}/vehicle`} className="p-2 bg-slate-700 rounded text-white">{t('vehicleCard')}</Link>
-          <Link href={`/${locale}/sos`} className="p-2 bg-slate-700 rounded text-white">{t('sosCard')}</Link>
-          <Link href={`/${locale}/security`} className="p-2 bg-slate-700 rounded text-white">{t('securityCard')}</Link>
-          <Link href={`/${locale}/ai-tutor`} className="p-2 bg-slate-700 rounded text-white">{t('aiTutorCard')}</Link>
-          <Link href={`/${locale}/marketplace`} className="p-2 bg-slate-700 rounded text-white">{t('chatCardAction')}</Link>
+          <Link href={`/${locale}/bookings`} className="p-2 bg-slate-700 rounded text-white flex items-center gap-2">
+            <span className="text-sky-300"><Icons.VerificationIcon className="h-5 w-5" /></span>
+            <span>{t('myBookings')}</span>
+          </Link>
+          <Link href={`/${locale}/marketplace`} className="p-2 bg-slate-700 rounded text-white flex items-center gap-2">
+            <span className="text-amber-300"><Icons.VerificationIcon className="h-5 w-5" /></span>
+            <span>{t('findInstructor')}</span>
+          </Link>
+          <Link href={`/${locale}/services`} className="p-2 bg-slate-700 rounded text-white flex items-center gap-2">
+            <span className="text-emerald-300"><Icons.VerificationIcon className="h-5 w-5" /></span>
+            <span>{t('browseServicesCard')}</span>
+          </Link>
+          <Link href={`/${locale}/service-bookings`} className="p-2 bg-slate-700 rounded text-white flex items-center gap-2">
+            <span className="text-sky-300"><Icons.VerificationIcon className="h-5 w-5" /></span>
+            <span>{t('myServiceBookings')}</span>
+          </Link>
+          <Link href={`/${locale}/verification`} className="p-2 bg-slate-700 rounded text-white flex items-center gap-2">
+            <span className="text-amber-300"><Icons.VerificationIcon className="h-5 w-5" /></span>
+            <span>{t('verificationManage')}</span>
+          </Link>
+          <Link href={`/${locale}/vehicle`} className="p-2 bg-slate-700 rounded text-white flex items-center gap-2">
+            <span className="text-sky-300"><Icons.FuelIcon className="h-5 w-5" /></span>
+            <span>{t('vehicleCard')}</span>
+          </Link>
+          <Link href={`/${locale}/sos`} className="p-2 bg-slate-700 rounded text-white flex items-center gap-2">
+            <span className="text-rose-300"><Icons.SOSIcon className="h-5 w-5" /></span>
+            <span>{t('sosCard')}</span>
+          </Link>
+          <Link href={`/${locale}/security`} className="p-2 bg-slate-700 rounded text-white flex items-center gap-2">
+            <span className="text-slate-300"><Icons.VerificationIcon className="h-5 w-5" /></span>
+            <span>{t('securityCard')}</span>
+          </Link>
+          <Link href={`/${locale}/ai-tutor`} className="p-2 bg-slate-700 rounded text-white flex items-center gap-2">
+            <span className="text-emerald-300"><Icons.VerificationIcon className="h-5 w-5" /></span>
+            <span>{t('aiTutorCard')}</span>
+          </Link>
+          <Link href={`/${locale}/marketplace`} className="p-2 bg-slate-700 rounded text-white flex items-center gap-2">
+            <span className="text-sky-300"><Icons.WalletIcon className="h-5 w-5" /></span>
+            <span>{t('chatCardAction')}</span>
+          </Link>
         </nav>
         <div className="mt-2 text-xs text-slate-400">{t('chatCardBody')}</div>
 
