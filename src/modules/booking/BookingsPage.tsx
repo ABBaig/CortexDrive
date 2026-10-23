@@ -7,11 +7,13 @@ import { getSupabaseBrowserClient } from '@/lib/supabase/client';
 import BackButton from '@/components/BackButton';
 import TelematicsRecorder from './TelematicsRecorder';
 import TelematicsResult from './TelematicsResult';
+import LiveTracking from './LiveTracking';
 
 export default function BookingsPage() {
   const supabase = getSupabaseBrowserClient();
   const t = useTranslations('Booking');
   const tt = useTranslations('Telematics');
+  const tg = useTranslations('GpsTracking');
   const tc = useTranslations('Common');
   const locale = useLocale();
   const router = useRouter();
@@ -23,6 +25,7 @@ export default function BookingsPage() {
   const [success, setSuccess] = React.useState<string | null>(null);
   const [confirmingId, setConfirmingId] = React.useState<string | null>(null);
   const [recordingId, setRecordingId] = React.useState<string | null>(null);
+  const [trackingId, setTrackingId] = React.useState<string | null>(null);
   const mountedRef = React.useRef(true);
 
   React.useEffect(() => {
@@ -183,12 +186,28 @@ export default function BookingsPage() {
         <tbody>
           {bookings.map((b: any) => {
             const isOwner = userId != null && b.learner_id === userId;
+            const isActive = b.status === 'booked' || b.status === 'in_progress';
             return (
               <tr key={b.id} className="border-t border-neutral-800 align-top">
                 <td className="py-3 align-top">
                   {new Date(b.created_at).toLocaleString()}
                   {b.status === 'completed' && b.telematics && (
                     <TelematicsResult telematics={b.telematics} score={b.telematics_score ?? null} />
+                  )}
+                  {isActive && (
+                    <div className="mt-1">
+                      {trackingId === b.id ? (
+                        <LiveTracking bookingId={b.id} />
+                      ) : (
+                        <button
+                          type="button"
+                          onClick={() => setTrackingId(b.id)}
+                          className="text-xs text-sky-400 hover:text-sky-300"
+                        >
+                          {tg('trackInstructor')}
+                        </button>
+                      )}
+                    </div>
                   )}
                 </td>
                 <td className="py-3">{b.instructor_id ?? t('unknownInstructor')}</td>
