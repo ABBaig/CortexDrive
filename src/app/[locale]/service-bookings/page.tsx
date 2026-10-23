@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { getSupabaseBrowserClient } from '@/lib/supabase/client';
 import { useTranslations } from 'next-intl';
 import BackButton from '@/components/BackButton';
+import RatingModal from '@/modules/vendor/services/RatingModal';
 
 type Booking = {
   id: string;
@@ -26,12 +27,15 @@ const STATUS_CLASS: Record<string, string> = {
 
 export default function MyServiceBookingsPage() {
   const t = useTranslations('VendorBooking');
+  const tr = useTranslations('VendorRating');
   const ts = useTranslations('VendorServices');
   const supabase = getSupabaseBrowserClient();
   const [bookings, setBookings] = useState<Booking[]>([]);
+  const [ratedIds, setRatedIds] = useState<Set<string>>(new Set());
   const [loading, setLoading] = useState(true);
   const [signedOut, setSignedOut] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [rating, setRating] = useState<Booking | null>(null);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -52,9 +56,17 @@ export default function MyServiceBookingsPage() {
     if (dbError) {
       setError(t('bookingFailed'));
       setBookings([]);
-    } else {
-      setBookings((data ?? []) as Booking[]);
+      setLoading(false);
+      return;
     }
+    const rows = (data ?? []) as Booking[];
+    setBookings(rows);
+    // hide "Rate" for bookings this learner already rated
+    const { data: myRatings } = await supabase
+      .from('vendor_booking_ratings')
+      .select('booking_id')
+      .eq('learner_id', user.id);
+    setRatedIds(new Set((myRatings ?? []).map((r: { booking_id: string }) => r.booking_id)));
     setLoading(false);
   }, [supabase, t]);
 
@@ -128,8 +140,8 @@ export default function MyServiceBookingsPage() {
               </div>
               {b.address && <div className="mt-1 text-sm text-slate-400">{b.address}</div>}
               {b.notes && <div className="mt-1 text-sm text-slate-400">{b.notes}</div>}
-              {(b.status === 'pending' || b.status === 'booked') && (
-                <div className="mt-3">
+              <div className="mt-3 flex gap-2">
+                {(b.status === 'pending' || b.status === 'booked') && (
                   <button
                     type="button"
                     onClick={() => void cancelBooking(b.id)}
@@ -137,11 +149,37 @@ export default function MyServiceBookingsPage() {
                   >
                     {t('cancelBooking')}
                   </button>
-                </div>
-              )}
+                )}
+                {b.status === 'completed' && !ratedIds.has(b.id) && (
+                  <button
+                    type="button"
+                    onClick={() => setRating(b)}
+                    className="px-3 py-1.5 rounded-lg text-sm font-medium bg-amber-500/90 text-white hover:bg-amber-400"
+                  >
+                    {tr('rateBooking')}
+                  </button>
+                )}
+                {b.status === 'completed' && ratedIds.has(b.id) && (
+                  <span className="inline-block px-2 py-1 rounded-full text-xs font-medium bg-emerald-500/15 text-emerald-300 ring-1 ring-emerald-500/30">
+                    {tr('rated')}
+                  </span>
+                )}
+              </div>
             </li>
           ))}
         </ul>
+      )}
+
+      {rating && (
+        <RatingModal
+          bookingId={rating.id}
+          serviceTitle={rating.vendor_services?.title ?? '—'}
+          onClose={() => setRating(null)}
+          onRated={() => {
+            setRating(null);
+            void load();
+          }}
+        />
       )}
     </main>
   );
