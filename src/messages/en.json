@@ -52,7 +52,7 @@
   "Earnings": {
     "title": "Earnings",
     "pending": "Pending (in escrow)",
-    "released": "Gross",
+    "released": "Released",
     "gross": "Gross",
     "net": "Net",
     "fee": "Platform fee",
