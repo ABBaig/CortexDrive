@@ -52,7 +52,7 @@
   "Earnings": {
     "title": "Earnings",
     "pending": "Pending (in escrow)",
-    "released": "Released",
+    "released": "Gross",
     "gross": "Gross",
     "net": "Net",
     "fee": "Platform fee",
@@ -206,7 +206,7 @@
     "servicesCard": "My Services",
     "servicesComingSoon": "Service listings & bookings are coming soon",
     "adminTitle": "Admin Dashboard",
-    "adminPendingVerifications": "Pending verifications",
+    "adminPendingVerifications": "Pending pending verifications",
     "adminBookings": "Total bookings",
     "adminSosEvents": "SOS events",
     "adminWalletActivity": "Wallet activity",
@@ -282,5 +282,15 @@
     "bookingCreated": "Booking request sent! The vendor will confirm it.",
     "loginToBook": "Please sign in to book a service.",
     "myBookingsTitle": "My service bookings"
+  },
+  "VendorRating": {
+    "rateBooking": "Rate this booking",
+    "chooseRating": "Your rating",
+    "commentLabel": "Comment (optional)",
+    "submitRating": "Submit rating",
+    "ratingFailed": "Could not submit your rating. Please try again.",
+    "rated": "Rated",
+    "loginToRate": "Please sign in to rate this booking.",
+    "reviewsCount": "reviews"
   }
 }
