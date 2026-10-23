@@ -11,6 +11,7 @@ const CATEGORIES = ['general', 'maintenance', 'repair', 'inspection', 'other'];
 
 export default function ServicesBrowsePage() {
   const t = useTranslations('VendorServices');
+  const tr = useTranslations('VendorRating');
   const supabase = getSupabaseBrowserClient();
   const [services, setServices] = useState<ServiceRow[]>([]);
   const [loading, setLoading] = useState(true);
@@ -27,7 +28,7 @@ export default function ServicesBrowsePage() {
       // select on users is restricted by RLS, so fetch services and vendor rows separately
       const { data, error } = await supabase
         .from('vendor_services')
-        .select('id,vendor_id,title,description,category,mode,price,duration_minutes')
+        .select('id,vendor_id,title,description,category,mode,price,duration_minutes,vendor_ratings(avg_rating,rating_count)')
         .eq('is_active', true)
         .order('created_at', { ascending: false })
         .limit(100);
@@ -36,7 +37,11 @@ export default function ServicesBrowsePage() {
         setLoadFailed(true);
         setServices([]);
       } else {
-        const rows = (data ?? []) as Omit<ServiceRow, 'vendor_name' | 'vendor_city'>[];
+        const rows = data as Array<
+          Omit<ServiceRow, 'vendor_name' | 'vendor_city'> & {
+            vendor_ratings: { avg_rating: number | string | null; rating_count: number | null } | null;
+          }
+        >;
         // best-effort vendor names (RLS may hide users rows)
         const vendorIds = Array.from(new Set(rows.map((r) => r.vendor_id)));
         let nameById = new Map<string, { name: string | null; city: string | null }>();
@@ -56,6 +61,9 @@ export default function ServicesBrowsePage() {
         }
         const merged: ServiceRow[] = rows.map((r) => ({
           ...r,
+          vendor_ratings: undefined,
+          avg_rating: r.vendor_ratings?.avg_rating ?? null,
+          rating_count: r.vendor_ratings?.rating_count ?? null,
           vendor_name: nameById.get(r.vendor_id)?.name ?? null,
           vendor_city: nameById.get(r.vendor_id)?.city ?? null,
         }));
@@ -141,6 +149,14 @@ export default function ServicesBrowsePage() {
                   {s.vendor_name ?? '—'}{s.vendor_city ? ` · ${s.vendor_city}` : ''}
                 </span>
               </div>
+              {(s.rating_count ?? 0) > 0 && (
+                <div className="mt-2 text-sm text-amber-300">
+                  ★ {Number(s.avg_rating ?? 0).toFixed(1)}{' '}
+                  <span className="text-slate-400">
+                    ({s.rating_count} {tr('reviewsCount')})
+                  </span>
+                </div>
+              )}
               <div className="mt-3">
                 <button
                   type="button"
