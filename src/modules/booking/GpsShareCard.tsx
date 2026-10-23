@@ -18,7 +18,7 @@ export default function GpsShareCard({ instructorId }: { instructorId: string })
   const tc = useTranslations('Common');
   const supabase = getSupabaseBrowserClient();
   const [bookings, setBookings] = useState<Booking[]>([]);
-  [selected, setSelected] = useState<string>('');
+  const [selected, setSelected] = useState<string>('');
   const [sharing, setSharing] = useState(false);
   const [supported, setSupported] = useState(true);
   const [permissionDenied, setPermissionDenied] = useState(false);
