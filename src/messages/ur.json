@@ -292,5 +292,39 @@
     "rated": "ریٹنگ دی گئی",
     "loginToRate": "ریٹنگ دینے کے لیے براہ کرم سائن ان کریں۔",
     "reviewsCount": "تبصرے"
+  },
+  "VendorReschedule": {
+    "reschedule": "نئے وقت پر رکھیں",
+    "newStart": "نیا شروع ہونے کا وقت",
+    "propose": "تجویز کریں",
+    "proposed": "تجویز بھیج دی گئی — دوسری فریق کے جواب کا انتظار۔",
+    "proposedByYou": "آپ نے تجویز دی",
+    "proposedByOther": "نئے وقت کی تجویز موصول ہوئی",
+    "accept": "قبول کریں",
+    "decline": "مسترد کریں",
+    "accepted": "تجویز قبول ہو گئی — نیا وقت لاگو ہو گیا۔",
+    "rejected": "تجویز مسترد کر دی گئی۔",
+    "rescheduleInvalid": "آئندہ کا درست شروع ہونے کا وقت منتخب کریں۔",
+    "rescheduleFailed": "تجویز محفوظ نہیں ہو سکی۔",
+    "overlapOnAccept": "نیا وقت کسی موجودہ فعال بکنگ سے ٹکرا رہا ہے — تجویز دوبارہ کھول دی گئی۔",
+    "raiseIssue": "مسئلہ رپورٹ کریں",
+    "issueReason": "مسئلے کی تفصیل لکھیں",
+    "send": "بھیجیں",
+    "issueSent": "مسئلہ ایڈمن کو بھیج دیا گیا۔",
+    "issueFailed": "مسئلہ بھیجا نہیں جا سکا۔"
+  },
+  "VendorEscalation": {
+    "title": "سروس بکنگ کے مسائل",
+    "notAuthorized": "صرف ایڈمن یہ صفحہ دیکھ سکتے ہیں۔",
+    "empty": "کوئی کھلا مسئلہ نہیں۔",
+    "loadFailed": "مسائل لوڈ نہیں ہو سکے۔",
+    "statusOpen": "کھلا",
+    "statusResolved": "حل شدہ",
+    "statusDismissed": "مسترد",
+    "resolve": "حل کریں",
+    "dismiss": "مسترد کریں",
+    "resolutionLabel": "حل",
+    "resolutionPlaceholder": "حل لکھیں...",
+    "resolutionRequired": "حل کرنے سے پہلے حل لکھنا لازمی ہے۔"
   }
 }
