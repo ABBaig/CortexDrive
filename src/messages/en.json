@@ -292,5 +292,39 @@
     "rated": "Rated",
     "loginToRate": "Please sign in to rate this booking.",
     "reviewsCount": "reviews"
+  },
+  "VendorReschedule": {
+    "reschedule": "Reschedule",
+    "newStart": "New start time",
+    "propose": "Propose",
+    "proposed": "Proposal sent — waiting for the other party.",
+    "proposedByYou": "You proposed",
+    "proposedByOther": "Reschedule proposed",
+    "accept": "Accept",
+    "decline": "Decline",
+    "accepted": "Reschedule accepted — new time applied.",
+    "rejected": "Reschedule declined.",
+    "rescheduleInvalid": "Pick a valid future start time.",
+    "rescheduleFailed": "Could not save the reschedule proposal.",
+    "overlapOnAccept": "The new time overlaps an existing active booking — proposal reopened.",
+    "raiseIssue": "Raise issue",
+    "issueReason": "Describe the problem",
+    "send": "Send",
+    "issueSent": "Issue reported to admin.",
+    "issueFailed": "Could not report the issue."
+  },
+  "VendorEscalation": {
+    "title": "Service booking issues",
+    "notAuthorized": "Only admins can view this page.",
+    "empty": "No open issues.",
+    "loadFailed": "Could not load issues.",
+    "statusOpen": "Open",
+    "statusResolved": "Resolved",
+    "statusDismissed": "Dismissed",
+    "resolve": "Resolve",
+    "dismiss": "Dismiss",
+    "resolutionLabel": "Resolution",
+    "resolutionPlaceholder": "Write the resolution...",
+    "resolutionRequired": "Please write the resolution before resolving."
   }
 }
