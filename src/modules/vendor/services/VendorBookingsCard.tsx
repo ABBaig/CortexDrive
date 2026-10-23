@@ -52,8 +52,18 @@ export default function VendorBookingsCard({ vendorId }: { vendorId: string }) {
     setActionError(null);
     const { error } = await supabase.from('vendor_bookings').update({ status }).eq('id', id);
     if (error) {
+      const code = (error as any).code;
+      // P0002 = insufficient funds (payment trigger)
+      if (code === 'P0002') {
+        setActionError(t('learnerCannotPay'));
+        return;
+      }
       // 23P01 = exclusion violation from no_provider_overlap (double-booking)
-      setActionError((error as any).code === '23P01' ? t('overlapError') : t('bookingFailed'));
+      if (code === '23P01') {
+        setActionError(t('overlapError'));
+        return;
+      }
+      setActionError(t('bookingFailed'));
       return;
     }
     void loadBookings();
