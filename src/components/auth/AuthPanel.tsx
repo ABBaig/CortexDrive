@@ -9,17 +9,47 @@ import Link from 'next/link';
 type Mode = 'signin' | 'signup';
 type AuthRole = 'learner' | 'instructor' | 'vendor';
 
-/** Coerce any error value into a readable string (fixes red `{}` in UI). */
+/**
+ * Coerce any error value into a readable string.
+ * Supabase errors sometimes carry an EMPTY message (e.g. the auth API returns
+ * an error body without a message field). The old fallback was
+ * JSON.stringify(err), which produces "{}" for most error objects because
+ * their fields are non-enumerable — that is exactly the red "{}" box users
+ * saw. This version surfaces everything the error actually carries:
+ * message / msg / error, toString(), HTTP status, and error codes.
+ */
 function toErrorMessage(err: unknown): string {
+  if (err == null) return 'An unexpected error occurred.';
   if (typeof err === 'string') return err;
-  if (err && typeof err === 'object') {
-    const e = err as Record<string, unknown>;
-    if (typeof e.message === 'string' && e.message) return e.message;
-    if (typeof e.msg === 'string' && e.msg) return e.msg;
-    if (typeof e.error === 'string' && e.error) return e.error;
-    try { return JSON.stringify(e); } catch { return 'An unexpected error occurred.'; }
+  if (typeof err !== 'object') return String(err);
+
+  const e = err as Record<string, any>;
+  const parts: string[] = [];
+
+  if (typeof e.message === 'string' && e.message) parts.push(e.message);
+  else if (typeof e.msg === 'string' && e.msg) parts.push(e.msg);
+  else if (typeof e.error === 'string' && e.error) parts.push(e.error);
+  else if (e.error && typeof e.error === 'object' && typeof e.error.message === 'string' && e.error.message) {
+    parts.push(e.error.message);
+  } else if (e.originalError) {
+    parts.push(toErrorMessage(e.originalError));
+  } else {
+    // Error subclass: toString() usually yields "ErrorName: the real message"
+    const s = String(err).trim();
+    if (s && s !== '[object Object]') parts.push(s.replace(/^Error:\s*$/,'Error'));
   }
-  return 'An unexpected error occurred.';
+
+  if (e.status) parts.push(`(status ${e.status})`);
+  if (typeof e.code === 'string' && e.code) parts.push(`code: ${e.code}`);
+  else if (typeof e.error_code === 'string' && e.error_code) parts.push(`code: ${e.error_code}`);
+
+  if (parts.length === 0) {
+    try {
+      const j = JSON.stringify(err);
+      if (j && j !== '{}') parts.push(j);
+    } catch { /* not serializable */ }
+  }
+  return parts.length ? parts.join(' — ') : 'An unexpected error occurred.';
 }
 
 export default function AuthPanel({
@@ -106,7 +136,7 @@ export default function AuthPanel({
           .maybeSingle();
         if (!adminRow) {
           await supabase.auth.signOut();
-          setEmail('This account is not an admin.');
+          setError('This account is not an admin.');
           return;
         }
         router.push(`/${locale}/admin`);
