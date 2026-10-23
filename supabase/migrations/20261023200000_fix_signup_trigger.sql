@@ -10,6 +10,10 @@
 --    so instructor/vendor signups landed as 'learner'. This version persists
 --    it (validated).
 -- 3) Ensures public.users exists and has every column the app queries.
+-- 4) Grants so the auth service (supabase_auth_admin, which runs the trigger
+--    on auth.users during signup) can execute the function and write the
+--    profile row. Without these, EVERY signup fails with a bare
+--    "500 Internal Server Error" and an empty error body.
 -- Idempotent: safe to re-run.
 
 -- 3) Ensure the users table exists with the full shape the app expects.
@@ -73,3 +77,9 @@ drop trigger if exists auth_user_created on auth.users;
 create trigger auth_user_created
   after insert on auth.users
   for each row execute function public.handle_new_user();
+
+-- 4) Auth-service grants — the missing piece that caused the bare 500.
+--    GoTrue runs as supabase_auth_admin and fires the trigger during signup.
+grant usage on schema public to supabase_auth_admin;
+grant execute on function public.handle_new_user to supabase_auth_admin;
+grant select, insert, update on table public.users to supabase_auth_admin;
