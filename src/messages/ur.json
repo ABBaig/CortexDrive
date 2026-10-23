@@ -68,7 +68,8 @@
       "bookings": "بکنگز",
       "wallet": "والیٹ ٹرانزیکشنز",
       "sos": "ایس او ایس لاگ",
-      "escalatedChats": "ایسکیلیٹڈ چیٹس"
+      "escalatedChats": "ایسکیلیٹڈ چیٹس",
+      "vendorIssues": "وینڈر مسائل"
     },
     "loading": "لوڈ ہو رہا ہے...",
     "error": "ایک خرابی پیش آگئی",
@@ -77,6 +78,8 @@
     "emptyTransactions": "کوئی ٹرانزیکشنز نہیں",
     "emptySos": "کوئی ایس او ایس لاگز نہیں",
     "emptyEscalated": "کوئی ایسکیلیٹڈ چیٹس نہیں",
+    "emptyVendorIssues": "کوئی کھلا وینڈر مسئلہ نہیں",
+    "openVendorIssues": "وینڈر مسائل کھولیں",
     "openChat": "کھولیں",
     "approve": "منظور کریں",
     "reject": "رد کریں",
@@ -283,6 +286,12 @@
     "loginToBook": "خدمت بک کرنے کے لیے براہ کرم سائن ان کریں۔",
     "myBookingsTitle": "میری سروس بکنگز"
   },
+  "VendorPayment": {
+    "escrowed": "ادائیگی اسکرو میں محفوظ ہے",
+    "settled": "ادائیگی وینڈر کو جاری کر دی گئی",
+    "refunded": "آپ کے والیٹ میں واپس کر دی گئی",
+    "learnerCannotPay": "تصدیق نہیں ہو سکی — لرنر کے والیٹ میں رقم کافی نہیں ہے۔"
+  },
   "VendorRating": {
     "rateBooking": "اس بکنگ کی ریٹنگ دیں",
     "chooseRating": "آپ کی ریٹنگ",
@@ -326,5 +335,60 @@
     "resolutionLabel": "حل",
     "resolutionPlaceholder": "حل لکھیں...",
     "resolutionRequired": "حل کرنے سے پہلے حل لکھنا لازمی ہے۔"
+  },
+  "Vehicle": {
+    "title": "گاڑی",
+    "signInRequired": "اپنے گاڑی کے لاگز سنبھالنے کے لیے براہ کرم سائن ان کریں۔",
+    "loadFailed": "کچھ خرابی ہو گئی۔ براہ کرم دوبارہ کوشش کریں۔",
+    "totalKm": "کل کلومیٹر",
+    "totalLiters": "کل لیٹر",
+    "avgKmPerLiter": "اوسط کلومیٹر/لیٹر",
+    "pkrPerKm": "روپے/کلومیٹر",
+    "fuelEfficiency": "فیول ایفیشنسی",
+    "needTwoFuelLogs": "ایفیشنسی چارٹ دیکھنے کے لیے کم از کم دو فیول اندراجات (اوڈومیٹر کے ساتھ) شامل کریں۔",
+    "addLog": "اندراج شامل کریں",
+    "logType": "قسم",
+    "typeFuel": "فیول",
+    "typeSparePart": "سپیئر پارٹ",
+    "typeService": "سروس",
+    "odometerKm": "اوڈومیٹر (کلومیٹر)",
+    "liters": "لیٹر",
+    "amountPkr": "رقم (روپے)",
+    "note": "نوٹ (اختیاری)",
+    "saveLog": "محفوظ کریں",
+    "amountInvalid": "درست رقم درج کریں۔",
+    "litersInvalid": "فیول اندراج کے لیے درست لیٹر درج کریں۔",
+    "odometerInvalid": "درست اوڈومیٹر ریڈنگ درج کریں۔",
+    "partsBreakdown": "پارٹس اور سروس اخراجات",
+    "partsTotal": "کل",
+    "noPartsYet": "ابھی تک کوئی سپیئر پارٹ یا سروس لاگ نہیں۔",
+    "allLogs": "تمام لاگز",
+    "noLogsYet": "ابھی کوئی لاگ نہیں — اوپر اپنا پہلا اندراج شامل کریں۔",
+    "amountDisplay": "{amount} روپے",
+    "odometerDisplay": "{km} کلومیٹر",
+    "litersShort": "لیٹر"
+  },
+  "Quiz": {
+    "title": "ڈرائیونگ کوئز",
+    "pickTopic": "مشق کے لیے موضوع منتخب کریں",
+    "topics": {
+      "road_signs": "روڈ سائنز",
+      "traffic_rules": "ٹریفک رولز",
+      "safe_driving": "محفوظ ڈرائیونگ",
+      "parking": "پارکنگ",
+      "highway": "ہائی وے ڈرائیونگ",
+      "license_test": "لائسنس ٹیسٹ"
+    },
+    "startQuiz": "کوئز شروع کریں",
+    "generating": "سوالات بنائے جا رہے ہیں...",
+    "mockNotice": "(نمونہ کوئز — اصلی AI سوالات کے لیے GOOGLE_API_KEY سیٹ کریں)",
+    "questionN": "سوال {current} از {total}",
+    "next": "اگلا",
+    "yourScore": "آپ کا اسکور",
+    "resultLabel": "{score}% — مشق جاری رکھیں!",
+    "correct": "درست",
+    "yourAnswer": "آپ کا جواب",
+    "correctAnswer": "درست جواب",
+    "anotherTopic": "کوئی اور موضوع آزمائیں"
   }
 }
