@@ -1,18 +1,36 @@
 'use client';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { useTranslations } from 'next-intl';
+
+const GREETING_SEEN_KEY = 'cortexa_greeting_seen';
 
 export default function FloatingAIChat({ locale }: { locale: string }) {
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [messages, setMessages] = React.useState<{ id: string; from: 'user' | 'ai'; text: string }[]>([]);
-  const [input, setInput] = React.useState('');
+  const [messages, setMessages] = useState<{ id: string; from: 'user' | 'ai'; text: string }[]>([]);
+  const [input, setInput] = useState('');
+  const [greetingVisible, setGreetingVisible] = useState(false);
   const t = useTranslations('AiTutor');
   const tc = useTranslations('Chat');
   const tCommon = useTranslations('Common');
 
-  const greeting = t('greeting');
+  useEffect(() => {
+    // Show the greeting bubble only once per browser session — not on every
+    // client-side navigation, and not after the user has already seen it.
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    try {
+      if (sessionStorage.getItem(GREETING_SEEN_KEY)) return;
+      setGreetingVisible(true);
+      sessionStorage.setItem(GREETING_SEEN_KEY, '1');
+      timer = setTimeout(() => setGreetingVisible(false), 10000);
+    } catch {
+      // sessionStorage unavailable (private mode etc.) — still show once
+      setGreetingVisible(true);
+      timer = setTimeout(() => setGreetingVisible(false), 10000);
+    }
+    return () => { if (timer) clearTimeout(timer); };
+  }, []);
 
   async function send() {
     if (!input || loading) return;
@@ -44,10 +62,11 @@ export default function FloatingAIChat({ locale }: { locale: string }) {
   return (
     <div className="fixed right-4 bottom-4 z-50">
       <div className="flex flex-col items-end">
-        {/* Greeting bubble — appears when the site loads and the chat is closed */}
-        {!open && (
+        {/* Greeting bubble — shows once per session, auto-dismisses after 10s,
+            and hides whenever the chat is open */}
+        {!open && greetingVisible && (
           <div className="mb-2 max-w-[240px] px-3 py-2 rounded-xl rounded-br-sm bg-slate-800 text-slate-100 text-xs shadow-lg ring-1 ring-slate-600">
-            {greeting}
+            {t('greeting')}
           </div>
         )}
 

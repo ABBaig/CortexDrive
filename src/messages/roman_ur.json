@@ -15,7 +15,9 @@
     "selectLanguage": "Zaban ka intikhab karein",
     "loading": "Loading...",
     "error": "Koi masla hua hai. Barah-e-karam baad mein koshish karein.",
-    "cancel": "Cancel"
+    "cancel": "Cancel",
+    "chats": "Chats",
+    "signOut": "Sign out"
   },
   "Wallet": {
     "title": "Wallet",
@@ -44,6 +46,7 @@
     "colAmount": "Raqam",
     "statusBooked": "Booked",
     "statusRefunded": "Refunded",
+    "statusCompleted": "Completed",
     "missingAmountColumn": "Is booking mein raqam save nahin; refund ka hisaab nahin kiya ja sakta.",
     "unknownInstructor": "Unknown",
     "noWallet": "Aapke account ke liye koi wallet nahi mila.",
@@ -146,6 +149,7 @@
     "connectAdmin": "Admin se rabta karein",
     "mockAiNotice": "(Mock AI jawab — real jawab ke liye GOOGLE_API_KEY set karein)",
     "title": "Chat",
+    "inbox": "Meri chats",
     "send": "Bhejein",
     "empty": "Abhi koi paigham nahi",
     "sendError": "Paigham bhejne mein nakaami",

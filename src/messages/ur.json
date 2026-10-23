@@ -15,7 +15,9 @@
     "selectLanguage": "زبان منتخب کریں",
     "loading": "لوڈ ہو رہا ہے...",
     "error": "ایک خرابی پیش آگئی۔ براہ کرم بعد میں دوبارہ کوشش کریں۔",
-    "cancel": "منسوخ کریں"
+    "cancel": "منسوخ کریں",
+    "chats": "چیٹس",
+    "signOut": "سائن آؤٹ"
   },
   "Wallet": {
     "title": "والیٹ",
@@ -44,6 +46,7 @@
     "colAmount": "رقم",
     "statusBooked": "بک ہوئی",
     "statusRefunded": "واپس کردی گئی",
+    "statusCompleted": "مکمل شدہ",
     "missingAmountColumn": "اس بکنگ میں رقم محفوظ نہیں ہے؛ واپسی کا حساب نہیں کیا جا سکتا۔",
     "unknownInstructor": "نامعلوم",
     "noWallet": "آپ کے اکاؤنٹ کے لیے کوئی والیٹ نہیں ملا۔",
@@ -146,6 +149,7 @@
     "connectAdmin": "ایڈمن سے رابطہ کریں",
     "mockAiNotice": "(نمونہ AI جواب — اصلی جوابات کے لیے GOOGLE_API_KEY سیٹ کریں)",
     "title": "چیٹ",
+    "inbox": "میری چیٹس",
     "send": "بھیجیں",
     "empty": "ابھی کوئی پیغام نہیں",
     "sendError": "پیغام بھیجنے میں ناکامی",
