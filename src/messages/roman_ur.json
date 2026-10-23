@@ -69,7 +69,7 @@
       "wallet": "Wallet Transactions",
       "sos": "SOS Log",
       "escalatedChats": "Escalated Chats"
-  },
+    },
     "loading": "Loading...",
     "error": "Koi masla hua hai",
     "emptyVerifications": "Koi pending verifications nahi hain",
@@ -138,7 +138,7 @@
       "unavailable": "AI waqt bhar ke liye available nahi — submission manual review ke liye queue mein hai."
     }
   },
-    "Chat": {
+  "Chat": {
     "message": "Paigham bhejein",
     "connectAdmin": "Admin se rabta karein",
     "mockAiNotice": "(Mock AI jawab — real jawab ke liye GOOGLE_API_KEY set karein)",
@@ -184,6 +184,7 @@
     "lessonsCompleted": "Mukammal shuda classes",
     "myBookings": "Meri bookings",
     "findInstructor": "Instructor talash karein",
+    "browseServicesCard": "Services dekhein",
     "vehicleCard": "Gaari",
     "sosCard": "SOS",
     "securityCard": "Security",
@@ -209,5 +210,41 @@
     "adminSosEvents": "SOS waqiat",
     "adminWalletActivity": "Wallet activity",
     "openAdminPanel": "Admin Panel Kholein"
+  },
+  "VendorServices": {
+    "loading": "Loading...",
+    "errorLoad": "Services load nahi ho sakin.",
+    "myServices": "Meri Services",
+    "servicesUsed": "3 mein se {count} services use hui hain",
+    "addFirstService": "Apni pehli service add karein",
+    "noServices": "Aapki abhi koi services nahi hain.",
+    "noServicesBrowse": "Abhi tak koi services list nahi hui.",
+    "inactive": "Inactive",
+    "archive": "Archive",
+    "activate": "Activate",
+    "newService": "Nayi service",
+    "editService": "Service edit karein",
+    "title": "Title",
+    "description": "Tafseel",
+    "category": "Qism",
+    "mode": "Mode",
+    "inPerson": "In person",
+    "mobile": "Mobile",
+    "both": "Dono",
+    "price": "Qeemat",
+    "durationMinutes": "Duration (minutes)",
+    "isActive": "Active",
+    "currency": "Rs {amount}",
+    "minutes": "min",
+    "save": "Save",
+    "cancel": "Cancel",
+    "browseServices": "Services dekhein",
+    "searchPlaceholder": "Services talash karein...",
+    "allCategories": "Tamam qismein",
+    "bookingSoon": "Booking jald aa rahi hai",
+    "errorTitle": "Title zaruri hai.",
+    "errorPrice": "Sahi qeemat darj karein (0 ya zyada).",
+    "errorDuration": "Duration 15 se 480 minutes ke darmiyan hona chahiye.",
+    "errorSave": "Save nahi ho saka — aap sirf apni services sambhal sakte hain."
   }
 }
