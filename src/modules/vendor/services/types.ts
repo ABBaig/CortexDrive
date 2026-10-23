@@ -26,4 +26,6 @@ export type ServiceRow = {
   duration_minutes: number;
   vendor_name: string | null;
   vendor_city: string | null;
+  avg_rating?: number | string | null;
+  rating_count?: number | null;
 };
