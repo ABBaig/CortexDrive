@@ -2,16 +2,18 @@
 
 import React from 'react';
 import Image from 'next/image';
+import { useTranslations } from 'next-intl';
+import { useRouter, usePathname } from 'next/navigation';
 import LanguageSelector from './LanguageSelector';
 import { getSupabaseBrowserClient } from '@/lib/supabase/client';
-import { useRouter } from 'next/navigation';
 import { useLocale } from 'next-intl';
 
 export default function AppShell({ children }: { children: React.ReactNode }) {
   const supabase = getSupabaseBrowserClient();
-
   const router = useRouter();
+  const pathname = usePathname();
   const locale = useLocale();
+  const t = useTranslations('Common');
 
   async function signOut() {
     await supabase.auth.signOut();
@@ -32,11 +34,17 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
           <span className="text-2xl font-bold" style={{ color: 'var(--cd-primary)' }}>CortexDrive</span>
         </div>
         <div className="flex items-center gap-4">
+          <a
+            href={`/${locale}/chat`}
+            className={`text-sm hover:text-sky-400 ${pathname === `/${locale}/chat` ? 'text-sky-400' : 'text-slate-300'}`}
+          >
+            {t('chats')}
+          </a>
           <LanguageSelector />
-          <button onClick={signOut} className="px-3 py-1 rounded bg-slate-800">Sign out</button>
+          <button onClick={signOut} className="px-3 py-1 rounded bg-slate-800">{t('signOut')}</button>
         </div>
+        <main className="p-6">{children}</main>
       </header>
-      <main className="p-6">{children}</main>
     </div>
   );
 }
