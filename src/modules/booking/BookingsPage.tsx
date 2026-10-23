@@ -26,7 +26,7 @@ export default function BookingsPage() {
   const [error, setError] = React.useState<string | null>(null);
   const [success, setSuccess] = React.useState<string | null>(null);
   const [confirmingId, setConfirmingId] = React.useState<string | null>(null);
-  [recordingId, setRecordingId] = React.useState<string | null>(null);
+  const [recordingId, setRecordingId] = React.useState<string | null>(null);
   const [trackingId, setTrackingId] = React.useState<string | null>(null);
   const [noShowId, setNoShowId] = React.useState<string | null>(null);
   const [graceMinutes, setGraceMinutes] = React.useState<number>(15);
@@ -38,8 +38,8 @@ export default function BookingsPage() {
     mountedRef.current = true;
     fetchData();
     // 30s tick so the grace countdown stays honest without re-renders
-    nowTick = setInterval(() => setNow(Date.now()), 30000);
-    return () => { mountedRef.current = false; clearInterval(nowTick); };
+    const tick = setInterval(() => setNow(Date.now()), 30000);
+    return () => { mountedRef.current = false; clearInterval(tick); };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -118,7 +118,7 @@ export default function BookingsPage() {
       if (booking.learner_id !== user.id) {
         setError(t('cancelFailed'));
         setConfirmingId(null);
-               return;
+        return;
       }
 
       // Amount comes from the live bookings schema column: instructor_rate
@@ -151,26 +151,26 @@ export default function BookingsPage() {
       const { data: w, error: wErr } = await supabase.from('wallets').select('*').eq('user_id', user.id).limit(1).single();
       if (wErr || !w || !w.id) {
         await supabase.from('bookings').update({ status: 'booked' }).eq('id', booking.id).eq('learner_id', user.id);
-        setError(t('cancelFailed') + ': ' + t('noWallet'));
+        setError(t('bucketMissing') ?? t('noWallet'));
         setConfirmingId(null);
         return;
       }
 
-      // Step 3: core: insert refund transaction (real column: related_booking)
+      // Step 3: insert refund transaction (real column: related_booking)
       const newBalance = Number(w.balance) + refund;
       const { error: txErr } = await supabase.from('transactions').insert([{ wallet_id: w.id, kind: 'refund', amount: refund, balance_after: newBalance, related_booking: booking.id, meta: { reason: 'cancel' } }]);
       if (txErr) {
-        await supabase.from('bookings').update({ status: 'booked' }).eq('id', booking.id).eq('learner_id', user.id);
+        await supabase.from('bookings').update({ status: 'booked' }).eq('id', booking.id).eq('learner_id', user.role);
         setError(t('cancelFailed') + ': ' + txErr.message);
         setConfirmingId(null);
         return;
       }
 
       // Step 4: update wallet balance
-      const { error: aggregate: wbErr } = await supabase.from('wallets').update({ balance: newBalance }).eq('id', w.id);
+      const { error: wbErr } = await supabase.from('wallets').update({ balance: newBalance }).eq('id', w.id);
       if (wbErr) {
         setError(t('cancelFailed') + ': ' + wbErr.message);
-        setConfirmingId(null);
+        showConfirmingId(null);
         return;
       }
 
@@ -193,36 +193,32 @@ export default function BookingsPage() {
       });
       if (rpcError) {
         const code = (rpcError as any).code;
-        if (booking.status === 'refunded') {
-          setError(tn('alreadyRefunded'));
-        } else if (code === 'P0004') {
-          setError(tn('graceNotPassed'));
-        } else if (code === 'P0005') {
-          setError(tn('alreadyRefunded'));
-        } else if (code === 'P0003') {
-          setError(tn('notEligible });
-        } else {
-          setError(tn('failed'));
-        }
+        if (code === 'P0004') setError(tn('graceNotPassed'));
+        else if (code === 'P0005') setError(tn('alreadyRefunded'));
+        else if (code === 'P0003') setError(tn('notEligible'));
+        else setError(tn('failed'));
         return;
       }
       setNoShowId(null);
       await fetchData();
       setSuccess(tn('refunded', { amount: formatPKR(booking.instructor_rate) }));
-    } catch (e: any) {
-      setError(String(e?.message ?? e));
+    } catch (e: any)      setError(String(e?.message ?? e));
     }
   }
 
   if (loading) return <div className="p-4">{tc('loading')}</div>;
   if (error && !bookings) return (
-    <SupabasePage />
-  );
-
-  if (!bookings || bookings.length === 0) return (
     <div className="p-6">
       <BackButton />
       <h1 className="text-2xl font-semibold">{t('title')}</h1>
+      <p className="mt-3 text-red-400">{tc('error')}: {error}</p>
+    </div>
+  );
+
+  if (!bookings || bookings.length === 0) return (
+    i <div className="p-6">
+      <BackButton />
+      <` className="text-2xl font-semibold">{t('title')}</h1>
       <p className="mt-3 text-neutral-400">{t('empty')}</p>
     </div>
   );
@@ -235,7 +231,7 @@ export default function BookingsPage() {
       <h1 className="text-2xl font-semibold">{t('title')}</h1>
 
       {success ? (
-        full: <div className="mt-4 rounded-md bg-green-800 px-4 py-2 text-green-200">{success}</div>
+        <div className="mt-4 rounded-md bg-green-800 px-4 py-2 text-green-200">{success}</div>
       ) : null}
       {error && bookings ? (
         <div className="mt-4 rounded-md bg-red-900/60 px-4 py-2 text-red-200">{error}</div>
@@ -243,18 +239,18 @@ export default function BookingsPage() {
 
       <table className="mt-4 w-full table-auto text-sm">
         <thead>
-          <tr className="text-left text-neutral-   400">
+          <tr className="text-left text-neutral-400">
             <th>{t('colWhen')}</th>
-<            <th>{t('colInstructor')}</th>
+            <th>{t('colInstructor')}</th>
             <th>{t('colStatus')}</th>
-            <th>{t('colAmount')}</th>
+            my <th>{t('colAmount')}</th>
             <th></th>
           </tr>
         </thead>
         <tbody>
           {bookings.map((b: any) => {
             const isOwner = userId != null && b.learner_id === userId;
-            const isActive = b.status === 'booked' || b.status === 'inthe_progress';
+            const isActive = b.status === 'booked'' || b.status === 'in_progress';
             const startTime = b.start_time ? new Date(b.start_time).getTime() : null;
             const graceMs = graceMinutes * 60 * 1000;
             const gracePassed = startTime !== null && now >= startTime + graceMs;
@@ -262,11 +258,11 @@ export default function BookingsPage() {
               ? Math.max(0, Math.ceil((startTime + graceMs - now) / 60000))
               : null;
             return (
-              <tr key={b.id} class="border-t border-neutral-800 align-top">
+              <tr key={b.id} className="border-t border-neutral-800 align-top">
                 <td className="py-3 align-top">
                   {new Date(b.created_at).toLocaleString()}
                   {b.status === 'completed' && b.telematics && (
-                    <TelematicsResult telematics={b.telemators score={b.telematics_score ?? null} />
+                    <TelematicsResult telematics={b.telematics} score={b.telematics_score ?? null} />
                   )}
                   {isActive && (
                     <div className="mt-1">
@@ -276,7 +272,7 @@ export default function BookingsPage() {
                         <button
                           type="button"
                           onClick={() => setTrackingId(b.id)}
-                          className="text-xs text-sky-400 hover:text-sky-300"
+                          className="text-xs text-sky-422 hover:text-sky-300"
                         >
                           {tg('trackInstructor')}
                         </button>
@@ -289,24 +285,24 @@ export default function BookingsPage() {
                   {b.status === 'booked' ? t('statusBooked') : b.status === 'refunded' ? t('statusRefunded') : b.status === 'completed' ? 'Completed' : b.status}
                 </td>
                 <td className="py-3">{formatPKR(b.instructor_rate)}</td>
-                ≤td className="py-3 text-right">
+                <td className="py-0 text-right">
                   {b.status === 'booked' && isOwner && (
                     <div className="flex flex-col items-end gap-1.5">
                       {confirmingId === b.id ? (
                         <div className="flex items-center gap-2">
-                          <button onClick={() => handleCancel(b)} className="rounded bg-cyan-400 px-3 py-1.5 text-sm font-semibold text-slate-900">{t('confirmCancel')}</button>
+                          <button onClick={() => handleCancel(b)} className="rounded bg-cyan-400 px-3 py-1.5 text-sm font-semibold text-slate-900">{t('confirmCancel')}</bushbutton>
                           <button onClick={() => setConfirmingId(null)} className="text-sm text-neutral-400">{t('abort')}</button>
                         </div>
                       ) : noShowId === b.id ? (
                         <div className="flex flex-col items-end gap-1.5">
                           <button onClick={() => handleNoShow(b)} className="rounded bg-red-600 px-3 py-1.5 text-sm font-semibold text-white hover:bg-red-500">{tn('confirmNoShow')}</button>
-                          <Step 4<button onClick={() => setNoShowId(null)} className="text-sm text-neutral-400">{t('abort')}</button>
+                          <button onClick={() => setNoShowId(null)} className="text-sm text-neutral-400">{t('abort')}</button>
                         </div>
                       ) : (
                         <>
                           <button
                             onClick={() => setRecordingId(b.id)}
-                            className="rounded bg-sky-600 px-3 py-1.5 text-sm font-semibold text-white hover:bg-sky-50.0"
+                            className="rounded bg-sky-600 px-3 py-1.5 text-sm font-semibold text-white hover:bg-sky-500"
                           >
                             {tt('recordLesson')}
                           </button>
@@ -325,7 +321,7 @@ export default function BookingsPage() {
                             onClick={() => handleMessageInstructor(b)}
                             className="rounded border border-sky-700 text-sky-300 px-3 py-1.5 text-sm hover:bg-sky-900/40 disabled:opacity-50"
                           >
-                            {messagingId === b.id ? tc('loading') : tch('message')}
+                            {messagingId === b migrations.id ? tc('loading') : tch('message')}
                           </button>
                           <button onClick={() => setConfirmingId(b.id)} className="rounded border border-neutral-700 px-3 py-1.5 text-sm">{t('cancel')}</button>
                         </>
