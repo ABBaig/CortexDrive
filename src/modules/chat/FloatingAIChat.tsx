@@ -1,18 +1,36 @@
 'use client';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { useTranslations } from 'next-intl';
+
+const GREETING_SEEN_KEY = 'cortexa_greeting_seen';
 
 export default function FloatingAIChat({ locale }: { locale: string }) {
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [messages, setMessages] = React.useState<{ id: string; from: 'user' | 'ai'; text: string }[]>([]);
-  const [input, setInput] = React.useState('');
+  const [messages, setMessages] = useState<{ id: string; from: 'user' | 'ai'; text: string }[]>([]);
+  const [input, setInput] = useState('');
+  const [greetingVisible, setGreetingVisible] = useState(false);
   const t = useTranslations('AiTutor');
   const tc = useTranslations('Chat');
   const tCommon = useTranslations('Common');
 
-  const greeting = t('greeting');
+  useEffect(() => {
+    // Show the greeting bubble only once per browser session — not on every
+    // client-side navigation, and not after the user has already seen it.
+    try {
+      if (sessionStorage.getItem(GREETING_SEEN_KEY)) return;
+      setGreetingVisible(true);
+      sessionStorage.setItem(GREETING_SEEN_KEY, '1');
+      const timer = setTimeout(() => setGreetingVisible(false), 10000);
+      return () => clearTimeout(timer);
+    } catch {
+      // sessionStorage unavailable (private mode etc.) — still show once
+      setGreetingVisible(true);
+      const timer = setTimeout(() => setGreetingVisible(false), 10000);
+      return () => clearTimeout(timer);
+    }
+  }, []);
 
   async function send() {
     if (!input || loading) return;
@@ -44,10 +62,11 @@ export default function FloatingAIChat({ locale }: { locale: string }) {
   return (
     <div className="fixed right-4 bottom-4 z-50">
       <div className="flex flex-col items-end">
-        {/* Greeting bubble — appears when the site loads and the chat is closed */}
-        {!open && (
+        {/* Greeting bubble — shows once per session, auto-dismisses after 10s,
+            and hides whenever the chat is open */}
+        {!open && greetingVisible && (
           <div className="mb-2 max-w-[240px] px-3 py-2 rounded-xl rounded-br-sm bg-slate-800 text-slate-100 text-xs shadow-lg ring-1 ring-slate-600">
-            {greeting}
+            {t('greeting')}
           </div>
         )}
 
@@ -66,9 +85,9 @@ export default function FloatingAIChat({ locale }: { locale: string }) {
               </div>
               <button onClick={() => setOpen(false)} className="text-sm text-slate-400 hover:text-white">{t('close')}</button>
             </div>
-            <div className="p-2 flex-1 overflow-auto text-sm bg-slate-900">
+            <div className="p-2 flex-1 overflow-auto text-sm bg-slate-100">
               {messages.length === 0 ? (
-                <div className="text-slate-400">{t('empty')}</div>
+                <div className="text-slate-400">{t('empty')}</</div>
               ) : (
                 messages.map((m) => (
                   <div key={m.id} className={m.from === 'user' ? 'text-right mb-1' : 'text-left mb-1'}>
@@ -97,13 +116,15 @@ export default function FloatingAIChat({ locale }: { locale: string }) {
           aria-label={t('title')}
           className="w-12 h-12 rounded-full bg-slate-800 ring-1 ring-slate-600 flex items-center justify-center shadow-lg overflow-hidden hover:ring-sky-500 transition"
         >
-          <Image
-            src="/logo.png"
-            alt="Cortexa"
-            width={48}
-            height={48}
-            className="w-12 h-12 object-cover rounded-full"
-          />
+          <div className="w-12 h-12 rounded-full overflow-hidden">
+            <Image
+              src="/logo.png"
+              alt="Cortexa"
+              width={48}
+              height={48}
+              className="w-12 h-12 object-cover"
+            />
+          </div>
         </button>
       </div>
     </div>
