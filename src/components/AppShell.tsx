@@ -2,11 +2,10 @@
 
 import React from 'react';
 import Image from 'next/image';
-import { useTranslations } from 'next-intl';
+import { useTranslations, useLocale } from 'next-intl';
 import { useRouter, usePathname } from 'next/navigation';
 import LanguageSelector from './LanguageSelector';
 import { getSupabaseBrowserClient } from '@/lib/supabase/client';
-import { useLocale } from 'next-intl';
 
 export default function AppShell({ children }: { children: React.ReactNode }) {
   const supabase = getSupabaseBrowserClient();
@@ -43,8 +42,8 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
           <LanguageSelector />
           <button onClick={signOut} className="px-3 py-1 rounded bg-slate-800">{t('signOut')}</button>
         </div>
-        <main className="p-6">{children}</main>
       </header>
+      <main className="p-6">{children}</main>
     </div>
   );
 }
