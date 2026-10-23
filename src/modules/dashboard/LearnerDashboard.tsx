@@ -185,6 +185,7 @@ export default async function LearnerDashboard({ locale, userId, fullName, city 
           <Link href={`/${locale}/bookings`} className="p-2 bg-slate-700 rounded text-white">{t('myBookings')}</Link>
           <Link href={`/${locale}/marketplace`} className="p-2 bg-slate-700 rounded text-white">{t('findInstructor')}</Link>
           <Link href={`/${locale}/services`} className="p-2 bg-slate-700 rounded text-white">{t('browseServicesCard')}</Link>
+          <Link href={`/${locale}/service-bookings`} className="p-2 bg-slate-700 rounded text-white">{t('myServiceBookings')}</Link>
           <Link href={`/${locale}/verification`} className="p-2 bg-slate-700 rounded text-white">{t('verificationManage')}</Link>
           <Link href={`/${locale}/vehicle`} className="p-2 bg-slate-700 rounded text-white">{t('vehicleCard')}</Link>
           <Link href={`/${locale}/sos`} className="p-2 bg-slate-700 rounded text-white">{t('sosCard')}</Link>
