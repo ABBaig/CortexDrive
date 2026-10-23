@@ -419,5 +419,26 @@
     "tooShort": "Lesson too short to score — record at least one minute.",
     "saveFailed": "Could not save the lesson results. Please try again.",
     "deviceOnlyNote": "Speed is measured from this device's GPS only — no extra hardware."
+  },
+  "GpsTracking": {
+    "shareTitle": "Share my live location",
+    "shareHint": "Let the learner watch you approach on the map during an active lesson.",
+    "pickLessonFirst": "Pick a lesson first.",
+    "noLessons": "No active lessons to share location for.",
+    "startShare": "Start sharing",
+    "sharingActive": "Sharing live location",
+    "stopShare": "Stop sharing",
+    "lastUpdate": "Last update",
+    "shareFailed": "Could not update your location. Please try again.",
+    "notSupported": "Your browser does not support GPS location tracking.",
+    "permissionDenied": "Location permission denied. Enable it in your browser to share.",
+    "liveTitle": "Instructor live location",
+    "instructorMoving": "On the move",
+    "notSharingYet": "The instructor hasn't started sharing their location for this lesson yet.",
+    "loadFailed": "Could not load the live location.",
+    "distanceToYou": "Distance to you",
+    "distanceUnknown": "Allow location to see",
+    "staleFix": "Location hasn't updated in a while — the instructor may have stopped sharing.",
+    "trackInstructor": "Track instructor"
   }
 }
