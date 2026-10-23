@@ -4,6 +4,8 @@ import AppShell from '@/components/AppShell';
 import BackButton from '@/components/BackButton';
 import SOSButtonClientWrapper from '@/modules/safety/SOSButtonClientWrapper';
 import VendorServicesCard from '@/modules/vendor/services/VendorServicesCard';
+import VendorAvailabilityCard from '@/modules/vendor/services/VendorAvailabilityCard';
+import VendorBookingsCard from '@/modules/vendor/services/VendorBookingsCard';
 import { getSupabaseServerClient } from '@/lib/supabase/server';
 
 type Props = {
@@ -119,6 +121,8 @@ export default async function VendorDashboard({ locale, userId, fullName, city }
         </div>
 
         <VendorServicesCard vendorId={userId} />
+        <VendorAvailabilityCard vendorId={userId} />
+        <VendorBookingsCard vendorId={userId} />
 
         <div className="mt-3 grid grid-cols-2 gap-3">
           <Link
