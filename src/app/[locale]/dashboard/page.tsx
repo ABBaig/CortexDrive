@@ -5,6 +5,7 @@ import AppShell from '@/components/AppShell';
 import LearnerDashboard from '@/modules/dashboard/LearnerDashboard';
 import InstructorDashboard from '@/modules/dashboard/InstructorDashboard';
 import AdminDashboard from '@/modules/dashboard/AdminDashboard';
+import VendorDashboard from '@/modules/dashboard/VendorDashboard';
 
 export default async function DashboardPage({ params }: { params: { locale: string } }) {
   const { locale } = params;
@@ -57,7 +58,18 @@ export default async function DashboardPage({ params }: { params: { locale: stri
     );
   }
 
-  // vendor / unknown — dashboard lands in a later pass
+  if (role === 'vendor') {
+    return (
+      <VendorDashboard
+        locale={locale}
+        userId={user.id}
+        fullName={fullName}
+        city={city}
+      />
+    );
+  }
+
+  // unknown role — no dashboard exists yet
   return (
     <AppShell>
       <div className="max-w-2xl mx-auto bg-slate-800 p-6 rounded">
