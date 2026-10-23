@@ -26,7 +26,14 @@ export default async function DashboardPage({ params }: { params: { locale: stri
   const role = profile?.role;
 
   if (role === 'learner') {
-    resturn;
+    return (
+      <LearnerDashboard
+        locale={locale}
+        userId={user.id}
+        fullName={fullName}
+        city={city}
+      />
+    );
   }
 
   if (role === 'instructor') {
