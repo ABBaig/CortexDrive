@@ -18,7 +18,7 @@ export default function SignUpPage(){
           if (role === 'admin') router.push('/en/admin');
           else if (role === 'vendor') router.push('/en/vendor');
           else if (role === 'instructor') router.push('/en/instructor');
-          else router.push('/en/dashboard');
+          else router.push('/en/learner');
         } catch {
           router.push('/en/dashboard');
         }

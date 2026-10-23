@@ -10,5 +10,7 @@ export default async function OnboardingPage({ params }:{ params:any }){
       headers: { Location: `/${params.locale}/signin` }
     });
   }
-  return <div className="min-h-screen bg-slate-900 text-slate-100 p-8"><OnboardingWizard/></div>
+  import OnboardingEnterDetails from '@/modules/auth/OnboardingEnterDetails';
+
+return <div className="min-h-screen bg-slate-900 text-slate-100 p-8"><OnboardingEnterDetails/></div>
 }
