@@ -1,6 +1,7 @@
 'use client';
 
 import { Suspense } from 'react';
+import Image from 'next/image';
 import { LanguageSelector } from '../../components/LanguageSelector';
 import { useTranslations, useLocale } from 'next-intl';
 import Link from 'next/link';
@@ -13,7 +14,16 @@ export default function Home() {
     <main className="min-h-screen p-8 bg-dark-slate text-neutral-100">
       <div className="max-w-4xl mx-auto">
         <header className="flex items-center justify-between">
-          <h1 className="text-4xl font-semibold">{t('title')}</h1>
+          <div className="flex items-center gap-3">
+            <Image
+              src="/logo.png"
+              alt="CortexDrive"
+              width={48}
+              height={48}
+              className="w-12 h-12 rounded-full object-cover"
+            />
+            <h1 className="text-4xl font-semibold">{t('title')}</h1>
+          </div>
           <LanguageSelector />
         </header>
 
