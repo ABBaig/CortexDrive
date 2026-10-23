@@ -17,9 +17,10 @@ export async function POST(req: NextRequest) {
     }
 
     // Call the ai-verify Edge Function (holds the Gemini key) with the service role key
+    const functionsUrl = `${(process.env.SUPABASE_URL ?? process.env.NEXT_PUBLIC_SUPABASE_URL ?? '').replace(/\/$/, '')}/functions/v1/ai-verify`;
     let aiJson: any;
     try {
-      const aiRes = await fetch(`${process.env.SUPABASE_URL?.replace(/\/$/, '')}/functions/v1/ai-verify`, {
+      const aiRes = await fetch(functionsUrl, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -50,7 +51,7 @@ export async function POST(req: NextRequest) {
     };
 
     // Owner-checked update: only the row belonging to the signed-in user is touched
-    const updates: Record<string, unknown> = { status };
+    const updates: Record<string, unknown> = { status, ai_decision: aiDecision };
     if (aiJson.raw !== undefined) updates.ocr_payload = aiJson.raw;
     if (aiJson.face_match_score !== undefined) updates.face_match_score = aiJson.face_match_score;
 
