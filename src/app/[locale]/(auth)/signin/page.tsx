@@ -5,28 +5,25 @@ import { useRouter } from 'next/navigation';
 import { getSupabaseBrowserClient } from '@/lib/supabase/client';
 import { useEffect } from 'react';
 import Image from 'next/image';
+import { useLocale } from 'next-intl';
 
 export default function SignInPage(){
   const supabase = getSupabaseBrowserClient();
   const router = useRouter();
+  const locale = useLocale();
 
   useEffect(()=>{
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+    // The dashboard page is the single role dispatcher: it reads the user's
+    // role server-side and renders the learner/instructor/admin/vendor
+    // dashboard. So every successful sign-in goes there — never to
+    // role-specific routes (those pages do not exist).
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       if (event === 'SIGNED_IN' && session?.user) {
-        try {
-          const { data: profile } = await supabase.from('users').select('role').eq('id', session.user.id).maybeSingle();
-          const role = profile?.role || 'learner';
-          if (role === 'admin') router.push('/en/admin');
-          else if (role === 'vendor') router.push('/en/vendor');
-          else if (role === 'instructor') router.push('/en/instructor');
-          else router.push('/en/learner');
-        } catch {
-          router.push('/en/dashboard');
-        }
+        router.push(`/${locale}/dashboard`);
       }
     });
     return () => subscription.unsubscribe();
-  },[]);
+  },[locale, router, supabase]);
 
   return (
     <div className="min-h-screen bg-slate-900 text-slate-100 p-8">
