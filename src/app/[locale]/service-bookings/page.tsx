@@ -5,6 +5,7 @@ import { getSupabaseBrowserClient } from '@/lib/supabase/client';
 import { useTranslations } from 'next-intl';
 import BackButton from '@/components/BackButton';
 import RatingModal from '@/modules/vendor/services/RatingModal';
+import BookingActions from '@/modules/vendor/services/BookingActions';
 
 type Booking = {
   id: string;
@@ -165,6 +166,14 @@ export default function MyServiceBookingsPage() {
                   </span>
                 )}
               </div>
+              <BookingActions
+                bookingId={b.id}
+                status={b.status}
+                startsAt={b.starts_at}
+                durationMinutes={Math.round(
+                  (new Date(b.ends_at).getTime() - new Date(b.starts_at).getTime()) / 60000
+                )}
+              />
             </li>
           ))}
         </ul>
