@@ -3,6 +3,7 @@ import { getTranslations } from 'next-intl/server';
 import { getSupabaseServerClient } from '@/lib/supabase/server';
 import AppShell from '@/components/AppShell';
 import LearnerDashboard from '@/modules/dashboard/LearnerDashboard';
+import InstructorDashboard from '@/modules/dashboard/InstructorDashboard';
 
 export default async function DashboardPage({ params }: { params: { locale: string } }) {
   const { locale } = params;
@@ -19,18 +20,33 @@ export default async function DashboardPage({ params }: { params: { locale: stri
     .eq('id', user.id)
     .maybeSingle();
 
-  if (profile?.role === 'learner') {
+  const fullName = profile?.full_name ?? '';
+  const city = profile?.city ?? '';
+  const role = profile?.role;
+
+  if (role === 'learner') {
     return (
       <LearnerDashboard
         locale={locale}
         userId={user.id}
-        fullName={profile?.full_name ?? ''}
-        city={profile?.city ?? ''}
+        fullName={fullName}
+        city={city}
       />
     );
   }
 
-  // instructor / admin / vendor / unknown — dashboards land in later passes
+  if (role === 'instructor') {
+    return (
+      <InstructorDashboard
+        locale={locale}
+        userId={user.id}
+        fullName={fullName}
+        city={city}
+      />
+    );
+  }
+
+  // admin / vendor / unknown — dashboards land in a later pass
   return (
     <AppShell>
       <div className="max-w-2xl mx-auto bg-slate-800 p-6 rounded">
