@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { getSupabaseBrowserClient } from '@/lib/supabase/client';
 import { useTranslations } from 'next-intl';
+import BookingActions from './BookingActions';
 
 type Booking = {
   id: string;
@@ -146,6 +147,14 @@ export default function VendorBookingsCard({ vendorId }: { vendorId: string }) {
                   </button>
                 )}
               </div>
+              <BookingActions
+                bookingId={b.id}
+                status={b.status}
+                startsAt={b.starts_at}
+                durationMinutes={Math.round(
+                  (new Date(b.ends_at).getTime() - new Date(b.starts_at).getTime()) / 60000
+                )}
+              />
             </li>
           ))}
         </ul>
