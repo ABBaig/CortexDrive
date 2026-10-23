@@ -194,13 +194,17 @@
     "instructorTitle": "Instructor Dashboard",
     "earnings": "Aamdani",
     "myLessons": "Mere Lessons",
-    "lessonsUpcomingInstructor": "Aane wali classes",
-    "lessonsCompletedInstructor": "Mukammal shuda classes",
     "verificationCard": "Tasdeeq",
     "walletCard": "Wallet",
     "profileCard": "Profile aur Availability",
     "comingSoon": "Jald aa raha hai",
     "marketplaceCard": "Learners ko aap kaise nazar aate hain",
-    "safetyCard": "Safety"
+    "safetyCard": "Safety",
+    "adminTitle": "Admin Dashboard",
+    "adminPendingVerifications": "Pending tasdeeqat",
+    "adminBookings": "Kuli bookings",
+    "adminSosEvents": "SOS waqiat",
+    "adminWalletActivity": "Wallet activity",
+    "openAdminPanel": "Admin Panel Kholein"
   }
 }
