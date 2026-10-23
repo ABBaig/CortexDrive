@@ -3,6 +3,18 @@
 -- proposal (and updating a consensus vote) requires UPDATE policies, otherwise
 -- RLS silently denies the write. Safe to re-run.
 
+-- Client-callable admin check for the escalation admin page (is_admin takes a
+-- uid argument, which is awkward to call from supabase-js with auth.uid()).
+create or replace function public.is_admin_current_user()
+returns boolean
+language sql
+security definer
+stable
+set search_path = public
+as $$
+  select public.is_admin(auth.uid());
+$$;
+
 drop policy if exists "parties update reschedules" on public.vendor_booking_reschedules;
 create policy "parties update reschedules" on public.vendor_booking_reschedules
   for update using (
