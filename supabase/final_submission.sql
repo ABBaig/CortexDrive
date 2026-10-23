@@ -40,7 +40,6 @@ create unique index if not exists gps_locations_booking_uidx
 -- ----------------------------------------------------------------------------
 -- 3. FEATURE 3 — No-show auto-refund (grace setting + atomic RPC)
 -- ----------------------------------------------------------------------------
-
 insert into platform_settings (key, value)
 values ('no_show_grace_minutes', '15')
 on conflict (key) do nothing;
@@ -371,6 +370,7 @@ create policy "license_progress_upsert_own"
 -- ----------------------------------------------------------------------------
 -- 10. SIGNUP ROBUSTNESS — defensive handle_new_user trigger (never blocks auth)
 --     + ensures users table has every column the app queries + saves role
+--     + grants so the auth service can execute the trigger (bare-500 fix)
 -- ----------------------------------------------------------------------------
 create table if not exists public.users (
   id uuid primary key default gen_random_uuid(),
@@ -432,6 +432,13 @@ create trigger auth_user_created
   after insert on auth.users
   for each row execute function public.handle_new_user();
 
+-- Auth-service grants: GoTrue runs as supabase_auth_admin and fires the
+-- trigger during signup. Without these, EVERY signup fails with a bare
+-- "500 Internal Server Error" and an empty error body.
+grant usage on schema public to supabase_auth_admin;
+grant execute on function public.handle_new_user to supabase_auth_admin;
+grant select, insert, update on table public.users to supabase_auth_admin;
+
 -- ============================================================================
 -- DONE. Verify with:
 --   select key, value from platform_settings;
@@ -439,4 +446,6 @@ create trigger auth_user_created
 --   select indexname from pg_indexes where tablename='gps_locations';
 --   select count(*) from pg_policies where schemaname='public';
 --   select role, count(*) from public.users group by role;
+--   select has_function_privilege('supabase_auth_admin',
+--          'public.handle_new_user()', 'EXECUTE') as auth_can_execute;  -- expect true
 -- ============================================================================
