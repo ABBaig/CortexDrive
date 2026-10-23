@@ -5,6 +5,7 @@ import { getSupabaseBrowserClient } from '@/lib/supabase/client';
 import { useTranslations } from 'next-intl';
 import BackButton from '@/components/BackButton';
 import type { ServiceRow } from '@/modules/vendor/services/types';
+import BookingModal from '@/modules/vendor/services/BookingModal';
 
 const CATEGORIES = ['general', 'maintenance', 'repair', 'inspection', 'other'];
 
@@ -16,6 +17,7 @@ export default function ServicesBrowsePage() {
   const [loadFailed, setLoadFailed] = useState(false);
   const [category, setCategory] = useState<string>('all');
   const [search, setSearch] = useState('');
+  const [booking, setBooking] = useState<ServiceRow | null>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -140,13 +142,25 @@ export default function ServicesBrowsePage() {
                 </span>
               </div>
               <div className="mt-3">
-                <span className="inline-block px-2 py-1 rounded-full text-xs font-medium bg-slate-600/40 text-slate-300 ring-1 ring-slate-500/40 cursor-not-allowed">
-                  {t('bookingSoon')}
-                </span>
+                <button
+                  type="button"
+                  onClick={() => setBooking(s)}
+                  className="px-3 py-1.5 rounded-lg text-sm font-medium bg-sky-600 text-white hover:bg-sky-500"
+                >
+                  {t('bookCta')}
+                </button>
               </div>
             </div>
           ))}
         </div>
+      )}
+
+      {booking && (
+        <BookingModal
+          service={booking}
+          onClose={() => setBooking(null)}
+          onBooked={() => setBooking(null)}
+        />
       )}
     </main>
   );
