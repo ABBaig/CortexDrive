@@ -194,13 +194,17 @@
     "instructorTitle": "انسٹرکٹر ڈیش بورڈ",
     "earnings": "آمدنی",
     "myLessons": "میرے لیسنز",
-    "lessonsUpcomingInstructor": "آنے والی کلاسیں",
-    "lessonsCompletedInstructor": "مکمل شدہ کلاسیں",
     "verificationCard": "تصدیق",
     "walletCard": "والیٹ",
     "profileCard": "پروفائل اور دستیابی",
     "comingSoon": "جلد آ رہا ہے",
     "marketplaceCard": "لرنرز کو آپ کیسے دکھائی دیتے ہیں",
-    "safetyCard": "سیکیورٹی و حفاظت"
+    "safetyCard": "سیکیورٹی و حفاظت",
+    "adminTitle": "ایڈمن ڈیش بورڈ",
+    "adminPendingVerifications": "زیر التواء توثیقات",
+    "adminBookings": "کل بکنگز",
+    "adminSosEvents": "ایس او ایس واقعات",
+    "adminWalletActivity": "والیٹ سرگرمی",
+    "openAdminPanel": "ایڈمن پینل کھولیں"
   }
 }
