@@ -26,12 +26,20 @@ const STATUS_CLASS: Record<string, string> = {
   cancelled: 'bg-slate-500/20 text-slate-300 ring-1 ring-slate-500/30',
 };
 
+const PAY_CLASS: Record<string, string> = {
+  escrow: 'bg-amber-500/15 text-amber-300 ring-1 ring-amber-500/30',
+  settled: 'bg-emerald-500/15 text-emerald-300 ring-1 ring-emerald-500/30',
+  refunded: 'bg-slate-500/20 text-slate-300 ring-1 ring-slate-500/30',
+};
+
 export default function MyServiceBookingsPage() {
   const t = useTranslations('VendorBooking');
   const tr = useTranslations('VendorRating');
+  const tp = useTranslations('VendorPayment');
   const ts = useTranslations('VendorServices');
   const supabase = getSupabaseBrowserClient();
   const [bookings, setBookings] = useState<Booking[]>([]);
+  const [payState, setPayState] = useState<Record<string, string>>({});
   const [ratedIds, setRatedIds] = useState<Set<string>>(new Set());
   const [loading, setLoading] = useState(true);
   const [signedOut, setSignedOut] = useState(false);
@@ -68,6 +76,26 @@ export default function MyServiceBookingsPage() {
       .select('booking_id')
       .eq('learner_id', user.id);
     setRatedIds(new Set((myRatings ?? []).map((r: { booking_id: string }) => r.booking_id)));
+    // payment state per booking from the ledger (learner wallet transactions)
+    const ids = rows.map((r) => r.id);
+    const state: Record<string, string> = {};
+    if (ids.length > 0) {
+      const { data: txns } = await supabase
+        .from('transactions')
+        .select('kind,related_booking')
+        .in('related_booking', ids);
+      (txns ?? []).forEach((x: { kind: string; related_booking: string }) => {
+        if (!x.related_booking) return;
+        if (x.kind === 'escrow_hold') state[x.related_booking] = 'escrow';
+        if (x.kind === 'refund') state[x.related_booking] = 'refunded';
+      });
+      // a fee_split exists on the vendor wallet, invisible to the learner via RLS —
+      // a completed booking with an escrow means it settled
+      rows.forEach((r) => {
+        if (r.status === 'completed' && state[r.id] === 'escrow') state[r.id] = 'settled';
+      });
+    }
+    setPayState(state);
     setLoading(false);
   }, [supabase, t]);
 
@@ -96,6 +124,13 @@ export default function MyServiceBookingsPage() {
     return t('statusCancelled');
   }
 
+  function payLabel(p: string | undefined) {
+    if (p === 'escrow') return tp('escrowed');
+    if (p === 'settled') return tp('settled');
+    if (p === 'refunded') return tp('refunded');
+    return null;
+  }
+
   if (signedOut) {
     return (
       <main className="p-6 max-w-2xl mx-auto">
@@ -122,60 +157,70 @@ export default function MyServiceBookingsPage() {
 
       {!loading && bookings.length > 0 && (
         <ul className="mt-6 space-y-3">
-          {bookings.map((b) => (
-            <li key={b.id} className="p-4 bg-slate-800 rounded-xl ring-1 ring-slate-700">
-              <div className="flex items-center justify-between gap-2">
-                <span className="text-white font-semibold">{b.vendor_services?.title ?? '—'}</span>
-                <span
-                  className={`px-2 py-0.5 rounded-full text-xs font-medium ${
-                    STATUS_CLASS[b.status] ?? STATUS_CLASS.cancelled
-                  }`}
-                >
-                  {statusLabel(b.status)}
-                </span>
-              </div>
-              <div className="mt-2 text-sm text-slate-400">
-                {new Date(b.starts_at).toLocaleString()} – {new Date(b.ends_at).toLocaleTimeString()}
-                {' · '}
-                {ts('currency', { amount: Number(b.total_price).toFixed(2) })}
-              </div>
-              {b.address && <div className="mt-1 text-sm text-slate-400">{b.address}</div>}
-              {b.notes && <div className="mt-1 text-sm text-slate-400">{b.notes}</div>}
-              <div className="mt-3 flex gap-2">
-                {(b.status === 'pending' || b.status === 'booked') && (
-                  <button
-                    type="button"
-                    onClick={() => void cancelBooking(b.id)}
-                    className="px-3 py-1.5 rounded-lg text-sm font-medium bg-slate-700 text-slate-200 hover:bg-red-600 hover:text-white"
+          {bookings.map((b) => {
+            const payChip = payLabel(payState[b.id]);
+            return (
+              <li key={b.id} className="p-4 bg-slate-800 rounded-xl ring-1 ring-slate-700">
+                <div className="flex items-center justify-between gap-2">
+                  <span className="text-white font-semibold">{b.vendor_services?.title ?? '—'}</span>
+                  <span
+                    className={`px-2 py-0.5 rounded-full text-xs font-medium ${
+                      STATUS_CLASS[b.status] ?? STATUS_CLASS.cancelled
+                    }`}
                   >
-                    {t('cancelBooking')}
-                  </button>
-                )}
-                {b.status === 'completed' && !ratedIds.has(b.id) && (
-                  <button
-                    type="button"
-                    onClick={() => setRating(b)}
-                    className="px-3 py-1.5 rounded-lg text-sm font-medium bg-amber-500/90 text-white hover:bg-amber-400"
-                  >
-                    {tr('rateBooking')}
-                  </button>
-                )}
-                {b.status === 'completed' && ratedIds.has(b.id) && (
-                  <span className="inline-block px-2 py-1 rounded-full text-xs font-medium bg-emerald-500/15 text-emerald-300 ring-1 ring-emerald-500/30">
-                    {tr('rated')}
+                    {statusLabel(b.status)}
                   </span>
+                </div>
+                <div className="mt-2 text-sm text-slate-400">
+                  {new Date(b.starts_at).toLocaleString()} – {new Date(b.ends_at).toLocaleTimeString()}
+                  {' · '}
+                  {ts('currency', { amount: Number(b.total_price).toFixed(2) })}
+                </div>
+                {b.address && <div className="mt-1 text-sm text-slate-400">{b.address}</div>}
+                {b.notes && <div className="mt-1 text-sm text-slate-400">{b.notes}</div>}
+                {payChip && (
+                  <div className="mt-2">
+                    <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${PAY_CLASS[payState[b.id]]}`}>
+                      {payChip}
+                    </span>
+                  </div>
                 )}
-              </div>
-              <BookingActions
-                bookingId={b.id}
-                status={b.status}
-                startsAt={b.starts_at}
-                durationMinutes={Math.round(
-                  (new Date(b.ends_at).getTime() - new Date(b.starts_at).getTime()) / 60000
-                )}
-              />
-            </li>
-          ))}
+                <div className="mt-3 flex gap-2">
+                  {(b.status === 'pending' || b.status === 'booked') && (
+                    <button
+                      type="button"
+                      onClick={() => void cancelBooking(b.id)}
+                      className="px-3 py-1.5 rounded-lg text-sm font-medium bg-slate-700 text-slate-200 hover:bg-red-600 hover:text-white"
+                    >
+                      {t('cancelBooking')}
+                    </button>
+                  )}
+                  {b.status === 'completed' && !ratedIds.has(b.id) && (
+                    <button
+                      type="button"
+                      onClick={() => setRating(b)}
+                      className="px-3 py-1.5 rounded-lg text-sm font-medium bg-amber-500/90 text-white hover:bg-amber-400"
+                    >
+                      {tr('rateBooking')}
+                    </button>
+                  )}
+                  {b.status === 'completed' && ratedIds.has(b.id) && (
+                    <span className="inline-block px-2 py-1 rounded-full text-xs font-medium bg-emerald-500/15 text-emerald-300 ring-1 ring-emerald-500/30">
+                      {tr('rated')}
+                    </span>
+                  )}
+                </div>
+                <BookingActions
+                  bookingId={b.id}
+                  status={b.status}
+                  startsAt={b.starts_at}
+                  durationMinutes={Math.round(
+                    (new Date(b.ends_at).getTime() - new Date(b.starts_at).getTime()) / 60000
+                  )}
+                />
+              </li>
+            );
+          })}
         </ul>
       )}
 
