@@ -292,5 +292,39 @@
     "rated": "Rating di gayi",
     "loginToRate": "Rating dene ke liye barah-e-karam sign in karein.",
     "reviewsCount": "reviews"
+  },
+  "VendorReschedule": {
+    "reschedule": "Reschedule karein",
+    "newStart": "Naya shuru hone ka waqt",
+    "propose": "Tajweez karein",
+    "proposed": "Tajweez bhej di gayi — doosri taraf ke jawab ka intezar.",
+    "proposedByYou": "Aap ne tajweez di",
+    "proposedByOther": "Reschedule ki tajweez aayi hai",
+    "accept": "Qabool karein",
+    "decline": "Rad karein",
+    "accepted": "Tajweez qabool ho gayi — naya waqt lagu ho gaya.",
+    "rejected": "Tajweez rad kar di gayi.",
+    "rescheduleInvalid": "Aane walay ka sahi shuru hone ka waqt intikhab karein.",
+    "rescheduleFailed": "Tajweez save nahi ho saki.",
+    "overlapOnAccept": "Naya waqt kisi maujooda active booking se takra raha hai — tajweez dobara khul gayi.",
+    "raiseIssue": "Masla report karein",
+    "issueReason": "Masle ki tafseel likhein",
+    "send": "Bhejein",
+    "issueSent": "Masla admin ko bhej diya gaya.",
+    "issueFailed": "Masla report nahi ho saka."
+  },
+  "VendorEscalation": {
+    "title": "Service booking ke masail",
+    "notAuthorized": "Sirf admin yeh page dekh sakte hain.",
+    "empty": "Koi khula masla nahi.",
+    "loadFailed": "Masail load nahi ho sake.",
+    "statusOpen": "Khula",
+    "statusResolved": "Hal shuda",
+    "statusDismissed": "Rad shuda",
+    "resolve": "Hal karein",
+    "dismiss": "Rad karein",
+    "resolutionLabel": "Hal",
+    "resolutionPlaceholder": "Hal likhein...",
+    "resolutionRequired": "Hal karne se pehle hal likhna zaruri hai."
   }
 }
