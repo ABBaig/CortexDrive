@@ -67,14 +67,17 @@
       "verifications": "Pending Verifications",
       "bookings": "Bookings",
       "wallet": "Wallet Transactions",
-      "sos": "SOS Log"
-    },
+      "sos": "SOS Log",
+      "escalatedChats": "Escalated Chats"
+  },
     "loading": "Loading...",
     "error": "Koi masla hua hai",
     "emptyVerifications": "Koi pending verifications nahi hain",
     "emptyBookings": "Koi bookings nahi hain",
     "emptyTransactions": "Koi transactions nahi hain",
     "emptySos": "Koi SOS logs nahi hain",
+    "emptyEscalated": "Koi escalated chats nahi",
+    "openChat": "Open",
     "approve": "Manzoor Karein",
     "reject": "Rad Karein",
     "colWhen": "Kab",
@@ -135,15 +138,22 @@
       "unavailable": "AI waqt bhar ke liye available nahi — submission manual review ke liye queue mein hai."
     }
   },
-  "Chat": {
+    "Chat": {
     "message": "Paigham bhejein",
     "connectAdmin": "Admin se rabta karein",
-    "mockAiNotice": "(Mock AI jawab — real jawab ke liye GOOGLE_API_KEY set karein)"
+    "mockAiNotice": "(Mock AI jawab — real jawab ke liye GOOGLE_API_KEY set karein)",
+    "title": "Chat",
+    "send": "Bhejein",
+    "empty": "Abhi koi paigham nahi",
+    "sendError": "Paigham bhejne mein nakaami",
+    "escalatedOk": "Admin jur gaya",
+    "escalatedFail": "Admin se rabta nah ho saka"
   },
   "AiTutor": {
     "title": "AI Tutor",
     "open": "Open",
     "close": "Close",
-    "ask": "Pooch"
+    "ask": "Pooch",
+    "empty": "Driving sawal poochein..."
   }
 }
