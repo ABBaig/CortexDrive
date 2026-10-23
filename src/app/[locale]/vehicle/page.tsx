@@ -7,6 +7,8 @@ import BackButton from '@/components/BackButton';
 import FuelChart from '@/components/FuelChart';
 import VehicleCsvImport from '@/components/VehicleCsvImport';
 import FuelTrackerSummary from '@/components/FuelTrackerSummary';
+import VehicleManager from '@/components/VehicleManager';
+import VehicleHistory from '@/components/VehicleHistory';
 
 type Log = {
   id: string;
@@ -32,6 +34,7 @@ export default function VehiclePage() {
   const [amount, setAmount] = useState('');
   const [note, setNote] = useState('');
   const [busy, setBusy] = useState(false);
+  const [vehicleId, setVehicleId] = useState<string | null>(null);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -44,11 +47,13 @@ export default function VehiclePage() {
       return;
     }
     // live schema: vehicle_logs has `type` (not event_type) and `meta` jsonb
-    const { data, error: dbError } = await supabase
+    const query = supabase
       .from('vehicle_logs')
       .select('id,type,event_type,odometer_km,liters,amount_pkr,meta,created_at')
       .eq('user_id', user.id)
       .order('created_at', { ascending: true });
+    if (vehicleId) query.eq('vehicle_id', vehicleId);
+    const { data, error: dbError } = await query;
     if (dbError) {
       setError(t('loadFailed'));
       setLogs([]);
@@ -170,6 +175,8 @@ export default function VehiclePage() {
 
       <FuelTrackerSummary totalKm={totalKm} totalLiters={totalLiters} avgKmPerLiter={avgKmPerLiter} pkrPerKm={pkrPerKm} />
 
+      <VehicleManager onSelect={(v) => setVehicleId(v?.id ?? null)} />
+
       <div className="mt-4 bg-slate-800 rounded-xl ring-1 ring-slate-700 p-4">
 
       <div className="mt-4 bg-slate-800 rounded-xl ring-1 ring-slate-700 p-4">
@@ -256,8 +263,9 @@ export default function VehiclePage() {
       <div className="mt-4">
         <div className="flex items-center justify-between">
           <h2 className="text-sm font-semibold text-white">{t('allLogs')}</h2>
-          <VehicleCsvImport onDone={() => void load()} />
+          <VehicleCsvImport vehicleId={vehicleId} onDone={() => void load()} />
         </div>
+        <VehicleHistory vehicleId={vehicleId} />
         {loading && <div className="mt-2 text-sm text-slate-400">{tc('loading')}</div>}
         {!loading && logs.length === 0 && (
           <div className="mt-2 text-sm text-slate-400">{t('noLogsYet')}</div>

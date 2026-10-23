@@ -26,3 +26,5 @@ Live URL: (placeholder)
 
 A migration to add marketplace tables (ratings, availability_slots, messages, gps_locations) and hourly_rate on users was created but is held for approval in the Database panel and has NOT run. The app code expects those tables once the migration is applied.
 Marketplace module: added migrations held for approval. To apply DB changes, approve the migration in the Database panel.
+
+Additionally, Phase-4 adds a fuel-efficiency tracker which requires vehicle_logs and vehicles tables / policies. A SQL migration was prepared but is held for approval in the Database panel and has NOT been applied. The UI will work with the existing schema where possible; to enable full per-vehicle data storage and RLS, approve the pending migration in the Database panel.
