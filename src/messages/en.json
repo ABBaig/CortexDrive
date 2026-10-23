@@ -153,11 +153,12 @@
     "escalatedFail": "Could not connect admin"
   },
   "AiTutor": {
-    "title": "AI Tutor",
+    "title": "Cortexa",
     "open": "Open",
     "close": "Close",
     "ask": "Ask",
-    "empty": "Ask a driving question..."
+    "empty": "Ask a driving question...",
+    "greeting": "Hi I am Cortexa, How Can I Help You Today!"
   },
   "Dashboard": {
     "greeting": "Hello, {name}",
