@@ -18,18 +18,18 @@ export default function FloatingAIChat({ locale }: { locale: string }) {
   useEffect(() => {
     // Show the greeting bubble only once per browser session — not on every
     // client-side navigation, and not after the user has already seen it.
+    let timer: ReturnType<typeof setTimeout> | undefined;
     try {
       if (sessionStorage.getItem(GREETING_SEEN_KEY)) return;
       setGreetingVisible(true);
       sessionStorage.setItem(GREETING_SEEN_KEY, '1');
-      const timer = setTimeout(() => setGreetingVisible(false), 10000);
-      return () => clearTimeout(timer);
+      timer = setTimeout(() => setGreetingVisible(false), 10000);
     } catch {
       // sessionStorage unavailable (private mode etc.) — still show once
       setGreetingVisible(true);
-      const timer = setTimeout(() => setGreetingVisible(false), 10000);
-      return () => clearTimeout(timer);
+      timer = setTimeout(() => setGreetingVisible(false), 10000);
     }
+    return () => { if (timer) clearTimeout(timer); };
   }, []);
 
   async function send() {
@@ -85,9 +85,9 @@ export default function FloatingAIChat({ locale }: { locale: string }) {
               </div>
               <button onClick={() => setOpen(false)} className="text-sm text-slate-400 hover:text-white">{t('close')}</button>
             </div>
-            <div className="p-2 flex-1 overflow-auto text-sm bg-slate-100">
+            <div className="p-2 flex-1 overflow-auto text-sm bg-slate-900">
               {messages.length === 0 ? (
-                <div className="text-slate-400">{t('empty')}</</div>
+                <div className="text-slate-400">{t('empty')}</div>
               ) : (
                 messages.map((m) => (
                   <div key={m.id} className={m.from === 'user' ? 'text-right mb-1' : 'text-left mb-1'}>
@@ -116,15 +116,13 @@ export default function FloatingAIChat({ locale }: { locale: string }) {
           aria-label={t('title')}
           className="w-12 h-12 rounded-full bg-slate-800 ring-1 ring-slate-600 flex items-center justify-center shadow-lg overflow-hidden hover:ring-sky-500 transition"
         >
-          <div className="w-12 h-12 rounded-full overflow-hidden">
-            <Image
-              src="/logo.png"
-              alt="Cortexa"
-              width={48}
-              height={48}
-              className="w-12 h-12 object-cover"
-            />
-          </div>
+          <Image
+            src="/logo.png"
+            alt="Cortexa"
+            width={48}
+            height={48}
+            className="w-12 h-12 object-cover rounded-full"
+          />
         </button>
       </div>
     </div>
