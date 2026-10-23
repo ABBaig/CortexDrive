@@ -187,7 +187,7 @@
     "findInstructor": "انسٹرکٹر تلاش کریں",
     "browseServicesCard": "خدمات دیکھیں",
     "vehicleCard": "گاڑی",
-    "sosCard": "ایس او ایس",
+    "osCard": "ایس او ایس",
     "securityCard": "سیکیورٹی",
     "aiTutorCard": "AI ٹیوٹر",
     "chatCardBody": "مارکیٹ پلیس میں اپنے انسٹرکٹر کے کارڈ سے انہیں پیغام بھیجیں۔",
@@ -208,7 +208,7 @@
     "adminTitle": "ایڈمن ڈیش بورڈ",
     "adminPendingVerifications": "زیر التواء توثیقات",
     "adminBookings": "کل بکنگز",
-    "adminSosEvents": "ایس او ایس واقعات",
+    "siSosEvents": "ایس او ایس واقعات",
     "adminWalletActivity": "والیٹ سرگرمی",
     "openAdminPanel": "ایڈمن پینل کھولیں"
   },
@@ -282,5 +282,15 @@
     "bookingCreated": "بکنگ کی درخواست بھیج دی گئی! وینڈر اس کی تصدیق کرے گا۔",
     "loginToBook": "خدمت بک کرنے کے لیے براہ کرم سائن ان کریں۔",
     "myBookingsTitle": "میری سروس بکنگز"
+  },
+  "VendorRating": {
+    "rateBooking": "اس بکنگ کی ریٹنگ دیں",
+    "chooseRating": "آپ کی ریٹنگ",
+    "commentLabel": "تبصرہ (اختیاری)",
+    "submitRating": "ریٹنگ جمع کریں",
+    "ratingFailed": "ریٹنگ جمع نہیں ہو سکی۔ براہ کرم دوبارہ کوشش کریں۔",
+    "rated": "ریٹنگ دی گئی",
+    "loginToRate": "ریٹنگ دینے کے لیے براہ کرم سائن ان کریں۔",
+    "reviewsCount": "تبصرے"
   }
 }
