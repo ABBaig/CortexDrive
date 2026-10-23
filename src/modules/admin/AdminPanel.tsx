@@ -1,11 +1,12 @@
 'use client';
 import React, { useEffect, useState } from 'react';
 import { getSupabaseBrowserClient } from '@/lib/supabase/client';
-import { useTranslations } from 'next-intl';
+import { useTranslations, useLocale } from 'next-intl';
 
 export default function AdminPanel() {
   const supabase = getSupabaseBrowserClient();
   const t = useTranslations('Admin');
+  const locale = useLocale();
   const [tab, setTab] = useState<'verifications' | 'bookings' | 'wallet' | 'sos' | 'escalated'>('verifications');
   const [verifs, setVerifs] = useState<any[]>([]);
   const [sosLogs, setSosLogs] = useState<any[]>([]);
@@ -15,82 +16,114 @@ export default function AdminPanel() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
+useEffect(() => {
     setLoading(true);
-    Promise.all([fetchVerifications(), fetchBookings(), fetchWalletTransactions(), fetchSos(), fetchEscalated()])
-      .catch((e) => setError(String(e)))
+    Promise.allSettled([fetchVerifications(), fetchBookings(), fetchWalletTransactions(), fetchSos(), fetchEscalated()])
+      .then((results) => {
+        const failed = results.find((r) => r.status === 'rejected');
+        if (failed) setError(String((failed as PromiseRejectedResult).reason));
+      })
       .finally(() => setLoading(false));
 
-    const channel = supabase
+const channel = supabase
       .channel('public:sos_logs')
       .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'sos_logs' }, (payload) => {
         setSosLogs((s) => [payload.new, ...s]);
       })
       .subscribe();
 
-    // listen for escalated conversations
-    const ch2 = supabase
+const ch2 = supabase
       .channel('public:conversations')
       .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'conversations' }, (payload) => {
         if (payload.new && payload.new.escalated) {
-          setEscalated((e) => [payload.new, ...e]);
+          setEscalated((e) => (e.some((c) => c.id === payload.new.id) ? e : [payload.new, ...e]));
         }
       })
       .subscribe();
 
-    return () => { channel.unsubscribe(); ch2.unsubscribe(); };
+return () => { channel.unsubscribe(); ch2.unsubscribe(); };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  async function fetchVerifications() {
+async function fetchVerifications() {
     const { data, error } = await supabase.from('verifications').select('*').order('created_at', { ascending: false }).limit(200);
     if (error) throw error;
     setVerifs(data || []);
   }
 
-  async function fetchBookings() {
+async function fetchBookings() {
     const { data, error } = await supabase.from('bookings').select('id,learner_id,instructor_id,slot_start,status,created_at').order('created_at', { ascending: false }).limit(200);
     if (error) throw error;
     setBookings(data || []);
   }
 
-  async function fetchEscalated() {
-    const { data, error } = await supabase.from('conversations').select('id,first_user_id,second_user_id,subject,last_message_at,escalated').eq('escalated', true).order('last_message_at', { ascending: false }).limit(200);
+async function fetchEscalated() {
+    // conversations has only id/pair_key/created_at/last_message_at/escalated —
+    // no user columns, so resolve participant names via participants + profiles.
+    const { data: convs, error } = await supabase
+      .from('conversations')
+      .select('id,last_message_at,escalated')
+      .eq('escalated', true)
+      .order('last_message_at', { ascending: false, nullsFirst: false })
+      .limit(200);
     if (error) throw error;
-    setEscalated(data || []);
+    const list: any[] = convs || [];
+    if (list.length === 0) { setEscalated([]); return; }
+
+const ids = list.map((c) => c.id);
+    const { data: parts, error: perr } = await supabase
+      .from('conversation_participants')
+      .select('conversation_id,user_id')
+      .in('conversation_id', ids);
+    if (perr) throw perr;
+
+const userIds = Array.from(new Set((parts || []).map((p: any) => p.user_id)));
+    const namesByUser: Record<string, string> = {};
+    if (userIds.length > 0) {
+      const { data: profiles } = await supabase.from('profiles').select('id,full_name').in('id', userIds);
+      (profiles || []).forEach((p: any) => { namesByUser[p.id] = p.full_name ?? '—'; });
+    }
+
+const namesByConv: Record<string, string[]> = {};
+    (parts || []).forEach((p: any) => {
+      namesByConv[p.conversation_id] = namesByConv[p.conversation_id] || [];
+      namesByConv[p.conversation_id].push(namesByUser[p.user_id] || '—');
+    });
+
+setEscalated(list.map((c) => ({ ...c, participantNames: namesByConv[c.id] || [] })));
   }
 
-  async function fetchWalletTransactions() {
+async function fetchWalletTransactions() {
     const { data, error } = await supabase.from('transactions').select('id,kind,amount,created_at,wallets(id,user_id,balance)').order('created_at', { ascending: false }).limit(50);
     if (error) throw error;
     setTransactions(data || []);
   }
 
-  async function fetchSos() {
+async function fetchSos() {
     const { data, error } = await supabase.from('sos_logs').select('*').order('created_at', { ascending: false }).limit(200);
     if (error) throw error;
     setSosLogs(data || []);
   }
 
-  async function act(id: string, action: 'approve' | 'reject') {
+async function act(id: string, action: 'approve' | 'reject') {
     await supabase.from('verifications').update({ status: action === 'approve' ? 'verified' : 'rejected' }).eq('id', id);
     await fetchVerifications();
   }
 
-  return (
+return (
     <div className="mt-6">
       <div className="flex gap-2">
         <button className={`px-3 py-1 ${tab === 'verifications' ? 'bg-slate-700 text-white' : ''}`} onClick={() => setTab('verifications')}>{t('tabs.verifications')}</button>
         <button className={`px-3 py-1 ${tab === 'bookings' ? 'bg-slate-700 text-white' : ''}`} onClick={() => setTab('bookings')}>{t('tabs.bookings')}</button>
         <button className={`px-3 py-1 ${tab === 'wallet' ? 'bg-slate-700 text-white' : ''}`} onClick={() => setTab('wallet')}>{t('tabs.wallet')}</button>
         <button className={`px-3 py-1 ${tab === 'sos' ? 'bg-slate-700 text-white' : ''}`} onClick={() => setTab('sos')}>{t('tabs.sos')}</button>
-        <button className={`px-3 py-1 ${tab === 'escalated' ? 'bg-slate-700 text-white' : ''}`} onClick={() => setTab('escalated')}>Escalated Chats</button>
+        <button className={`px-3 py-1 ${tab === 'escalated' ? 'bg-slate-700 text-white' : ''}`} onClick={() => setTab('escalated')}>{t('tabs.escalatedChats')}</button>
       </div>
 
-      {loading && <div className="mt-4 text-sm text-neutral-500">{t('loading')}</div>}
+{loading && <div className="mt-4 text-sm text-neutral-500">{t('loading')}</div>}
       {error && <div className="mt-4 text-sm text-red-600">{t('error')}: {error}</div>}
 
-      {tab === 'verifications' && (
+{tab === 'verifications' && (
         <div className="mt-4">
           {verifs.length === 0 ? (
             <div className="text-neutral-400">{t('emptyVerifications')}</div>
@@ -115,7 +148,7 @@ export default function AdminPanel() {
         </div>
       )}
 
-      {tab === 'bookings' && (
+{tab === 'bookings' && (
         <div className="mt-4">
           {bookings.length === 0 ? (
             <div className="text-neutral-400">{t('emptyBookings')}</div>
@@ -132,7 +165,7 @@ export default function AdminPanel() {
         </div>
       )}
 
-      {tab === 'wallet' && (
+{tab === 'wallet' && (
         <div className="mt-4">
           {transactions.length === 0 ? (
             <div className="text-neutral-400">{t('emptyTransactions')}</div>
@@ -148,7 +181,7 @@ export default function AdminPanel() {
         </div>
       )}
 
-      {tab === 'sos' && (
+{tab === 'sos' && (
         <div className="mt-4">
           {sosLogs.length === 0 ? (
             <div className="text-neutral-400">{t('emptySos')}</div>
@@ -159,24 +192,24 @@ export default function AdminPanel() {
           )}
         </div>
       )}
-    </div>
-  );
-}
-      {tab === 'escalated' && (
+
+{tab === 'escalated' && (
         <div className="mt-4">
           {escalated.length === 0 ? (
-            <div className="text-neutral-400">No escalated chats</div>
+            <div className="text-neutral-400">{t('emptyEscalated')}</div>
           ) : (
             escalated.map((c) => (
               <div key={c.id} className="border p-3 rounded mb-2">
-                <div className="text-sm text-neutral-400">Last: {new Date(c.last_message_at).toLocaleString()}</div>
-                <div className="font-medium">Conversation {c.id}</div>
-                <div className="text-sm">Participants: {c.first_user_id} — {c.second_user_id}</div>
-                <div className="mt-2">
-                  <a className="text-sky-500" href={`/${'en'}/chat/${c.id}`}>Open</a>
+                <div className="text-sm text-neutral-400">
+                  {c.last_message_at ? new Date(c.last_message_at).toLocaleString() : '—'}
                 </div>
+                <div className="font-medium">{(c.participantNames || []).join(' · ') || c.id}</div>
+                <a className="text-sky-500" href={`/${locale}/chat/${c.id}`}>{t('openChat')}</a>
               </div>
             ))
           )}
         </div>
       )}
+    </div>
+  );
+}
