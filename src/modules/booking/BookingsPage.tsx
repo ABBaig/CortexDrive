@@ -5,10 +5,13 @@ import { useTranslations, useLocale } from 'next-intl';
 import { useRouter } from 'next/navigation';
 import { getSupabaseBrowserClient } from '@/lib/supabase/client';
 import BackButton from '@/components/BackButton';
+import TelematicsRecorder from './TelematicsRecorder';
+import TelematicsResult from './TelematicsResult';
 
 export default function BookingsPage() {
   const supabase = getSupabaseBrowserClient();
   const t = useTranslations('Booking');
+  const tt = useTranslations('Telematics');
   const tc = useTranslations('Common');
   const locale = useLocale();
   const router = useRouter();
@@ -19,6 +22,7 @@ export default function BookingsPage() {
   const [error, setError] = React.useState<string | null>(null);
   const [success, setSuccess] = React.useState<string | null>(null);
   const [confirmingId, setConfirmingId] = React.useState<string | null>(null);
+  const [recordingId, setRecordingId] = React.useState<string | null>(null);
   const mountedRef = React.useRef(true);
 
   React.useEffect(() => {
@@ -155,6 +159,8 @@ export default function BookingsPage() {
     </div>
   );
 
+  const recordingBooking = bookings.find((b: any) => b.id === recordingId) ?? null;
+
   return (
     <div className="p-6">
       <BackButton />
@@ -179,27 +185,55 @@ export default function BookingsPage() {
             const isOwner = userId != null && b.learner_id === userId;
             return (
               <tr key={b.id} className="border-t border-neutral-800 align-top">
-                <td className="py-3 align-top">{new Date(b.created_at).toLocaleString()}</td>
+                <td className="py-3 align-top">
+                  {new Date(b.created_at).toLocaleString()}
+                  {b.status === 'completed' && b.telematics && (
+                    <TelematicsResult telematics={b.telematics} score={b.telematics_score ?? null} />
+                  )}
+                </td>
                 <td className="py-3">{b.instructor_id ?? t('unknownInstructor')}</td>
-                <td className="py-3">{b.status === 'booked' ? t('statusBooked') : b.status === 'refunded' ? t('statusRefunded') : b.status}</td>
+                <td className="py-3">
+                  {b.status === 'booked' ? t('statusBooked') : b.status === 'refunded' ? t('statusRefunded') : b.status === 'completed' ? 'Completed' : b.status}
+                </td>
                 <td className="py-3">{formatPKR(b.instructor_rate)}</td>
                 <td className="py-3 text-right">
-                  {b.status === 'booked' && isOwner ? (
-                    confirmingId === b.id ? (
-                      <div className="flex items-center gap-2">
-                        <button onClick={() => handleCancel(b)} className="rounded bg-cyan-400 px-3 py-1.5 text-sm font-semibold text-slate-900">{t('confirmCancel')}</button>
-                        <button onClick={() => setConfirmingId(null)} className="text-sm text-neutral-400">{t('abort')}</button>
-                      </div>
-                    ) : (
-                      <button onClick={() => setConfirmingId(b.id)} className="rounded border border-neutral-700 px-3 py-1.5 text-sm">{t('cancel')}</button>
-                    )
-                  ) : null}
+                  {b.status === 'booked' && isOwner && (
+                    <div className="flex flex-col items-end gap-1.5">
+                      {confirmingId === b.id ? (
+                        <div className="flex items-center gap-2">
+                          <button onClick={() => handleCancel(b)} className="rounded bg-cyan-400 px-3 py-1.5 text-sm font-semibold text-slate-900">{t('confirmCancel')}</button>
+                          <button onClick={() => setConfirmingId(null)} className="text-sm text-neutral-400">{t('abort')}</button>
+                        </div>
+                      ) : (
+                        <>
+                          <button
+                            onClick={() => setRecordingId(b.id)}
+                            className="rounded bg-sky-600 px-3 py-1.5 text-sm font-semibold text-white hover:bg-sky-500"
+                          >
+                            {tt('recordLesson')}
+                          </button>
+                          <button onClick={() => setConfirmingId(b.id)} className="rounded border border-neutral-700 px-3 py-1.5 text-sm">{t('cancel')}</button>
+                        </>
+                      )}
+                    </div>
+                  )}
                 </td>
               </tr>
             );
           })}
         </tbody>
       </table>
+
+      {recordingBooking && (
+        <TelematicsRecorder
+          booking={recordingBooking}
+          onClose={() => setRecordingId(null)}
+          onFinished={() => {
+            setRecordingId(null);
+            fetchData();
+          }}
+        />
+      )}
     </div>
   );
 }
