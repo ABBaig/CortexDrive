@@ -52,7 +52,6 @@
   "Earnings": {
     "title": "Aamdani",
     "pending": "Pending (escrow mein)",
-    "filtered": "Filtered",
     "released": "Released",
     "gross": "Gross",
     "net": "Net",
@@ -154,11 +153,12 @@
     "escalatedFail": "Admin se rabta nah ho saka"
   },
   "AiTutor": {
-    "title": "AI Tutor",
+    "title": "Cortexa",
     "open": "Open",
     "close": "Close",
     "ask": "Pooch",
-    "empty": "Driving sawal poochein..."
+    "empty": "Driving sawal poochein...",
+    "greeting": "Hi! Main Cortexa hoon, aaj main aap ki kya madad kar sakta hoon!"
   },
   "Dashboard": {
     "greeting": "Salam, {name}",
@@ -441,5 +441,15 @@
     "distanceUnknown": "Dekhne ke liye location ki ijazat dein",
     "staleFix": "Location kuch der se update nahi hui — instructor ne share rok diya hoga.",
     "trackInstructor": "Instructor ko track karein"
+  },
+  "NoShow": {
+    "reportNoShow": "No-show report karein",
+    "confirmNoShow": "Tasdeeq karein: instructor nahi aaya",
+    "graceCountdown": "No-show report {minutes} minute mein",
+    "graceNotPassed": "Grace window abhi mukammal nahi hui — lesson ke shuru hone ke waqt ke baad grace window guzarne par report kar sakte hain.",
+    "alreadyRefunded": "Is booking ki raqam pehle hi wapas kar di ja chuki hai.",
+    "notEligible": "Is booking ko ab no-show ke tor par report nahi kiya ja sakta.",
+    "failed": "Report save nahi ho saki. Barah-e-karam dobara koshish karein.",
+    "refunded": "No-show tasdeeq ho gayi — {amount} aapke wallet mein wapas kar di gayi."
   }
 }

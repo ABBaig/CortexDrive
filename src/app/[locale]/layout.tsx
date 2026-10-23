@@ -8,14 +8,18 @@ export const metadata = {
   title: 'CortexDrive',
   description:
     'AI-assisted driving education and instructor marketplace in Pakistan',
+  icons: {
+    icon: '/logo.png',
+  },
 };
 
 const locales = ['en', 'ur', 'roman_ur'];
 
-export default async function LocaleLayout({
-  children,
-  params,
-}: {
+export default async function LocaleLayout(
+  {
+    children,
+    params,
+  }: {
   children: ReactNode;
   params: { locale: string };
 }) {

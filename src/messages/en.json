@@ -153,11 +153,12 @@
     "escalatedFail": "Could not connect admin"
   },
   "AiTutor": {
-    "title": "AI Tutor",
+    "title": "Cortexa",
     "open": "Open",
     "close": "Close",
     "ask": "Ask",
-    "empty": "Ask a driving question..."
+    "empty": "Ask a driving question...",
+    "greeting": "Hi I am Cortexa, How Can I Help You Today!"
   },
   "Dashboard": {
     "greeting": "Hello, {name}",
@@ -440,5 +441,15 @@
     "distanceUnknown": "Allow location to see",
     "staleFix": "Location hasn't updated in a while — the instructor may have stopped sharing.",
     "trackInstructor": "Track instructor"
+  },
+  "NoShow": {
+    "reportNoShow": "Report no-show",
+    "confirmNoShow": "Confirm: instructor didn't come",
+    "graceCountdown": "No-show in {minutes} min",
+    "graceNotPassed": "The grace window hasn't passed yet — you can report a no-show after the lesson start time plus the grace period.",
+    "alreadyRefunded": "This booking was already refunded.",
+    "notEligible": "This booking can no longer be reported as a no-show.",
+    "failed": "Could not report the no-show. Please try again.",
+    "refunded": "No-show confirmed — {amount} refunded to your wallet."
   }
 }

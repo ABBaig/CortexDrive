@@ -14,6 +14,7 @@ export default function BookingsPage() {
   const t = useTranslations('Booking');
   const tt = useTranslations('Telematics');
   const tg = useTranslations('GpsTracking');
+  const tn = useTranslations('NoShow');
   const tc = useTranslations('Common');
   const locale = useLocale();
   const router = useRouter();
@@ -26,12 +27,17 @@ export default function BookingsPage() {
   const [confirmingId, setConfirmingId] = React.useState<string | null>(null);
   const [recordingId, setRecordingId] = React.useState<string | null>(null);
   const [trackingId, setTrackingId] = React.useState<string | null>(null);
+  const [noShowId, setNoShowId] = React.useState<string | null>(null);
+  const [graceMinutes, setGraceMinutes] = React.useState<number>(15);
+  const [now, setNow] = React.useState(Date.now());
   const mountedRef = React.useRef(true);
 
   React.useEffect(() => {
     mountedRef.current = true;
     fetchData();
-    return () => { mountedRef.current = false; };
+    // 30s tick so the grace countdown stays honest without re-renders
+    const tick = setInterval(() => setNow(Date.now()), 30000);
+    return () => { mountedRef.current = false; clearInterval(tick); };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -53,6 +59,17 @@ export default function BookingsPage() {
       }
 
       setBookings(rows || []);
+
+      // grace window from platform settings (best-effort, default 15)
+      const { data: ps } = await supabase
+        .from('platform_settings')
+        .select('value')
+        .eq('key', 'no_show_grace_minutes')
+        .maybeSingle();
+      if (ps && ps.value) {
+        const n = Number(ps.value);
+        if (Number.isFinite(n) && n >= 0) setGraceMinutes(n);
+      }
     } catch (e: any) {
       setError(String(e?.message ?? e));
       setBookings([]);
@@ -145,8 +162,32 @@ export default function BookingsPage() {
     }
   }
 
+  async function handleNoShow(booking: any) {
+    if (!booking) return;
+    setError(null);
+    setSuccess(null);
+    try {
+      const { error: rpcError } = await supabase.rpc('report_instructor_no_show', {
+        p_booking_id: booking.id,
+      });
+      if (rpcError) {
+        const code = (rpcError as any).code;
+        if (code === 'P0004') setError(tn('graceNotPassed'));
+        else if (code === 'P0005') setError(tn('alreadyRefunded'));
+        else if (code === 'P0003') setError(tn('notEligible'));
+        else setError(tn('failed'));
+        return;
+      }
+      setNoShowId(null);
+      await fetchData();
+      setSuccess(tn('refunded', { amount: formatPKR(booking.instructor_rate) }));
+    } catch (e: any) {
+      setError(String(e?.message ?? e));
+    }
+  }
+
   if (loading) return <div className="p-4">{tc('loading')}</div>;
-  if (error) return (
+  if (error && !bookings) return (
     <div className="p-6">
       <BackButton />
       <h1 className="text-2xl font-semibold">{t('title')}</h1>
@@ -172,6 +213,9 @@ export default function BookingsPage() {
       {success ? (
         <div className="mt-4 rounded-md bg-green-800 px-4 py-2 text-green-200">{success}</div>
       ) : null}
+      {error && bookings ? (
+        <div className="mt-4 rounded-md bg-red-900/60 px-4 py-2 text-red-200">{error}</div>
+      ) : null}
 
       <table className="mt-4 w-full table-auto text-sm">
         <thead>
@@ -187,6 +231,12 @@ export default function BookingsPage() {
           {bookings.map((b: any) => {
             const isOwner = userId != null && b.learner_id === userId;
             const isActive = b.status === 'booked' || b.status === 'in_progress';
+            const startTime = b.start_time ? new Date(b.start_time).getTime() : null;
+            const graceMs = graceMinutes * 60 * 1000;
+            const gracePassed = startTime !== null && now >= startTime + graceMs;
+            const minutesLeft = startTime !== null
+              ? Math.max(0, Math.ceil((startTime + graceMs - now) / 60000))
+              : null;
             return (
               <tr key={b.id} className="border-t border-neutral-800 align-top">
                 <td className="py-3 align-top">
@@ -223,6 +273,11 @@ export default function BookingsPage() {
                           <button onClick={() => handleCancel(b)} className="rounded bg-cyan-400 px-3 py-1.5 text-sm font-semibold text-slate-900">{t('confirmCancel')}</button>
                           <button onClick={() => setConfirmingId(null)} className="text-sm text-neutral-400">{t('abort')}</button>
                         </div>
+                      ) : noShowId === b.id ? (
+                        <div className="flex flex-col items-end gap-1.5">
+                          <button onClick={() => handleNoShow(b)} className="rounded bg-red-600 px-3 py-1.5 text-sm font-semibold text-white hover:bg-red-500">{tn('confirmNoShow')}</button>
+                          <button onClick={() => setNoShowId(null)} className="text-sm text-neutral-400">{t('abort')}</button>
+                        </div>
                       ) : (
                         <>
                           <button
@@ -230,6 +285,15 @@ export default function BookingsPage() {
                             className="rounded bg-sky-600 px-3 py-1.5 text-sm font-semibold text-white hover:bg-sky-500"
                           >
                             {tt('recordLesson')}
+                          </button>
+                          <button
+                            type="button"
+                            disabled={!gracePassed}
+                            title={!gracePassed && minutesLeft !== null ? tn('graceCountdown', { minutes: minutesLeft }) : undefined}
+                            onClick={() => setNoShowId(b.id)}
+                            className={`rounded border px-3 py-1.5 text-sm ${gracePassed ? 'border-red-700 text-red-300 hover:bg-red-900/40' : 'border-neutral-700 text-neutral-500 cursor-not-allowed'}`}
+                          >
+                            {gracePassed ? tn('reportNoShow') : tn('graceCountdown', { minutes: minutesLeft ?? 0 })}
                           </button>
                           <button onClick={() => setConfirmingId(b.id)} className="rounded border border-neutral-700 px-3 py-1.5 text-sm">{t('cancel')}</button>
                         </>
