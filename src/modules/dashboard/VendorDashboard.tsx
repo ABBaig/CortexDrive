@@ -3,6 +3,7 @@ import { getTranslations } from 'next-intl/server';
 import AppShell from '@/components/AppShell';
 import BackButton from '@/components/BackButton';
 import SOSButtonClientWrapper from '@/modules/safety/SOSButtonClientWrapper';
+import VendorServicesCard from '@/modules/vendor/services/VendorServicesCard';
 import { getSupabaseServerClient } from '@/lib/supabase/server';
 
 type Props = {
@@ -117,21 +118,9 @@ export default async function VendorDashboard({ locale, userId, fullName, city }
           </div>
         </div>
 
-        <div className="mt-3 grid grid-cols-2 gap-3">
-          <div className="p-4 bg-slate-700/60 rounded-xl ring-1 ring-slate-600/60 relative overflow-hidden">
-            <span className="absolute right-2 top-2 px-2 py-0.5 rounded-full text-[10px] font-semibold uppercase tracking-wide bg-violet-500/15 text-violet-400 ring-1 ring-violet-500/30">
-              Soon
-            </span>
-            <span className="inline-flex items-center justify-center w-10 h-10 rounded-lg bg-violet-500/15 text-violet-400 ring-1 ring-violet-500/30">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className="w-5 h-5">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-                <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-              </svg>
-            </span>
-            <div className="text-white font-semibold text-sm mt-3">{t('servicesCard')}</div>
-            <div className="text-slate-400 text-sm mt-0.5">{t('servicesComingSoon')}</div>
-          </div>
+        <VendorServicesCard vendorId={userId} />
 
+        <div className="mt-3 grid grid-cols-2 gap-3">
           <Link
             href={`/${locale}/ai-tutor`}
             className="group p-4 bg-slate-700/60 rounded-xl ring-1 ring-slate-600/60 hover:ring-sky-500/50 hover:bg-slate-700 transition-all duration-200"
@@ -147,6 +136,23 @@ export default async function VendorDashboard({ locale, userId, fullName, city }
               </svg>
             </div>
             <div className="text-white font-semibold text-sm mt-3">{t('aiTutorCard')}</div>
+          </Link>
+
+          <Link
+            href={`/${locale}/services`}
+            className="group p-4 bg-slate-700/60 rounded-xl ring-1 ring-slate-600/60 hover:ring-sky-500/50 hover:bg-slate-700 transition-all duration-200"
+          >
+            <div className="flex items-center justify-between">
+              <span className="inline-flex items-center justify-center w-10 h-10 rounded-lg bg-violet-500/15 text-violet-400 ring-1 ring-violet-500/30">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className="w-5 h-5">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
+              </span>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-4 h-4 text-slate-500 group-hover:text-sky-400 group-hover:translate-x-0.5 transition-all">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+              </svg>
+            </div>
+            <div className="text-white font-semibold text-sm mt-3">{t('browseServicesCard')}</div>
           </Link>
         </div>
 
