@@ -194,13 +194,17 @@
     "instructorTitle": "Instructor Dashboard",
     "earnings": "Earnings",
     "myLessons": "My Lessons",
-    "lessonsUpcomingInstructor": "Upcoming lessons",
-    "lessonsCompletedInstructor": "Completed lessons",
     "verificationCard": "Verification",
     "walletCard": "Wallet",
     "profileCard": "Profile & Availability",
     "comingSoon": "Coming soon",
     "marketplaceCard": "How you appear to learners",
-    "safetyCard": "Safety"
+    "safetyCard": "Safety",
+    "adminTitle": "Admin Dashboard",
+    "adminPendingVerifications": "Pending verifications",
+    "adminBookings": "Total bookings",
+    "adminSosEvents": "SOS events",
+    "adminWalletActivity": "Wallet activity",
+    "openAdminPanel": "Open Admin Panel"
   }
 }

@@ -4,6 +4,7 @@ import { getSupabaseServerClient } from '@/lib/supabase/server';
 import AppShell from '@/components/AppShell';
 import LearnerDashboard from '@/modules/dashboard/LearnerDashboard';
 import InstructorDashboard from '@/modules/dashboard/InstructorDashboard';
+import AdminDashboard from '@/modules/dashboard/AdminDashboard';
 
 export default async function DashboardPage({ params }: { params: { locale: string } }) {
   const { locale } = params;
@@ -46,7 +47,17 @@ export default async function DashboardPage({ params }: { params: { locale: stri
     );
   }
 
-  // admin / vendor / unknown — dashboards land in a later pass
+  if (role === 'admin') {
+    return (
+      <AdminDashboard
+        locale={locale}
+        userId={user.id}
+        fullName={fullName}
+      />
+    );
+  }
+
+  // vendor / unknown — dashboard lands in a later pass
   return (
     <AppShell>
       <div className="max-w-2xl mx-auto bg-slate-800 p-6 rounded">

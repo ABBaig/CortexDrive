@@ -110,37 +110,114 @@ async function act(id: string, action: 'approve' | 'reject') {
     await fetchVerifications();
   }
 
+// --- presentation helpers (pure styling, no logic) ---
+  const tabs: { key: typeof tab; label: string; badge?: number }[] = [
+    { key: 'verifications', label: t('tabs.verifications'), badge: verifs.filter((v) => v.status === 'pending' || v.status === 'needs_review').length },
+    { key: 'bookings', label: t('tabs.bookings') },
+    { key: 'wallet', label: t('tabs.wallet') },
+    { key: 'sos', label: t('tabs.sos') },
+    { key: 'escalated', label: t('tabs.escalatedChats') },
+  ];
+
+  function statusChip(status: string): string {
+    switch (status) {
+      case 'verified':
+      case 'booked':
+      case 'completed':
+        return 'bg-emerald-500/15 text-emerald-400 ring-1 ring-emerald-500/30';
+      case 'needs_review':
+        return 'bg-amber-500/15 text-amber-400 ring-1 ring-amber-500/30';
+      case 'pending':
+        return 'bg-sky-500/15 text-sky-400 ring-1 ring-sky-500/30';
+      case 'rejected':
+      case 'refunded':
+        return 'bg-red-500/15 text-red-400 ring-1 ring-red-500/30';
+      default:
+        return 'bg-slate-500/15 text-slate-400 ring-1 ring-slate-500/30';
+    }
+  }
+
+  function emptyCard(message: string) {
+    return (
+      <div className="mt-4 flex flex-col items-center justify-center py-12 text-center bg-slate-800/40 rounded-xl ring-1 ring-slate-700/60">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-8 h-8 text-slate-600">
+          <path strokeLinecap="round" strokeLinejoin="round" d="M20 13V7a2 2 0 00-2-2H6a2 2 0 00-2 2v10a2 2 0 002 2h8m-4-8h.01M9 12h.01m3 .01h.01M15 15v6m3-3h-6" />
+        </svg>
+        <div className="mt-3 text-sm text-slate-500">{message}</div>
+      </div>
+    );
+  }
+
 return (
     <div className="mt-6">
-      <div className="flex gap-2">
-        <button className={`px-3 py-1 ${tab === 'verifications' ? 'bg-slate-700 text-white' : ''}`} onClick={() => setTab('verifications')}>{t('tabs.verifications')}</button>
-        <button className={`px-3 py-1 ${tab === 'bookings' ? 'bg-slate-700 text-white' : ''}`} onClick={() => setTab('bookings')}>{t('tabs.bookings')}</button>
-        <button className={`px-3 py-1 ${tab === 'wallet' ? 'bg-slate-700 text-white' : ''}`} onClick={() => setTab('wallet')}>{t('tabs.wallet')}</button>
-        <button className={`px-3 py-1 ${tab === 'sos' ? 'bg-slate-700 text-white' : ''}`} onClick={() => setTab('sos')}>{t('tabs.sos')}</button>
-        <button className={`px-3 py-1 ${tab === 'escalated' ? 'bg-slate-700 text-white' : ''}`} onClick={() => setTab('escalated')}>{t('tabs.escalatedChats')}</button>
+      {/* Tab bar */}
+      <div className="flex flex-wrap gap-2 p-1.5 bg-slate-800/70 rounded-2xl ring-1 ring-slate-700/60">
+        {tabs.map((tb) => (
+          <button
+            key={tb.key}
+            onClick={() => setTab(tb.key)}
+            className={`relative px-4 py-2 rounded-xl text-sm font-medium transition-all duration-200 ${
+              tab === tb.key
+                ? 'bg-sky-600 text-white shadow-lg shadow-sky-600/25'
+                : 'text-slate-400 hover:text-white hover:bg-slate-700/70'
+            }`}
+          >
+            {tb.label}
+            {typeof tb.badge === 'number' && tb.badge > 0 && (
+              <span className="ml-2 inline-flex items-center justify-center min-w-[20px] h-5 px-1.5 rounded-full text-[11px] font-semibold bg-amber-500/20 text-amber-400 ring-1 ring-amber-500/40">
+                {tb.badge}
+              </span>
+            )}
+          </button>
+        ))}
       </div>
 
-{loading && <div className="mt-4 text-sm text-neutral-500">{t('loading')}</div>}
-      {error && <div className="mt-4 text-sm text-red-600">{t('error')}: {error}</div>}
+{loading && (
+        <div className="mt-4 flex items-center gap-2 text-sm text-slate-400">
+          <span className="w-4 h-4 rounded-full border-2 border-sky-500 border-t-transparent animate-spin" />
+          {t('loading')}
+        </div>
+      )}
+      {error && (
+        <div className="mt-4 flex items-start gap-2 p-3 rounded-xl bg-red-500/10 ring-1 ring-red-500/30 text-sm text-red-400">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className="w-5 h-5 shrink-0">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v4m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" />
+          </svg>
+          <span>{t('error')}: {error}</span>
+        </div>
+      )}
 
 {tab === 'verifications' && (
-        <div className="mt-4">
+        <div className="mt-4 space-y-2">
           {verifs.length === 0 ? (
-            <div className="text-neutral-400">{t('emptyVerifications')}</div>
+            emptyCard(t('emptyVerifications'))
           ) : (
             verifs.map((v) => (
-              <div key={v.id} className="border p-3 rounded mb-2 flex justify-between items-center">
-                <div>
-                  <div className="text-sm text-neutral-400">{v.type} — {v.status}</div>
-                  <div className="font-medium">{v.doc_url}</div>
-                  {v.face_match_score !== null && v.face_match_score !== undefined && (
-                    <div className="text-sm text-neutral-400">{t('colAiScore')}: {Number(v.face_match_score).toFixed(2)}</div>
-                  )}
-                  <div className="text-sm text-neutral-400">{new Date(v.created_at).toLocaleString()}</div>
+              <div key={v.id} className="group flex justify-between items-center gap-4 p-4 rounded-xl bg-slate-800 ring-1 ring-slate-700/60 hover:ring-slate-600 transition-colors">
+                <div className="min-w-0">
+                  <div className="flex items-center gap-2">
+                    <span className={`px-2 py-0.5 rounded-full text-[11px] font-semibold uppercase tracking-wide ${statusChip(v.status)}`}>
+                      {v.status}
+                    </span>
+                    <span className="text-sm text-slate-400">{v.type}</span>
+                    {v.face_match_score !== null && v.face_match_score !== undefined && (
+                      <span className="text-xs text-slate-500">{t('colAiScore')}: <span className="text-sky-400 font-medium tabular-nums">{Number(v.face_match_score).toFixed(2)}</span></span>
+                    )}
+                  </div>
+                  <div className="mt-1 font-medium text-white truncate">{v.doc_url}</div>
+                  <div className="text-xs text-slate-500 mt-0.5">{new Date(v.created_at).toLocaleString()}</div>
                 </div>
-                <div className="flex gap-2">
-                  {(v.status === 'pending' || v.status === 'needs_review') && <button onClick={() => act(v.id, 'approve')} className="px-2 py-1 bg-emerald-600 rounded text-white">{t('approve')}</button>}
-                  {(v.status === 'pending' || v.status === 'needs_review') && <button onClick={() => act(v.id, 'reject')} className="px-2 py-1 bg-red-600 rounded text-white">{t('reject')}</button>}
+                <div className="flex gap-2 shrink-0">
+                  {(v.status === 'pending' || v.status === 'needs_review') && (
+                    <button onClick={() => act(v.id, 'approve')} className="px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-sm font-medium shadow shadow-emerald-600/25 transition-colors">
+                      {t('approve')}
+                    </button>
+                  )}
+                  {(v.status === 'pending' || v.status === 'needs_review') && (
+                    <button onClick={() => act(v.id, 'reject')} className="px-3 py-1.5 rounded-lg bg-red-600/90 hover:bg-red-500 text-white text-sm font-medium transition-colors">
+                      {t('reject')}
+                    </button>
+                  )}
                 </div>
               </div>
             ))
@@ -149,16 +226,24 @@ return (
       )}
 
 {tab === 'bookings' && (
-        <div className="mt-4">
+        <div className="mt-4 space-y-2">
           {bookings.length === 0 ? (
-            <div className="text-neutral-400">{t('emptyBookings')}</div>
+            emptyCard(t('emptyBookings'))
           ) : (
             bookings.map((b) => (
-              <div key={b.id} className="border p-3 rounded mb-2">
-                <div className="text-sm text-neutral-400">{b.status} — {new Date(b.created_at).toLocaleString()}</div>
-                <div className="font-medium">Booking {b.id}</div>
-                <div className="text-sm">Learner: {b.learner_id} — Instructor: {b.instructor_id}</div>
-                <div className="text-sm">Slot: {b.slot_start}</div>
+              <div key={b.id} className="p-4 rounded-xl bg-slate-800 ring-1 ring-slate-700/60 hover:ring-slate-600 transition-colors">
+                <div className="flex items-center justify-between gap-2">
+                  <div className="font-medium text-white">Booking <span className="text-slate-500">{b.id}</span></div>
+                  <span className={`px-2 py-0.5 rounded-full text-[11px] font-semibold uppercase tracking-wide ${statusChip(b.status)}`}>
+                    {b.status}
+                  </span>
+                </div>
+                <div className="mt-2 grid grid-cols-2 gap-2 text-xs text-slate-400">
+                  <div><span className="text-slate-500">Learner:</span> <span className="break-all">{b.learner_id}</span></div>
+                  <div><span className="text-slate-500">Instructor:</span> <span className="break-all">{b.instructor_id}</span></div>
+                  <div className="col-span-2"><span className="text-slate-500">Slot:</span> {b.slot_start}</div>
+                  <div className="col-span-2"><span className="text-slate-500">{new Date(b.created_at).toLocaleString()}</span></div>
+                </div>
               </div>
             ))
           )}
@@ -166,15 +251,22 @@ return (
       )}
 
 {tab === 'wallet' && (
-        <div className="mt-4">
+        <div className="mt-4 space-y-2">
           {transactions.length === 0 ? (
-            <div className="text-neutral-400">{t('emptyTransactions')}</div>
+            emptyCard(t('emptyTransactions'))
           ) : (
             transactions.map((trow) => (
-              <div key={trow.id} className="border p-3 rounded mb-2">
-                <div className="text-sm text-neutral-400">{trow.kind} — {new Date(trow.created_at).toLocaleString()}</div>
-                <div className="font-medium">{trow.amount} PKR</div>
-                <div className="text-sm">Wallet: {trow.wallet?.id ?? '—'} Owner: {trow.wallet?.user_id ?? '—'}</div>
+              <div key={trow.id} className="flex items-center justify-between gap-4 p-4 rounded-xl bg-slate-800 ring-1 ring-slate-700/60 hover:ring-slate-600 transition-colors">
+                <div className="min-w-0">
+                  <div className="flex items-center gap-2">
+                    <span className={`px-2 py-0.5 rounded-full text-[11px] font-semibold uppercase tracking-wide ${statusChip(trow.kind)}`}>
+                      {trow.kind}
+                    </span>
+                    <span className="text-xs text-slate-500">{new Date(trow.created_at).toLocaleString()}</span>
+                  </div>
+                  <div className="mt-1 text-sm text-slate-400 truncate">Wallet: <span className="text-slate-300">{trow.wallet?.id ?? '—'}</span> · Owner: <span className="text-slate-300 break-all">{trow.wallet?.user_id ?? '—'}</span></div>
+                </div>
+                <div className="font-semibold text-white tabular-nums shrink-0">{trow.amount} PKR</div>
               </div>
             ))
           )}
@@ -182,29 +274,48 @@ return (
       )}
 
 {tab === 'sos' && (
-        <div className="mt-4">
+        <div className="mt-4 space-y-2">
           {sosLogs.length === 0 ? (
-            <div className="text-neutral-400">{t('emptySos')}</div>
+            emptyCard(t('emptySos'))
           ) : (
             sosLogs.map((s) => (
-              <div key={s.id} className="border p-2 rounded mb-2">{s.user_id} — {s.note} — {new Date(s.created_at).toLocaleString()}</div>
+              <div key={s.id} className="flex items-center gap-3 p-3 rounded-xl bg-red-500/5 ring-1 ring-red-500/20 hover:ring-red-500/40 transition-colors">
+                <span className="inline-flex items-center justify-center w-9 h-9 rounded-lg bg-red-500/15 text-red-400 shrink-0">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className="w-5 h-5">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v4m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" />
+                  </svg>
+                </span>
+                <div className="min-w-0">
+                  <div className="text-sm text-white truncate">{s.note || 'SOS'}</div>
+                  <div className="text-xs text-slate-500 break-all">{s.user_id} · {new Date(s.created_at).toLocaleString()}</div>
+                </div>
+              </div>
             ))
           )}
         </div>
       )}
 
 {tab === 'escalated' && (
-        <div className="mt-4">
+        <div className="mt-4 space-y-2">
           {escalated.length === 0 ? (
-            <div className="text-neutral-400">{t('emptyEscalated')}</div>
+            emptyCard(t('emptyEscalated'))
           ) : (
             escalated.map((c) => (
-              <div key={c.id} className="border p-3 rounded mb-2">
-                <div className="text-sm text-neutral-400">
-                  {c.last_message_at ? new Date(c.last_message_at).toLocaleString() : '—'}
+              <div key={c.id} className="p-4 rounded-xl bg-slate-800 ring-1 ring-slate-700/60 hover:ring-slate-600 transition-colors">
+                <div className="flex items-center justify-between gap-2">
+                  <div className="font-medium text-white truncate">
+                    {(c.participantNames || []).join(' · ') || c.id}
+                  </div>
+                  <span className="text-xs text-slate-500 shrink-0">
+                    {c.last_message_at ? new Date(c.last_message_at).toLocaleString() : '—'}
+                  </span>
                 </div>
-                <div className="font-medium">{(c.participantNames || []).join(' · ') || c.id}</div>
-                <a className="text-sky-500" href={`/${locale}/chat/${c.id}`}>{t('openChat')}</a>
+                <a className="mt-2 inline-flex items-center gap-1 text-sm text-sky-400 hover:text-sky-300 transition-colors" href={`/${locale}/chat/${c.id}`}>
+                  {t('openChat')}
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-3.5 h-3.5">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+                  </svg>
+                </a>
               </div>
             ))
           )}
