@@ -164,7 +164,7 @@ drop policy if exists "vendor manages availability" on public.vendor_availabilit
 create policy "vendor manages availability" on public.vendor_availability
   for insert with check (vendor_id = auth.uid());
 
-drop policy if exists "vendor updates availability" on public.vendor_vendor_availability;
+drop policy if exists "vendor updates availability" on public.vendor_availability;
 create policy "vendor updates availability" on public.vendor_availability
   for update using (vendor_id = auth.uid());
 
