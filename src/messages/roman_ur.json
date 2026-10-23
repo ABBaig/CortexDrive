@@ -282,5 +282,15 @@
     "bookingCreated": "Booking request bhej di gayi! Vendor isay confirm karega.",
     "loginToBook": "Service book karne ke liye barah-e-karam sign in karein.",
     "myBookingsTitle": "Meri service bookings"
+  },
+  "VendorRating": {
+    "rateBooking": "Is booking ki rating dein",
+    "chooseRating": "Aap ki rating",
+    "commentLabel": "Comment (optional)",
+    "submitRating": "Rating submit karein",
+    "ratingFailed": "Rating submit nahi ho saki. Barah-e-karam dobara koshish karein.",
+    "rated": "Rating di gayi",
+    "loginToRate": "Rating dene ke liye barah-e-karam sign in karein.",
+    "reviewsCount": "reviews"
   }
 }
