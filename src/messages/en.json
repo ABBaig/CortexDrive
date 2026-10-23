@@ -190,6 +190,17 @@
     "aiTutorCard": "AI Tutor",
     "chatCardBody": "Message your instructor from their card in the marketplace.",
     "chatCardAction": "Message your instructor",
-    "otherRolePending": "This role's dashboard is being set up"
+    "otherRolePending": "This role's dashboard is being set up",
+    "instructorTitle": "Instructor Dashboard",
+    "earnings": "Earnings",
+    "myLessons": "My Lessons",
+    "lessonsUpcomingInstructor": "Upcoming lessons",
+    "lessonsCompletedInstructor": "Completed lessons",
+    "verificationCard": "Verification",
+    "walletCard": "Wallet",
+    "profileCard": "Profile & Availability",
+    "comingSoon": "Coming soon",
+    "marketplaceCard": "How you appear to learners",
+    "safetyCard": "Safety"
   }
 }
