@@ -52,6 +52,7 @@
   "Earnings": {
     "title": "Aamdani",
     "pending": "Pending (escrow mein)",
+    "filtered": "Filtered",
     "released": "Released",
     "gross": "Gross",
     "net": "Net",
@@ -419,5 +420,26 @@
     "tooShort": "Lesson score ke liye bohat mukhtasar hai — kam az kam ek minute record karein.",
     "saveFailed": "Lesson ke nataij save nahin ho sake. Barah-e-karam dobara koshish karein.",
     "deviceOnlyNote": "Raftaar sirf isi device ke GPS se napi jati hai — koi extra hardware nahi."
+  },
+  "GpsTracking": {
+    "shareTitle": "Apni live location share karein",
+    "shareHint": "Active lesson ke dauran learner ko map par aap ko aate dekhne dein.",
+    "pickLessonFirst": "Pehle lesson intikhab karein.",
+    "noLessons": "Koi active lesson nahi jis ke liye location share ho sake.",
+    "startShare": "Share shuru karein",
+    "sharingActive": "Live location share ho rahi hai",
+    "stopShare": "Share rokein",
+    "lastUpdate": "Aakhri update",
+    "shareFailed": "Aap ki location update nahi ho saki. Barah-e-karam dobara koshish karein.",
+    "notSupported": "Aap ka browser GPS location tracking support nahi karta.",
+    "permissionDenied": "Location ki ijazat nahi di gayi. Share karne ke liye browser mein ijazat dein.",
+    "liveTitle": "Instructor ki live location",
+    "instructorMoving": "Safar mein",
+    "notSharingYet": "Instructor ne is lesson ke liye abhi location share shuru nahin ki.",
+    "loadFailed": "Live location load nahi ho saki.",
+    "distanceToYou": "Aap se faasla",
+    "distanceUnknown": "Dekhne ke liye location ki ijazat dein",
+    "staleFix": "Location kuch der se update nahi hui — instructor ne share rok diya hoga.",
+    "trackInstructor": "Instructor ko track karein"
   }
 }
