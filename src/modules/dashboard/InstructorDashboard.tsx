@@ -4,6 +4,7 @@ import AppShell from '@/components/AppShell';
 import BackButton from '@/components/BackButton';
 import SOSButtonClientWrapper from '@/modules/safety/SOSButtonClientWrapper';
 import InstructorEarnings from '@/modules/earning/InstructorEarnings';
+import GpsShareCard from '@/modules/booking/GpsShareCard';
 import { getSupabaseServerClient } from '@/lib/supabase/server';
 
 type Props = {
@@ -125,6 +126,8 @@ export default async function InstructorDashboard({ locale, userId, fullName, ci
             </div>
           </div>
         </div>
+
+        <GpsShareCard instructorId={userId} />
 
         <div className="mt-4">
           <h2 className="text-lg font-semibold text-white">{t('earnings')}</h2>
