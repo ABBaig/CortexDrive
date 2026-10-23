@@ -68,7 +68,8 @@
       "bookings": "Bookings",
       "wallet": "Wallet Transactions",
       "sos": "SOS Log",
-      "escalatedChats": "Escalated Chats"
+      "escalatedChats": "Escalated Chats",
+      "vendorIssues": "Vendor Issues"
     },
     "loading": "Loading...",
     "error": "Koi masla hua hai",
@@ -77,6 +78,8 @@
     "emptyTransactions": "Koi transactions nahi hain",
     "emptySos": "Koi SOS logs nahi hain",
     "emptyEscalated": "Koi escalated chats nahi",
+    "emptyVendorIssues": "Koi khula vendor masla nahi",
+    "openVendorIssues": "Vendor masail kholein",
     "openChat": "Open",
     "approve": "Manzoor Karein",
     "reject": "Rad Karein",
@@ -283,6 +286,12 @@
     "loginToBook": "Service book karne ke liye barah-e-karam sign in karein.",
     "myBookingsTitle": "Meri service bookings"
   },
+  "VendorPayment": {
+    "escrowed": "Payment escrow mein secure hai",
+    "settled": "Payment vendor ko release ho gayi",
+    "refunded": "Aapke wallet mein wapas ho gayi",
+    "learnerCannotPay": "Confirm nahi ho saka — learner ke wallet mein raqam kafi nahi hai."
+  },
   "VendorRating": {
     "rateBooking": "Is booking ki rating dein",
     "chooseRating": "Aap ki rating",
@@ -326,5 +335,60 @@
     "resolutionLabel": "Hal",
     "resolutionPlaceholder": "Hal likhein...",
     "resolutionRequired": "Hal karne se pehle hal likhna zaruri hai."
+  },
+  "Vehicle": {
+    "title": "Gaari",
+    "signInRequired": "Apni gaari ke logs sambhalne ke liye barah-e-karam sign in karein.",
+    "loadFailed": "Kuch masla hua hai. Barah-e-karam dobara koshish karein.",
+    "totalKm": "Kuli KM",
+    "totalLiters": "Kuli Liters",
+    "avgKmPerLiter": "Average km/L",
+    "pkrPerKm": "Rs/km",
+    "fuelEfficiency": "Fuel efficiency",
+    "needTwoFuelLogs": "Efficiency chart dekhne ke liye kam az kam do fuel entries (odometer ke saath) add karein.",
+    "addLog": "Entry add karein",
+    "logType": "Qism",
+    "typeFuel": "Fuel",
+    "typeSparePart": "Spare part",
+    "typeService": "Service",
+    "odometerKm": "Odometer (km)",
+    "liters": "Liters",
+    "amountPkr": "Raqam (PKR)",
+    "note": "Note (optional)",
+    "saveLog": "Save karein",
+    "amountInvalid": "Sahi raqam darj karein.",
+    "litersInvalid": "Fuel entry ke liye sahi liters darj karein.",
+    "odometerInvalid": "Sahi odometer reading darj karein.",
+    "partsBreakdown": "Parts aur service kharche",
+    "partsTotal": "Kul",
+    "noPartsYet": "Abhi tak koi spare part ya service log nahi.",
+    "allLogs": "Tamam logs",
+    "noLogsYet": "Abhi koi log nahi — oopar apni pehli entry add karein.",
+    "amountDisplay": "Rs {amount}",
+    "odometerDisplay": "{km} km",
+    "litersShort": "L"
+  },
+  "Quiz": {
+    "title": "Driving Quiz",
+    "pickTopic": "Mashq ke liye topic intikhab karein",
+    "topics": {
+      "road_signs": "Road signs",
+      "traffic_rules": "Traffic rules",
+      "safe_driving": "Safe driving",
+      "parking": "Parking",
+      "highway": "Highway driving",
+      "license_test": "License test"
+    },
+    "startQuiz": "Quiz shuru karein",
+    "generating": "Sawalat banaye ja rahe hain...",
+    "mockNotice": "(Mock quiz — real AI sawalat ke liye GOOGLE_API_KEY set karein)",
+    "questionN": "Sawal {current} az {total}",
+    "next": "Agla",
+    "yourScore": "Aap ka score",
+    "resultLabel": "{score}% — mashq jari rakhein!",
+    "correct": "Sahi",
+    "yourAnswer": "Aap ka jawab",
+    "correctAnswer": "Sahi jawab",
+    "anotherTopic": "Koi aur topic try karein"
   }
 }
