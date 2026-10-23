@@ -68,7 +68,8 @@
       "bookings": "Bookings",
       "wallet": "Wallet Transactions",
       "sos": "SOS Log",
-      "escalatedChats": "Escalated Chats"
+      "escalatedChats": "Escalated Chats",
+      "vendorIssues": "Vendor Issues"
     },
     "loading": "Loading...",
     "error": "An error occurred",
@@ -77,6 +78,8 @@
     "emptyTransactions": "No transactions",
     "emptySos": "No SOS logs",
     "emptyEscalated": "No escalated chats",
+    "emptyVendorIssues": "No open vendor issues",
+    "openVendorIssues": "Open vendor issues",
     "openChat": "Open",
     "approve": "Approve",
     "reject": "Reject",
@@ -283,6 +286,12 @@
     "loginToBook": "Please sign in to book a service.",
     "myBookingsTitle": "My service bookings"
   },
+  "VendorPayment": {
+    "escrowed": "Payment held in escrow",
+    "settled": "Payment released to vendor",
+    "refunded": "Refunded to your wallet",
+    "learnerCannotPay": "Could not confirm — the learner's wallet has insufficient funds."
+  },
   "VendorRating": {
     "rateBooking": "Rate this booking",
     "chooseRating": "Your rating",
@@ -326,5 +335,60 @@
     "resolutionLabel": "Resolution",
     "resolutionPlaceholder": "Write the resolution...",
     "resolutionRequired": "Please write the resolution before resolving."
+  },
+  "Vehicle": {
+    "title": "Vehicle",
+    "signInRequired": "Please sign in to manage your vehicle logs.",
+    "loadFailed": "Something went wrong. Please try again.",
+    "totalKm": "Total KM",
+    "totalLiters": "Total Liters",
+    "avgKmPerLiter": "Avg km/L",
+    "pkrPerKm": "PKR/km",
+    "fuelEfficiency": "Fuel efficiency",
+    "needTwoFuelLogs": "Add two or more fuel entries with odometer readings to see your efficiency chart.",
+    "addLog": "Add a log",
+    "logType": "Type",
+    "typeFuel": "Fuel",
+    "typeSparePart": "Spare part",
+    "typeService": "Service",
+    "odometerKm": "Odometer (km)",
+    "liters": "Liters",
+    "amountPkr": "Amount (PKR)",
+    "note": "Note (optional)",
+    "saveLog": "Save log",
+    "amountInvalid": "Enter a valid amount.",
+    "litersInvalid": "Fuel entries need a valid liters value.",
+    "odometerInvalid": "Enter a valid odometer reading.",
+    "partsBreakdown": "Parts & service costs",
+    "partsTotal": "Total",
+    "noPartsYet": "No spare part or service logs yet.",
+    "allLogs": "All logs",
+    "noLogsYet": "No logs yet — add your first one above.",
+    "amountDisplay": "Rs {amount}",
+    "odometerDisplay": "{km} km",
+    "litersShort": "L"
+  },
+  "Quiz": {
+    "title": "Driving Quiz",
+    "pickTopic": "Pick a topic to practice",
+    "topics": {
+      "road_signs": "Road signs",
+      "traffic_rules": "Traffic rules",
+      "safe_driving": "Safe driving",
+      "parking": "Parking",
+      "highway": "Highway driving",
+      "license_test": "License test"
+    },
+    "startQuiz": "Start quiz",
+    "generating": "Generating questions...",
+    "mockNotice": "(Mock quiz — set GOOGLE_API_KEY for real AI questions)",
+    "questionN": "Question {current} of {total}",
+    "next": "Next",
+    "yourScore": "Your score",
+    "resultLabel": "{score}% — keep practicing!",
+    "correct": "Correct",
+    "yourAnswer": "Your answer",
+    "correctAnswer": "Correct answer",
+    "anotherTopic": "Try another topic"
   }
 }
