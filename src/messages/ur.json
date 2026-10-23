@@ -138,7 +138,7 @@
       "unavailable": "اے آئی عارضی طور پر دستیاب نہیں — آپ کی جمع کرائی دستاویز دستی جائزے کے لیے منتظر ہے۔"
     }
   },
-    "Chat": {
+  "Chat": {
     "message": "پیغام بھیجیں",
     "connectAdmin": "ایڈمن سے رابطہ کریں",
     "mockAiNotice": "(نمونہ AI جواب — اصلی جوابات کے لیے GOOGLE_API_KEY سیٹ کریں)",
@@ -184,6 +184,7 @@
     "lessonsCompleted": "مکمل شدہ کلاسیں",
     "myBookings": "میری بکنگز",
     "findInstructor": "انسٹرکٹر تلاش کریں",
+    "browseServicesCard": "خدمات دیکھیں",
     "vehicleCard": "گاڑی",
     "sosCard": "ایس او ایس",
     "securityCard": "سیکیورٹی",
@@ -209,5 +210,41 @@
     "adminSosEvents": "ایس او ایس واقعات",
     "adminWalletActivity": "والیٹ سرگرمی",
     "openAdminPanel": "ایڈمن پینل کھولیں"
+  },
+  "VendorServices": {
+    "loading": "لوڈ ہو رہا ہے...",
+    "errorLoad": "خدمات لوڈ نہیں ہو سکیں۔",
+    "myServices": "میری خدمات",
+    "servicesUsed": "3 میں سے {count} خدمات استعمال ہوئیں",
+    "addFirstService": "اپنی پہلی خدمت شامل کریں",
+    "noServices": "آپ کی ابھی کوئی خدمات نہیں ہیں۔",
+    "noServicesBrowse": "ابھی تک کوئی خدمات درج نہیں ہیں۔",
+    "inactive": "غیر فعال",
+    "archive": "آرکائیو",
+    "activate": "فعال کریں",
+    "newService": "نئی خدمت",
+    "editService": "خدمت میں ترمیم کریں",
+    "title": "عنوان",
+    "description": "تفصیل",
+    "category": "قسم",
+    "mode": "موڈ",
+    "inPerson": "حضوری",
+    "mobile": "موبائل",
+    "both": "دونوں",
+    "price": "قیمت",
+    "durationMinutes": "دورانیہ (منٹ)",
+    "isActive": "فعال",
+    "currency": "{amount} روپے",
+    "minutes": "منٹ",
+    "save": "محفوظ کریں",
+    "cancel": "منسوخ کریں",
+    "browseServices": "خدمات دیکھیں",
+    "searchPlaceholder": "خدمات تلاش کریں...",
+    "allCategories": "تمام اقسام",
+    "bookingSoon": "بکنگ جلد آ رہی ہے",
+    "errorTitle": "عنوان لازمی ہے۔",
+    "errorPrice": "درست قیمت درج کریں (0 یا زیادہ)۔",
+    "errorDuration": "دورانیہ 15 سے 480 منٹ کے درمیان ہونا چاہیے۔",
+    "errorSave": "محفوظ نہیں ہو سکا — آپ صرف اپنی خدمات ہی سنبھال سکتے ہیں۔"
   }
 }
